@@ -173,8 +173,13 @@ const PortfolioHumor = (function() {
     isMuted = !isMuted;
     const btn = document.getElementById('muteToggleBtn');
     if (btn) {
-      btn.innerHTML = isMuted ? '🔇 <span class="hud-label">Muted</span>' : '🔊 <span class="hud-label">Sound</span>';
-      btn.title = isMuted ? 'Sound is Muted' : 'Sound is Enabled';
+      if (isMuted) {
+        btn.innerHTML = `<svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg><span class="hud-label">Muted</span>`;
+        btn.title = 'Sound is Muted (Click to Unmute)';
+      } else {
+        btn.innerHTML = `<svg class="uicon sound-icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg><span class="hud-label">Sound</span>`;
+        btn.title = 'Sound is Enabled (Click to Mute)';
+      }
     }
     return isMuted;
   }
@@ -240,11 +245,13 @@ const PortfolioHumor = (function() {
       dialog.innerHTML = `
         <div class="retro-error-window">
           <div class="retro-window-header">
-            <span>⚠️ System Warning: Motivation.exe</span>
+            <span style="display:flex; align-items:center; gap:6px;"><svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> System Warning: Motivation.exe</span>
             <button class="retro-close-x" onclick="PortfolioHumor.closeLaptopError()">✕</button>
           </div>
           <div class="retro-window-body">
-            <div class="retro-error-icon">💥</div>
+            <div class="retro-error-icon" style="display:flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:36px;height:36px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
             <div class="retro-error-details">
               <h4>Motivation.exe has stopped working.</h4>
               <p>A fatal exception 0xDEADBEEF occurred at memory address 4:00_AM_DEADLINE.</p>
@@ -270,7 +277,7 @@ const PortfolioHumor = (function() {
   function restartMotivation() {
     closeLaptopError();
     playSound('spill');
-    showToast('☕ Motivation rebooted! Coffee levels +100%');
+    showToast('Motivation rebooted! Coffee levels at 100%.');
   }
 
   function showTermsJokeModal() {
@@ -282,7 +289,7 @@ const PortfolioHumor = (function() {
       dialog.innerHTML = `
         <div class="retro-error-window terms-window">
           <div class="retro-window-header">
-            <span>📜 Terms &amp; Conditions (Nobody Reads This)</span>
+            <span style="display:flex; align-items:center; gap:6px;"><svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> Terms &amp; Conditions (Nobody Reads This)</span>
             <button class="retro-close-x" onclick="document.getElementById('termsModal').classList.remove('active')">✕</button>
           </div>
           <div class="retro-window-body terms-body">

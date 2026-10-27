@@ -664,24 +664,39 @@ class DeskScene {
         originalRot: { x: 0, y: layout.rotY, z: layout.rotZ }
       };
 
+      // Full-coverage hit-box mesh ensuring EVERY part of the clearbook is effortlessly clickable
+      const hitBoxGeo = new THREE.BoxGeometry(1.45, 0.45, 1.95);
+      const hitBoxMat = new THREE.MeshBasicMaterial({ visible: false, transparent: true, opacity: 0 });
+      const folderHitBox = new THREE.Mesh(hitBoxGeo, hitBoxMat);
+      folderHitBox.position.set(0, 0.1, 0);
+      folderHitBox.userData = {
+        type: 'folder',
+        member: member,
+        folderMesh: folderMesh
+      };
+      folderMesh.add(folderHitBox);
+
       this.scene.add(folderMesh);
       this.folders.push({
         mesh: folderMesh,
+        hitBox: folderHitBox,
         member: member,
         originalPos: { x: layout.x, y: posY, z: layout.z },
         originalRot: { x: 0, y: layout.rotY, z: layout.rotZ }
       });
       this.interactiveObjects.push(folderMesh);
+      this.interactiveObjects.push(folderHitBox);
     });
   }
 
   buildProps() {
-    // 1. LAPTOP
+    // 1. LAPTOP (Whole laptop is 100% clickable)
     const laptopGroup = new THREE.Group();
     const baseGeo = new THREE.BoxGeometry(2.2, 0.06, 1.6);
     const metalMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.25 });
     const laptopBase = new THREE.Mesh(baseGeo, metalMat);
     laptopBase.castShadow = true;
+    laptopBase.userData = { type: 'laptop' };
     laptopGroup.add(laptopBase);
 
     const lidGeo = new THREE.BoxGeometry(2.2, 1.45, 0.05);
@@ -689,6 +704,7 @@ class DeskScene {
     laptopLid.position.set(0, 0.72, -0.78);
     laptopLid.rotation.x = 0.18;
     laptopLid.castShadow = true;
+    laptopLid.userData = { type: 'laptop' };
     laptopGroup.add(laptopLid);
 
     const screenCanvas = document.createElement('canvas');
@@ -711,9 +727,9 @@ class DeskScene {
     sCtx.fillRect(25, 150, 460, 130);
     sCtx.fillStyle = '#FFFFFF';
     sCtx.font = 'bold 22px sans-serif';
-    sCtx.fillText('⚠️ Motivation.exe has stopped working', 45, 195);
+    sCtx.fillText('System Error: Motivation.exe crashed', 45, 195);
     sCtx.font = '16px sans-serif';
-    sCtx.fillText('Click to restart motivation...', 45, 235);
+    sCtx.fillText('Click anywhere to restart motivation...', 45, 235);
 
     const screenTex = new THREE.CanvasTexture(screenCanvas);
     const screenGeo = new THREE.PlaneGeometry(2.05, 1.3);
@@ -721,22 +737,37 @@ class DeskScene {
     const screenMesh = new THREE.Mesh(screenGeo, screenMat);
     screenMesh.position.set(0, 0.72, -0.75);
     screenMesh.rotation.x = 0.18;
+    screenMesh.userData = { type: 'laptop' };
     laptopGroup.add(screenMesh);
+
+    // Full-coverage generous hit box for laptop
+    const laptopHitBox = new THREE.Mesh(
+      new THREE.BoxGeometry(2.6, 2.0, 2.2),
+      new THREE.MeshBasicMaterial({ visible: false, transparent: true, opacity: 0 })
+    );
+    laptopHitBox.position.set(0, 0.85, -0.6);
+    laptopHitBox.userData = { type: 'laptop' };
+    laptopGroup.add(laptopHitBox);
 
     laptopGroup.position.set(-3.6, 0.22, -1.5);
     laptopGroup.rotation.y = 0.35;
     laptopGroup.userData = { type: 'laptop' };
     this.scene.add(laptopGroup);
     this.interactiveObjects.push(laptopGroup);
+    this.interactiveObjects.push(laptopBase);
+    this.interactiveObjects.push(laptopLid);
+    this.interactiveObjects.push(screenMesh);
+    this.interactiveObjects.push(laptopHitBox);
     this.laptop = laptopGroup;
 
-    // 2. COFFEE CUP
+    // 2. COFFEE CUP (Whole mug, handle, liquid, and puddle are 100% clickable)
     const cupGroup = new THREE.Group();
     const cupGeo = new THREE.CylinderGeometry(0.35, 0.28, 0.75, 24);
     const cupMat = new THREE.MeshStandardMaterial({ color: 0xF8FAFC, roughness: 0.2 });
     const cupMesh = new THREE.Mesh(cupGeo, cupMat);
     cupMesh.position.y = 0.375;
     cupMesh.castShadow = true;
+    cupMesh.userData = { type: 'coffee' };
     cupGroup.add(cupMesh);
 
     const liquidGeo = new THREE.CircleGeometry(0.32, 24);
@@ -744,22 +775,37 @@ class DeskScene {
     const liquidMesh = new THREE.Mesh(liquidGeo, liquidMat);
     liquidMesh.rotation.x = -Math.PI / 2;
     liquidMesh.position.y = 0.72;
+    liquidMesh.userData = { type: 'coffee' };
     cupGroup.add(liquidMesh);
 
     const handleGeo = new THREE.TorusGeometry(0.18, 0.05, 12, 24, Math.PI);
     const handleMesh = new THREE.Mesh(handleGeo, cupMat);
     handleMesh.position.set(0.38, 0.38, 0);
     handleMesh.rotation.z = -Math.PI / 2;
+    handleMesh.userData = { type: 'coffee' };
     cupGroup.add(handleMesh);
+
+    // Full-coverage generous hit box for coffee cup
+    const coffeeHitBox = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.75, 0.75, 1.2, 16),
+      new THREE.MeshBasicMaterial({ visible: false, transparent: true, opacity: 0 })
+    );
+    coffeeHitBox.position.set(0.1, 0.5, 0);
+    coffeeHitBox.userData = { type: 'coffee' };
+    cupGroup.add(coffeeHitBox);
 
     cupGroup.position.set(4.0, 0.18, -1.2);
     cupGroup.userData = { type: 'coffee' };
     this.scene.add(cupGroup);
     this.interactiveObjects.push(cupGroup);
+    this.interactiveObjects.push(cupMesh);
+    this.interactiveObjects.push(liquidMesh);
+    this.interactiveObjects.push(handleMesh);
+    this.interactiveObjects.push(coffeeHitBox);
     this.coffeeCup = cupGroup;
 
-    // Coffee Puddle
-    const puddleGeo = new THREE.CircleGeometry(0.9, 32);
+    // Coffee Puddle (Clickable to trigger or clean up)
+    const puddleGeo = new THREE.CircleGeometry(1.0, 32);
     const puddleMat = new THREE.MeshStandardMaterial({
       color: 0x3E2723,
       roughness: 0.2,
@@ -770,7 +816,9 @@ class DeskScene {
     this.puddle.rotation.x = -Math.PI / 2;
     this.puddle.position.set(4.1, 0.19, -1.0);
     this.puddle.scale.set(0, 0, 0);
+    this.puddle.userData = { type: 'coffee' };
     this.scene.add(this.puddle);
+    this.interactiveObjects.push(this.puddle);
 
     // 3. "DO NOT TOUCH" STICKY NOTE (With easy Easter Egg trigger!)
     const stickyCanvas = document.createElement('canvas');
@@ -783,7 +831,7 @@ class DeskScene {
     nCtx.fillStyle = '#DC2626';
     nCtx.font = 'bold 30px sans-serif';
     nCtx.textAlign = 'center';
-    nCtx.fillText('⚠️ DO NOT', 128, 80);
+    nCtx.fillText('DO NOT', 128, 80);
     nCtx.fillText('TOUCH!', 128, 125);
     nCtx.font = 'bold 16px sans-serif';
     nCtx.fillStyle = '#4B5563';
@@ -916,6 +964,12 @@ class DeskScene {
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
     window.addEventListener('mouseup', (e) => this.onMouseUp(e));
 
+    // Mouse Wheel to Tilt POV Up / Down smoothly
+    dom.addEventListener('wheel', (e) => {
+      if (this.isCameraZoomed) return;
+      this.targetPitch = THREE.MathUtils.clamp(this.targetPitch - e.deltaY * 0.0018, -0.65, 1.15);
+    }, { passive: true });
+
     // Touch Swipe to Look Around
     dom.addEventListener('touchstart', (e) => this.onTouchStart(e), { passive: false });
     window.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
@@ -936,12 +990,13 @@ class DeskScene {
 
   onMouseDown(e) {
     if (this.isCameraZoomed) return;
-    // Don't drag if clicking buttons or overlays
-    if (e.target.closest('button') || e.target.closest('.guestbook-modal-overlay') || e.target.closest('#bookOverlay')) return;
+    // Don't drag if clicking buttons, modals, or clear-book overlay
+    if (e.target.closest('button') || e.target.closest('.guestbook-modal-overlay') || e.target.closest('#bookOverlay') || e.target.closest('.error-modal-overlay')) return;
 
     this.isDraggingView = true;
     this.dragStartPos = { x: e.clientX, y: e.clientY };
     this.dragStartAngles = { yaw: this.targetYaw, pitch: this.targetPitch };
+    this.mouseDownTime = Date.now();
     this.hasDraggedMeaningfully = false;
   }
 
@@ -954,6 +1009,7 @@ class DeskScene {
     this.isDraggingView = true;
     this.dragStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     this.dragStartAngles = { yaw: this.targetYaw, pitch: this.targetPitch };
+    this.mouseDownTime = Date.now();
     this.hasDraggedMeaningfully = false;
   }
 
@@ -962,16 +1018,16 @@ class DeskScene {
     const dx = e.touches[0].clientX - this.dragStartPos.x;
     const dy = e.touches[0].clientY - this.dragStartPos.y;
 
-    if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+    if (Math.hypot(dx, dy) > 18) {
       this.hasDraggedMeaningfully = true;
     }
 
-    // Horizontal 180 degrees (range: -Math.PI/2 to +Math.PI/2)
+    // Horizontal 180 degrees (-90° to +90°) and vertical look up (-0.65 to +1.15)
     const yawDelta = -(dx / window.innerWidth) * Math.PI;
-    const pitchDelta = (dy / window.innerHeight) * 0.8;
+    const pitchDelta = -(dy / window.innerHeight) * 1.5;
 
     this.targetYaw = THREE.MathUtils.clamp(this.dragStartAngles.yaw + yawDelta, -Math.PI / 2, Math.PI / 2);
-    this.targetPitch = THREE.MathUtils.clamp(this.dragStartAngles.pitch + pitchDelta, -0.35, 0.35);
+    this.targetPitch = THREE.MathUtils.clamp(this.dragStartAngles.pitch + pitchDelta, -0.65, 1.15);
   }
 
   onMouseMove(e) {
@@ -980,32 +1036,31 @@ class DeskScene {
       return;
     }
 
-    // 1. If dragging, rotate camera across 180 degrees
+    // 1. If dragging, rotate camera with expanded look-up POV
     if (this.isDraggingView) {
       const dx = e.clientX - this.dragStartPos.x;
       const dy = e.clientY - this.dragStartPos.y;
 
-      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+      if (Math.hypot(dx, dy) > 18) {
         this.hasDraggedMeaningfully = true;
         this.hideTooltip();
       }
 
-      // 180-degree yaw sweep (-Math.PI/2 to +Math.PI/2)
-      const yawDelta = -(dx / window.innerWidth) * (Math.PI * 1.1);
-      const pitchDelta = (dy / window.innerHeight) * 0.7;
+      // Dragging UP looks UP (dy < 0 -> pitchDelta > 0)
+      const yawDelta = -(dx / window.innerWidth) * (Math.PI * 1.15);
+      const pitchDelta = -(dy / window.innerHeight) * 1.5;
 
       this.targetYaw = THREE.MathUtils.clamp(this.dragStartAngles.yaw + yawDelta, -Math.PI / 2, Math.PI / 2);
-      this.targetPitch = THREE.MathUtils.clamp(this.dragStartAngles.pitch + pitchDelta, -0.35, 0.35);
+      this.targetPitch = THREE.MathUtils.clamp(this.dragStartAngles.pitch + pitchDelta, -0.65, 1.15);
       return;
     }
 
-    // 2. Cursor subtle parallax look
+    // 2. Cursor subtle parallax look (lets you look up when cursor reaches top)
     const normX = (e.clientX / window.innerWidth) * 2 - 1;
     const normY = -(e.clientY / window.innerHeight) * 2 + 1;
 
-    // Subtle gentle head turn when hovering across screen (ranges +/- 0.4 rad)
-    this.targetYaw = THREE.MathUtils.clamp(this.currentYaw + ((-normX * 0.4) - this.currentYaw) * 0.05, -Math.PI / 2, Math.PI / 2);
-    this.targetPitch = THREE.MathUtils.clamp(this.currentPitch + ((normY * 0.2) - this.currentPitch) * 0.05, -0.35, 0.35);
+    this.targetYaw = THREE.MathUtils.clamp(this.currentYaw + ((-normX * 0.45) - this.currentYaw) * 0.05, -Math.PI / 2, Math.PI / 2);
+    this.targetPitch = THREE.MathUtils.clamp(this.currentPitch + ((normY * 0.4) - this.currentPitch) * 0.05, -0.65, 1.15);
 
     // 3. Raycast hovered props & folders
     const rect = this.renderer.domElement.getBoundingClientRect();
@@ -1037,7 +1092,7 @@ class DeskScene {
     document.body.style.cursor = 'pointer';
 
     if (obj.userData.type === 'folder') {
-      const folder = obj;
+      const folder = obj.userData.folderMesh || obj;
       if (typeof gsap !== 'undefined') {
         gsap.to(folder.position, { y: folder.userData.originalPos.y + 0.35, duration: 0.25, ease: 'power2.out' });
         gsap.to(folder.rotation, { x: -0.12, duration: 0.25 });
@@ -1045,25 +1100,27 @@ class DeskScene {
         folder.position.y = folder.userData.originalPos.y + 0.35;
       }
       const member = folder.userData.member;
-      this.showTooltip(`📂 <strong>${member.name}</strong><br><em>“${member.tagline}”</em><br><small style="color:#CBD5E1">Click to open clear-book</small>`, e);
+      this.showTooltip(`<strong>Clear-Book: ${member.name}</strong><br><em>“${member.tagline}”</em><br><small style="color:#38BDF8">Click anywhere to open portfolio</small>`, e);
     } else if (obj.userData.type === 'coffee') {
-      this.showTooltip('☕ Coffee of Destiny: 90% caffeine, 10% sleep deprivation.<br><small style="color:#CBD5E1">Click to spill</small>', e);
+      this.showTooltip('<strong>Coffee Mug:</strong> 90% caffeine, 10% panic.<br><small style="color:#38BDF8">Click anywhere to spill</small>', e);
     } else if (obj.userData.type === 'dont-touch-note') {
-      this.showTooltip('⚠️ "Do not touch": Click to shake, <strong>Double-click to float desk!</strong>', e);
+      this.showTooltip('<strong>Sticky Note:</strong> "Do not touch"<br><small style="color:#FBBF24">Click to shake • Double-click for Zero-G</small>', e);
     } else if (obj.userData.type === 'laptop') {
-      this.showTooltip('💻 System Error: Motivation.exe has stopped working.<br><small style="color:#CBD5E1">Click to inspect crash</small>', e);
+      this.showTooltip('<strong>Student Laptop:</strong> Motivation.exe crash<br><small style="color:#F43F5E">Click anywhere to inspect</small>', e);
+    } else if (obj.userData.type === 'calendar') {
+      this.showTooltip('<strong>Desk Calendar:</strong> Every single day is circled as DEADLINE!', e);
     } else if (obj.userData.type === 'duck') {
-      this.showTooltip('🦆 Senior Rubber Duck Debugger: Knows all your code secrets!', e);
+      this.showTooltip('<strong>Senior Rubber Duck:</strong> Chief Debugging Officer!', e);
     } else if (obj.userData.type === 'sticky-note') {
       const n = obj.userData.note;
-      this.showTooltip(`📝 Note from <strong>${n.author || 'Visitor'}</strong>:<br>“${n.text}”`, e);
+      this.showTooltip(`<strong>Note from ${n.author || 'Visitor'}:</strong><br>“${n.text}”`, e);
     }
   }
 
   resetHoverState() {
     if (this.hoveredObject) {
       if (this.hoveredObject.userData.type === 'folder' && !this.isCameraZoomed) {
-        const folder = this.hoveredObject;
+        const folder = this.hoveredObject.userData.folderMesh || this.hoveredObject;
         if (typeof gsap !== 'undefined') {
           gsap.to(folder.position, {
             y: folder.userData.originalPos.y,
@@ -1103,10 +1160,20 @@ class DeskScene {
   }
 
   onClick(e) {
-    if (this.isCameraZoomed || this.hasDraggedMeaningfully) {
+    if (this.isCameraZoomed) {
       return;
     }
     if (e.target.closest('button') || e.target.closest('#bookOverlay') || e.target.closest('.error-modal-overlay') || e.target.closest('.guestbook-modal-overlay')) {
+      return;
+    }
+
+    const startX = this.dragStartPos ? this.dragStartPos.x : e.clientX;
+    const startY = this.dragStartPos ? this.dragStartPos.y : e.clientY;
+    const dragDist = Math.hypot(e.clientX - startX, e.clientY - startY);
+    const dragDuration = Date.now() - (this.mouseDownTime || 0);
+
+    // Only abort if the user deliberately dragged across screen for look-around
+    if (dragDist > 22 && dragDuration > 280) {
       return;
     }
 
@@ -1130,7 +1197,8 @@ class DeskScene {
     const type = obj.userData.type;
 
     if (type === 'folder') {
-      this.selectFolder(obj);
+      const folderMesh = obj.userData.folderMesh || obj;
+      this.selectFolder(folderMesh);
     } else if (type === 'coffee') {
       this.triggerCoffeeSpill();
     } else if (type === 'dont-touch-note') {
@@ -1139,16 +1207,21 @@ class DeskScene {
       if (window.PortfolioHumor) {
         window.PortfolioHumor.showLaptopErrorDialog();
       }
+    } else if (type === 'calendar') {
+      if (window.PortfolioHumor) {
+        window.PortfolioHumor.playSound('error');
+        window.PortfolioHumor.showToast('Final submission is due soon! No pressure.');
+      }
     } else if (type === 'duck') {
       if (window.PortfolioHumor) {
         window.PortfolioHumor.playSound('pop');
-        window.PortfolioHumor.showToast('🦆 *Quack!* The Rubber Duck approves of your clean architecture.');
+        window.PortfolioHumor.showToast('*Quack!* The Rubber Duck approves of your clean architecture.');
       }
     } else if (type === 'sticky-note') {
       if (window.PortfolioHumor) {
         window.PortfolioHumor.playSound('pop');
         const n = obj.userData.note;
-        window.PortfolioHumor.showToast(`📝 Sticky note from ${n.author || 'Visitor'}: "${n.text}"`);
+        window.PortfolioHumor.showToast(`Sticky note from ${n.author || 'Visitor'}: "${n.text}"`);
       }
     }
   }
@@ -1164,7 +1237,8 @@ class DeskScene {
     this.lastStickyClick = now;
   }
 
-  selectFolder(folderMesh) {
+  selectFolder(obj) {
+    const folderMesh = obj.userData.folderMesh || obj;
     const member = folderMesh.userData.member;
     this.activeFolder = folderMesh;
     this.isCameraZoomed = true;
@@ -1193,7 +1267,6 @@ class DeskScene {
           }
         }
       });
-    } else {
       if (typeof this.onFolderSelect === 'function') {
         this.onFolderSelect(member);
       }
@@ -1365,10 +1438,10 @@ class DeskScene {
   }
 
   updateCameraLookAt() {
-    // 180-Degree Look: Calculate look target from yaw & pitch
+    // 180-Degree Look: Calculate look target from yaw & pitch with expanded vertical POV
     const lookDistance = 6.0;
     this.lookTarget.x = this.camera.position.x + Math.sin(this.currentYaw) * lookDistance;
-    this.lookTarget.y = this.camera.position.y + this.currentPitch * 3.5 - 2.8;
+    this.lookTarget.y = (this.camera.position.y - 2.2) + (this.currentPitch * 6.8);
     this.lookTarget.z = this.camera.position.z - Math.cos(this.currentYaw) * lookDistance;
 
     this.camera.lookAt(this.lookTarget);

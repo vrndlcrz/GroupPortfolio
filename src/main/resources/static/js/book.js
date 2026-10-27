@@ -209,7 +209,9 @@ class ClearBook {
       let frontHTML = '';
       let backHTML = `
         <div class="backside-pocket-decor">
-          <div class="backside-sleeve-seal">📁</div>
+          <div class="backside-sleeve-seal">
+            <svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          </div>
           <h4>Clear-Book Sleeve #${idx + 1}</h4>
           <p>Official student submission for <em>Advanced Emerging Technologies</em>.</p>
           <div style="font-size:0.75rem; color:#94A3B8; margin-top:8px;">Turn backward or forward with arrows</div>
@@ -227,7 +229,7 @@ class ClearBook {
 
             <div class="cover-photo-wrap" id="coverPhotoWrap">
               <img class="cover-photo-circle" id="coverPhotoImg" src="${member.photo || 'assets/photos/member1.svg'}" alt="${member.name}">
-              <span class="photo-easter-hint">✨ Double-click to spin!</span>
+              <span class="photo-easter-hint">Double-click to spin</span>
             </div>
 
             <div class="cover-footer">
@@ -255,7 +257,7 @@ class ClearBook {
                 }, 1200);
                 if (window.PortfolioHumor && typeof window.PortfolioHumor.playSound === 'function') {
                   window.PortfolioHumor.playSound('spin');
-                  window.PortfolioHumor.showToast('🌀 Wheee! Avatar spin easter egg unlocked!');
+                  window.PortfolioHumor.showToast('Avatar spin easter egg unlocked!');
                 }
               } else {
                 photoImg.style.transition = 'transform 0.15s ease';
@@ -294,8 +296,9 @@ class ClearBook {
         if (cfg.index === 5) {
           extraHTML += `
             <div style="margin-top: 14px; text-align: center;">
-              <button class="page-action-btn" id="roastMeBtn">
-                🔥 Roast Me!
+              <button class="page-action-btn" id="roastMeBtn" style="display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                <svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+                Roast Me!
               </button>
               <div class="roast-result-box" id="roastResultBox" style="display:none;"></div>
             </div>
@@ -305,8 +308,9 @@ class ClearBook {
         if (cfg.index === 6) {
           extraHTML += `
             <div style="margin-top: 14px; text-align: center;">
-              <button class="book-guestbook-trigger" id="openGuestbookFromBookBtn">
-                ✍️ Leave a Sticky Note for ${member.name.split(' ')[0]}
+              <button class="book-guestbook-trigger" id="openGuestbookFromBookBtn" style="display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                <svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Leave a Sticky Note for ${member.name.split(' ')[0]}
               </button>
             </div>
           `;
@@ -367,7 +371,7 @@ class ClearBook {
             <div>
               <span class="cover-badge">Course Finale</span>
               <h2 class="back-cover-title">The End</h2>
-              <p class="back-cover-subtitle">(Please Clap 👏)</p>
+              <p class="back-cover-subtitle">(Please Clap)</p>
             </div>
 
             <div class="team-credits-card">
