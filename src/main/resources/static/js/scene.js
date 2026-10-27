@@ -664,11 +664,12 @@ class DeskScene {
         originalRot: { x: 0, y: layout.rotY, z: layout.rotZ }
       };
 
-      // Full-coverage hit-box mesh ensuring EVERY part of the clearbook is effortlessly clickable
-      const hitBoxGeo = new THREE.BoxGeometry(1.45, 0.45, 1.95);
-      const hitBoxMat = new THREE.MeshBasicMaterial({ visible: false, transparent: true, opacity: 0 });
+      // Full-coverage generous hit-box mesh ensuring EVERY part of the clearbook is effortlessly clickable
+      // CRITICAL: Three.js Raycaster ignores visible=false! We use transparent=true and opacity=0 so it's invisible to eyes but 100% detectable by raycaster!
+      const hitBoxGeo = new THREE.BoxGeometry(1.7, 0.9, 2.3);
+      const hitBoxMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, depthTest: false });
       const folderHitBox = new THREE.Mesh(hitBoxGeo, hitBoxMat);
-      folderHitBox.position.set(0, 0.1, 0);
+      folderHitBox.position.set(0, 0.38, 0);
       folderHitBox.userData = {
         type: 'folder',
         member: member,
@@ -742,8 +743,8 @@ class DeskScene {
 
     // Full-coverage generous hit box for laptop
     const laptopHitBox = new THREE.Mesh(
-      new THREE.BoxGeometry(2.6, 2.0, 2.2),
-      new THREE.MeshBasicMaterial({ visible: false, transparent: true, opacity: 0 })
+      new THREE.BoxGeometry(2.8, 2.2, 2.4),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
     );
     laptopHitBox.position.set(0, 0.85, -0.6);
     laptopHitBox.userData = { type: 'laptop' };
@@ -787,8 +788,8 @@ class DeskScene {
 
     // Full-coverage generous hit box for coffee cup
     const coffeeHitBox = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.75, 0.75, 1.2, 16),
-      new THREE.MeshBasicMaterial({ visible: false, transparent: true, opacity: 0 })
+      new THREE.CylinderGeometry(0.9, 0.9, 1.5, 16),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
     );
     coffeeHitBox.position.set(0.1, 0.5, 0);
     coffeeHitBox.userData = { type: 'coffee' };
@@ -946,7 +947,8 @@ class DeskScene {
     mesh.position.set(xPos, 0.205, zPos);
     mesh.userData = {
       type: 'sticky-note',
-      note: note
+      note: note,
+      originalY: 0.205
     };
 
     this.scene.add(mesh);
@@ -1102,7 +1104,10 @@ class DeskScene {
       const member = folder.userData.member;
       this.showTooltip(`<strong>Clear-Book: ${member.name}</strong><br><em>“${member.tagline}”</em><br><small style="color:#38BDF8">Click anywhere to open portfolio</small>`, e);
     } else if (obj.userData.type === 'coffee') {
-      this.showTooltip('<strong>Coffee Mug:</strong> 90% caffeine, 10% panic.<br><small style="color:#38BDF8">Click anywhere to spill</small>', e);
+      const coffeeHint = this.isSpilled
+        ? '<strong>Spilled Coffee:</strong> What a mess...<br><small style="color:#34D399">Click to clean desk &amp; brew fresh coffee</small>'
+        : '<strong>Coffee Mug:</strong> 90% caffeine, 10% panic.<br><small style="color:#38BDF8">Click anywhere to spill</small>';
+      this.showTooltip(coffeeHint, e);
     } else if (obj.userData.type === 'dont-touch-note') {
       this.showTooltip('<strong>Sticky Note:</strong> "Do not touch"<br><small style="color:#FBBF24">Click to shake • Double-click for Zero-G</small>', e);
     } else if (obj.userData.type === 'laptop') {
@@ -1163,7 +1168,7 @@ class DeskScene {
     if (this.isCameraZoomed) {
       return;
     }
-    if (e.target.closest('button') || e.target.closest('#bookOverlay') || e.target.closest('.error-modal-overlay') || e.target.closest('.guestbook-modal-overlay')) {
+    if (e.target.closest('button') || e.target.closest('#bookOverlay') || e.target.closest('.error-modal-overlay') || e.target.closest('.guestbook-modal-overlay') || e.target.closest('.note-view-modal-overlay')) {
       return;
     }
 
@@ -1200,7 +1205,7 @@ class DeskScene {
       const folderMesh = obj.userData.folderMesh || obj;
       this.selectFolder(folderMesh);
     } else if (type === 'coffee') {
-      this.triggerCoffeeSpill();
+      this.handleCoffeeInteraction();
     } else if (type === 'dont-touch-note') {
       this.handleStickyNoteClick();
     } else if (type === 'laptop') {
@@ -1218,11 +1223,7 @@ class DeskScene {
         window.PortfolioHumor.showToast('*Quack!* The Rubber Duck approves of your clean architecture.');
       }
     } else if (type === 'sticky-note') {
-      if (window.PortfolioHumor) {
-        window.PortfolioHumor.playSound('pop');
-        const n = obj.userData.note;
-        window.PortfolioHumor.showToast(`Sticky note from ${n.author || 'Visitor'}: "${n.text}"`);
-      }
+      this.viewStickyNote(obj);
     }
   }
 
@@ -1311,13 +1312,21 @@ class DeskScene {
     }
   }
 
+  handleCoffeeInteraction() {
+    if (this.isSpilled) {
+      this.cleanAndRecreateCoffee();
+    } else {
+      this.triggerCoffeeSpill();
+    }
+  }
+
   triggerCoffeeSpill() {
     if (this.isSpilled) return;
     this.isSpilled = true;
 
     if (window.PortfolioHumor) {
       window.PortfolioHumor.playSound('spill');
-      window.PortfolioHumor.showToast('☕ Oops! Coffee spilled on the desk! Clean up in aisle 4.');
+      window.PortfolioHumor.showToast('Oops! Coffee spilled on the desk! Click the puddle to clean up.');
     }
 
     if (typeof gsap !== 'undefined') {
@@ -1327,6 +1336,124 @@ class DeskScene {
       this.coffeeCup.rotation.z = 1.4;
       this.puddle.scale.set(1, 1, 1);
     }
+  }
+
+  cleanAndRecreateCoffee() {
+    if (!this.isSpilled) return;
+
+    if (window.PortfolioHumor) {
+      window.PortfolioHumor.playSound('pop');
+      window.PortfolioHumor.showToast('Desk cleaned! Fresh coffee brewing... motivation restored.');
+    }
+
+    if (typeof gsap !== 'undefined') {
+      // 1. Shrink puddle away
+      gsap.to(this.puddle.scale, {
+        x: 0, y: 0, z: 0,
+        duration: 0.7,
+        ease: 'power2.in'
+      });
+
+      // 2. Rotate cup back upright with a satisfying bounce
+      gsap.to(this.coffeeCup.rotation, {
+        z: 0,
+        duration: 0.65,
+        ease: 'back.out(1.7)'
+      });
+
+      // 3. Pop cup up slightly then settle — like a fresh brew landing on desk
+      gsap.to(this.coffeeCup.position, {
+        y: this.coffeeCup.position.y + 0.35,
+        duration: 0.25,
+        ease: 'power2.out',
+        onComplete: () => {
+          gsap.to(this.coffeeCup.position, {
+            y: this.coffeeCup.position.y - 0.35,
+            duration: 0.5,
+            ease: 'bounce.out',
+            onComplete: () => {
+              this.isSpilled = false;
+            }
+          });
+        }
+      });
+    } else {
+      this.coffeeCup.rotation.z = 0;
+      this.puddle.scale.set(0, 0, 0);
+      this.isSpilled = false;
+    }
+  }
+
+  viewStickyNote(stickyMesh) {
+    const note = stickyMesh.userData.note;
+    if (!note) return;
+
+    this.isCameraZoomed = true;
+    this.hideTooltip();
+    this.activeStickyMesh = stickyMesh;
+
+    if (window.PortfolioHumor) {
+      window.PortfolioHumor.playSound('pageFlip');
+    }
+
+    // Animate camera zooming close to the sticky note
+    if (typeof gsap !== 'undefined') {
+      const noteWorldPos = new THREE.Vector3();
+      stickyMesh.getWorldPosition(noteWorldPos);
+
+      gsap.to(this.camera.position, {
+        x: noteWorldPos.x,
+        y: noteWorldPos.y + 2.2,
+        z: noteWorldPos.z + 1.6,
+        duration: 0.7,
+        ease: 'power3.inOut'
+      });
+
+      // Lift and tilt the sticky note toward the camera
+      gsap.to(stickyMesh.position, {
+        y: stickyMesh.position.y + 0.55,
+        duration: 0.5,
+        ease: 'back.out(1.5)',
+        onComplete: () => {
+          this.openNoteViewerModal(note);
+        }
+      });
+    } else {
+      this.openNoteViewerModal(note);
+    }
+  }
+
+  openNoteViewerModal(note) {
+    const modal = document.getElementById('noteViewModal');
+    const authorEl = document.getElementById('noteViewAuthor');
+    const dedicatedEl = document.getElementById('noteViewDedicated');
+    const bodyEl = document.getElementById('noteViewBody');
+
+    if (!modal) return;
+
+    if (authorEl) authorEl.textContent = note.author || 'Anonymous Visitor';
+    if (dedicatedEl) dedicatedEl.textContent = `Left on the 3D Desk`;
+    if (bodyEl) bodyEl.textContent = `"${note.text || 'No message written.'}"`;
+
+    modal.classList.add('active');
+  }
+
+  closeNoteViewerModal() {
+    const modal = document.getElementById('noteViewModal');
+    if (modal) modal.classList.remove('active');
+
+    // Animate sticky note back to desk
+    if (this.activeStickyMesh && typeof gsap !== 'undefined') {
+      gsap.to(this.activeStickyMesh.position, {
+        y: this.activeStickyMesh.userData.originalY !== undefined
+          ? this.activeStickyMesh.userData.originalY
+          : 0.205,
+        duration: 0.45,
+        ease: 'power2.out'
+      });
+    }
+    this.activeStickyMesh = null;
+    this.returnToDesk();
   }
 
   triggerShakeNearestFolder() {

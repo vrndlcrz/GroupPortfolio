@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const charCounter = document.getElementById('charCounter');
   const memberSelectDropdown = document.getElementById('memberSelectDropdown');
 
+  // CRITICAL: Setup navbar button listeners immediately
+  // so buttons are clickable during and after loading — not blocked by async await
+  setupHeaderControls();
+
   // 1. Run Fake Loading Bar with 99% Stall
   await runFakeLoading();
 
@@ -99,8 +103,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 6. Connect Guestbook Form & "sudo" Easter Egg
   setupGuestbook();
 
-  // 7. Connect Floating HUD Controls
-  setupHeaderControls();
+  // 7. Wire Note Viewer Modal close buttons
+  setupNoteViewerModal();
 
   // 8. Dismiss Loading Screen
   finishLoading();
@@ -192,6 +196,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     guestbookModal.classList.add('active');
     noteTextInput.focus();
     PortfolioHumor.playSound('pop');
+  }
+
+  function setupNoteViewerModal() {
+    const modal = document.getElementById('noteViewModal');
+    const closeBtn = document.getElementById('noteViewCloseBtn');
+    const returnBtn = document.getElementById('noteViewReturnBtn');
+
+    function closeNote() {
+      if (deskScene && typeof deskScene.closeNoteViewerModal === 'function') {
+        deskScene.closeNoteViewerModal();
+      }
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeNote);
+    if (returnBtn) returnBtn.addEventListener('click', closeNote);
+
+    // Click on backdrop (outside card) closes modal
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeNote();
+      });
+    }
+
+    // Escape key closes modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+        closeNote();
+      }
+    });
   }
 
   function closeGuestbookModal() {

@@ -135,28 +135,28 @@ html, body {
 .top-navbar-dock {
   position: fixed;
   top: 18px;
-  left: 0;
-  right: 0;
-  z-index: 1000;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999 !important;
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: none; /* Inner elements enable pointer events */
-  padding: 0 20px;
+  pointer-events: auto !important;
+  touch-action: manipulation;
 }
 
 .top-navbar-inner {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(15, 23, 42, 0.82);
+  background: rgba(15, 23, 42, 0.88);
   border: 1px solid var(--border-glass);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   padding: 6px 14px;
   border-radius: 999px;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.2);
-  pointer-events: auto;
+  pointer-events: auto !important;
 }
 
 /* Vector UI Icons */
@@ -328,8 +328,164 @@ html, body {
   padding: 20px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* ==========================================================================
+   4. CINEMATIC NOTE VIEWER MODAL (Clear-book style animation for sticky notes)
+   ========================================================================== */
+.note-view-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(8, 12, 22, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  perspective: 1200px;
+}
+
+.note-view-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.note-view-card {
+  background: #FEF08A; /* Real tactile pastel sticky note */
+  color: #1E293B;
+  border-radius: 12px;
+  padding: 36px 32px 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.65), 0 0 25px rgba(254, 240, 138, 0.3);
+  position: relative;
+  transform: rotate(-1.5deg) scale(0.85) translateY(30px);
+  opacity: 0;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+}
+
+.note-view-modal-overlay.active .note-view-card {
+  transform: rotate(-1deg) scale(1) translateY(0);
+  opacity: 1;
+}
+
+.note-pin-decor {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  background: radial-gradient(circle at 35% 35%, #EF4444 0%, #991B1B 100%);
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.note-view-close-x {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.08);
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 700;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #4B5563;
+  transition: background 0.2s;
+}
+
+.note-view-close-x:hover {
+  background: rgba(0, 0, 0, 0.18);
+  color: #0F172A;
+}
+
+.note-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  border-bottom: 1.5px dashed rgba(0, 0, 0, 0.15);
+  padding-bottom: 12px;
+}
+
+.note-view-author-badge {
+  background: #0284C7;
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+}
+
+.note-view-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #64748B;
+  font-weight: 600;
+}
+
+.note-view-body {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  line-height: 1.6;
+  font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 24px;
+  min-height: 80px;
+  word-break: break-word;
+}
+
+.note-view-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed rgba(0, 0, 0, 0.12);
+  padding-top: 14px;
+}
+
+.note-view-hint {
+  font-size: 0.75rem;
+  color: #64748B;
+  font-style: italic;
+}
+
+.note-view-return-btn {
+  background: #0F172A;
+  color: #FFFFFF;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
+}
+
+.note-view-return-btn:hover {
+  background: #1E293B;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.45);
+}
+
 
 .guestbook-modal-overlay.active {
   opacity: 1;
