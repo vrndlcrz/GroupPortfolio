@@ -38,95 +38,64 @@ html, body {
 }
 
 /* ==========================================================================
-   1. FAKE LOADING SCREEN (Stalls at 99%)
+   1. EYE-BLINK LOADING SCREEN
    ========================================================================== */
-.loading-screen {
+.eye-blink-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9999;
-  background: radial-gradient(circle at center, #1E293B 0%, #080D1A 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+  z-index: 99999;
+  pointer-events: all;
 }
 
-.loading-screen.hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.loading-card {
-  background: rgba(15, 23, 42, 0.88);
-  border: 1px solid var(--border-glass);
-  border-radius: 20px;
-  padding: 40px;
-  max-width: 480px;
+.eyelid {
+  position: fixed;
+  left: 0;
   width: 100%;
-  text-align: center;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(18px);
+  height: 51%; /* Slightly over 50% so no gap at center */
+  background: #0A0F1D;
+  transition: none;
 }
 
-.loading-icon-wrap {
-  font-size: 3.5rem;
-  margin-bottom: 16px;
-  animation: bounceSlow 2s infinite ease-in-out;
+.eyelid-top {
+  top: 0;
+  transform-origin: top center;
+  /* Animate: 3 blinks then open forever */
+  animation: blinkTop 2.1s ease-in-out forwards;
 }
 
-.loading-title {
-  font-family: var(--font-display);
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--accent-cyan);
-  margin-bottom: 8px;
+.eyelid-bottom {
+  bottom: 0;
+  transform-origin: bottom center;
+  animation: blinkBottom 2.1s ease-in-out forwards;
 }
 
-.loading-subtitle {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  margin-bottom: 24px;
+/* Eyelid closes = scaleY(1), opens = scaleY(0) */
+@keyframes blinkTop {
+  0%   { transform: scaleY(1); }  /* closed - start */
+  12%  { transform: scaleY(0); }  /* open blink 1 */
+  22%  { transform: scaleY(1); }  /* close blink 1 */
+  34%  { transform: scaleY(0); }  /* open blink 2 */
+  44%  { transform: scaleY(1); }  /* close blink 2 */
+  56%  { transform: scaleY(0); }  /* open blink 3 */
+  66%  { transform: scaleY(1); }  /* close blink 3 */
+  100% { transform: scaleY(0); }  /* final open - reveal scene */
+}
+@keyframes blinkBottom {
+  0%   { transform: scaleY(1); }
+  12%  { transform: scaleY(0); }
+  22%  { transform: scaleY(1); }
+  34%  { transform: scaleY(0); }
+  44%  { transform: scaleY(1); }
+  56%  { transform: scaleY(0); }
+  66%  { transform: scaleY(1); }
+  100% { transform: scaleY(0); }
 }
 
-.loading-progress-container {
-  width: 100%;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 999px;
-  overflow: hidden;
-  position: relative;
-  margin-bottom: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+.eye-blink-overlay.done {
+  display: none !important;
+  pointer-events: none !important;
 }
 
-.loading-progress-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #38BDF8, #8B5CF6, #F43F5E);
-  border-radius: 999px;
-  transition: width 0.3s ease-out;
-}
-
-.loading-status-text {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--accent-cyan);
-  min-height: 1.5em;
-}
-
-.loading-tip {
-  margin-top: 24px;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-style: italic;
-  border-top: 1px dashed rgba(255, 255, 255, 0.1);
-  padding-top: 14px;
-}
-
-/* ==========================================================================
 /* ==========================================================================
    2. TOP NAVIGATION BAR & ACTION CONTROLS (Top side, sleek glassmorphism)
    ========================================================================== */
@@ -878,18 +847,205 @@ html, body {
   100% { box-shadow: 0 4px 20px rgba(236, 72, 153, 0.75); }
 }
 
-@media (max-width: 900px) {
+/* ==========================================================================
+   RESPONSIVE DESIGN — Mobile First, Scales to Large Desktop
+   Breakpoints: xs=320, sm=480, md=768, lg=1024, xl=1280
+   ========================================================================== */
+
+/* --- SCENE CANVAS always fills viewport --- */
+#scene-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none; /* Prevent browser scroll/zoom interfering with 3D drag */
+}
+
+#scene-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  touch-action: none;
+}
+
+/* --- NAVBAR responsive --- */
+/* Mobile first: compact pill navbar */
+.top-navbar-dock {
+  top: 10px;
+}
+
+.top-navbar-inner {
+  gap: 6px;
+  padding: 4px 10px;
+}
+
+.hud-btn {
+  padding: 6px 10px;
+  font-size: 0.76rem;
+  min-height: 34px;
+  gap: 5px;
+}
+
+.hud-label {
+  display: none; /* Hide labels on smallest screens, show icon only */
+}
+
+/* sm: show labels again */
+@media (min-width: 480px) {
+  .top-navbar-dock {
+    top: 14px;
+  }
+  .top-navbar-inner {
+    gap: 8px;
+    padding: 5px 12px;
+  }
+  .hud-btn {
+    padding: 7px 12px;
+    font-size: 0.78rem;
+    min-height: 36px;
+  }
+  .hud-label {
+    display: inline; /* Show labels on sm+ */
+  }
+}
+
+/* md: full comfortable size */
+@media (min-width: 768px) {
+  .top-navbar-dock {
+    top: 18px;
+  }
+  .top-navbar-inner {
+    gap: 10px;
+    padding: 6px 14px;
+  }
+  .hud-btn {
+    padding: 8px 16px;
+    font-size: 0.82rem;
+    min-height: 38px;
+    gap: 8px;
+  }
+}
+
+/* --- LOOK GUIDE responsive --- */
+.floating-look-guide {
+  display: none; /* Hidden on very small screens */
+}
+
+@media (min-width: 600px) {
+  .floating-look-guide {
+    display: flex;
+    font-size: 0.7rem;
+    padding: 5px 14px;
+    bottom: 10px;
+  }
+}
+
+@media (min-width: 900px) {
+  .floating-look-guide {
+    font-size: 0.78rem;
+    padding: 6px 18px;
+    bottom: 14px;
+  }
+}
+
+/* --- TOOLTIP responsive --- */
+.desk-tooltip {
+  max-width: min(280px, 80vw);
+  font-size: 0.78rem;
+  padding: 10px 14px;
+}
+
+@media (min-width: 768px) {
+  .desk-tooltip {
+    max-width: 320px;
+    font-size: 0.82rem;
+    padding: 12px 16px;
+  }
+}
+
+/* --- GUESTBOOK MODAL responsive --- */
+.guestbook-card {
+  max-width: min(440px, 94vw);
+  margin: 0 auto;
+  border-radius: 16px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@media (min-width: 600px) {
+  .guestbook-card {
+    max-width: 480px;
+  }
+}
+
+/* --- NOTE VIEWER MODAL responsive --- */
+.note-view-card {
+  max-width: min(380px, 92vw);
+  padding: 28px 22px 22px;
+}
+
+@media (min-width: 600px) {
+  .note-view-card {
+    max-width: 420px;
+    padding: 36px 32px 28px;
+  }
+}
+
+/* --- BOOK OVERLAY responsive (from book.css integration) --- */
+#bookOverlayRoot {
+  z-index: 10000;
+}
+
+/* --- TOAST notifications responsive --- */
+.humor-toast {
+  max-width: min(340px, 90vw);
+  font-size: 0.82rem;
+  padding: 12px 16px;
+  bottom: 60px;
+  right: 12px;
+}
+
+@media (min-width: 600px) {
+  .humor-toast {
+    max-width: 380px;
+    font-size: 0.85rem;
+    padding: 14px 20px;
+    bottom: 80px;
+    right: 20px;
+  }
+}
+
+/* --- TOUCH: larger hit areas on mobile --- */
+@media (max-width: 767px) and (pointer: coarse) {
+  .hud-btn {
+    min-height: 44px; /* Apple HIG minimum touch target */
+    min-width: 44px;
+    padding: 8px 12px;
+  }
+
+  /* Prevent text selection during 3D drag on touch */
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Floating guide hidden on touch phones */
   .floating-look-guide {
     display: none;
   }
-  .floating-hud-dock {
-    bottom: 12px;
-    right: 12px;
-    padding: 4px 8px;
-    gap: 6px;
+}
+
+/* --- LARGE DESKTOP --- */
+@media (min-width: 1280px) {
+  .top-navbar-inner {
+    gap: 12px;
+    padding: 8px 18px;
   }
   .hud-btn {
-    padding: 6px 10px;
-    font-size: 0.75rem;
+    padding: 9px 18px;
+    font-size: 0.84rem;
+  }
+  .desk-tooltip {
+    max-width: 360px;
   }
 }

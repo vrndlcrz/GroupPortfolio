@@ -78,7 +78,7 @@ class DeskScene {
 
     // 2. Setup Camera
     this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-    this.camera.position.copy(this.defaultCameraPos);
+    this.adjustCameraForScreen();
     this.updateCameraLookAt();
 
     // 3. Setup Renderer
@@ -668,11 +668,12 @@ class DeskScene {
       };
 
       // Full-coverage generous hit-box mesh on Layer 1 (raycaster-only, never rendered by camera)
-      const hitBoxGeo = new THREE.BoxGeometry(1.7, 0.9, 2.3);
+      // Proportionally covers the book without spilling into sticky notes behind
+      const hitBoxGeo = new THREE.BoxGeometry(1.3, 0.35, 1.65);
       const hitBoxMat = new THREE.MeshBasicMaterial();
       const folderHitBox = new THREE.Mesh(hitBoxGeo, hitBoxMat);
       folderHitBox.layers.set(1);  // Layer 1 = invisible to camera, visible to raycaster
-      folderHitBox.position.set(0, 0.38, 0);
+      folderHitBox.position.set(0, 0.18, 0);
       folderHitBox.userData = {
         type: 'folder',
         member: member,
@@ -854,8 +855,20 @@ class DeskScene {
     stickyNote.rotation.z = -0.15;
     stickyNote.position.set(0.1, 0.21, 2.3);
     stickyNote.userData = { type: 'dont-touch-note' };
+
+    // Elevated Layer 1 hitbox for dont-touch-note
+    const dontTouchHitBox = new THREE.Mesh(
+      new THREE.BoxGeometry(0.9, 0.45, 0.9),
+      new THREE.MeshBasicMaterial()
+    );
+    dontTouchHitBox.layers.set(1);
+    dontTouchHitBox.position.set(0, 0, 0.15);
+    dontTouchHitBox.userData = { type: 'dont-touch-note' };
+    stickyNote.add(dontTouchHitBox);
+
     this.scene.add(stickyNote);
     this.interactiveObjects.push(stickyNote);
+    this.interactiveObjects.push(dontTouchHitBox);
     this.dontTouchNote = stickyNote;
 
     // 4. DESK CALENDAR
@@ -956,12 +969,13 @@ class DeskScene {
       originalY: 0.205
     };
 
-    // Add a thick box hitbox on Layer 1 — PlaneGeometry is zero-thickness and hard to raycast
+    // Add a thick elevated box hitbox on Layer 1 — prominent and easy to raycast
     const noteHitBox = new THREE.Mesh(
-      new THREE.BoxGeometry(0.7, 0.12, 0.7),
+      new THREE.BoxGeometry(0.85, 0.45, 0.85),
       new THREE.MeshBasicMaterial()
     );
     noteHitBox.layers.set(1);
+    noteHitBox.position.set(0, 0, 0.15);
     noteHitBox.userData = { type: 'sticky-note', note: note, originalY: 0.205 };
     mesh.add(noteHitBox);
 
@@ -996,13 +1010,42 @@ class DeskScene {
     dom.addEventListener('click', (e) => this.onClick(e));
   }
 
-  onWindowResize() {
+  adjustCameraForScreen() {
     if (!this.camera || !this.renderer) return;
     const width = this.container.clientWidth || window.innerWidth;
     const height = this.container.clientHeight || window.innerHeight;
-    this.camera.aspect = width / height;
+    const aspect = width / height;
+
+    this.camera.aspect = aspect;
+
+    // Responsive camera framing:
+    // On narrow screens (smartphones & portrait tablets, aspect < 1.2),
+    // widen FOV and adjust camera distance so the desk, clearbooks & notes fit without clipping
+    if (aspect < 0.75) {
+      // Small to medium smartphones portrait
+      this.camera.fov = 68;
+      this.defaultCameraPos.set(0, 4.3, 7.2);
+    } else if (aspect < 1.15) {
+      // Tablets / Foldables / square-ish screens
+      this.camera.fov = 58;
+      this.defaultCameraPos.set(0, 4.2, 6.2);
+    } else {
+      // Standard laptops and widescreen desktops
+      this.camera.fov = 50;
+      this.defaultCameraPos.set(0, 4.0, 5.2);
+    }
+
+    if (!this.isCameraZoomed) {
+      this.camera.position.copy(this.defaultCameraPos);
+      this.updateCameraLookAt();
+    }
+
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
+  }
+
+  onWindowResize() {
+    this.adjustCameraForScreen();
   }
 
   onMouseDown(e) {
@@ -1040,8 +1083,9 @@ class DeskScene {
     }
 
     // Horizontal 180 degrees (-90° to +90°) and vertical look up (-0.65 to +1.15)
+    // Consistent drag directions across all axes
     const yawDelta = -(dx / window.innerWidth) * Math.PI;
-    const pitchDelta = (dy / window.innerHeight) * 1.5;
+    const pitchDelta = -(dy / window.innerHeight) * 1.5;
 
     this.targetYaw = THREE.MathUtils.clamp(this.dragStartAngles.yaw + yawDelta, -Math.PI / 2, Math.PI / 2);
     this.targetPitch = THREE.MathUtils.clamp(this.dragStartAngles.pitch + pitchDelta, -0.65, 1.15);
@@ -1063,9 +1107,9 @@ class DeskScene {
         this.hideTooltip();
       }
 
-      // Dragging UP looks UP (dy < 0 -> pitchDelta > 0)
+      // Dragging UP looks UP (consistent negative sign with yaw)
       const yawDelta = -(dx / window.innerWidth) * (Math.PI * 1.15);
-      const pitchDelta = (dy / window.innerHeight) * 1.5;
+      const pitchDelta = -(dy / window.innerHeight) * 1.5;
 
       this.targetYaw = THREE.MathUtils.clamp(this.dragStartAngles.yaw + yawDelta, -Math.PI / 2, Math.PI / 2);
       this.targetPitch = THREE.MathUtils.clamp(this.dragStartAngles.pitch + pitchDelta, -0.65, 1.15);
@@ -1088,7 +1132,21 @@ class DeskScene {
     const intersects = this.raycaster.intersectObjects(this.interactiveObjects, true);
 
     if (intersects.length > 0) {
-      let hitObject = intersects[0].object;
+      // NOTE TOP PRIORITY: If any sticky note or dont-touch-note is intersected, prioritize it over folders
+      let chosenIntersect = intersects[0];
+      const noteIntersect = intersects.find(it => {
+        let cur = it.object;
+        while (cur.parent && cur.parent !== this.scene && !cur.userData.type) {
+          cur = cur.parent;
+        }
+        return cur.userData && (cur.userData.type === 'sticky-note' || cur.userData.type === 'dont-touch-note');
+      });
+
+      if (noteIntersect) {
+        chosenIntersect = noteIntersect;
+      }
+
+      let hitObject = chosenIntersect.object;
       while (hitObject.parent && hitObject.parent !== this.scene && !hitObject.userData.type) {
         hitObject = hitObject.parent;
       }
@@ -1205,7 +1263,21 @@ class DeskScene {
     const intersects = this.raycaster.intersectObjects(this.interactiveObjects, true);
 
     if (intersects.length > 0) {
-      let hit = intersects[0].object;
+      // NOTE TOP PRIORITY: If any sticky note or dont-touch-note is intersected, prioritize it over folders
+      let chosenIntersect = intersects[0];
+      const noteIntersect = intersects.find(it => {
+        let cur = it.object;
+        while (cur.parent && cur.parent !== this.scene && !cur.userData.type) {
+          cur = cur.parent;
+        }
+        return cur.userData && (cur.userData.type === 'sticky-note' || cur.userData.type === 'dont-touch-note');
+      });
+
+      if (noteIntersect) {
+        chosenIntersect = noteIntersect;
+      }
+
+      let hit = chosenIntersect.object;
       while (hit.parent && hit.parent !== this.scene && !hit.userData.type) {
         hit = hit.parent;
       }

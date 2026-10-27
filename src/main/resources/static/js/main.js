@@ -14,8 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // UI Elements
   const loadingScreen = document.getElementById('loadingScreen');
-  const progressBar = document.getElementById('progressBar');
-  const loadingStatus = document.getElementById('loadingStatus');
   const visitorCountBadge = document.getElementById('visitorCountBadge');
   const guestbookModal = document.getElementById('guestbookModal');
   const guestbookForm = document.getElementById('guestbookForm');
@@ -28,10 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // so buttons are clickable during and after loading — not blocked by async await
   setupHeaderControls();
 
-  // 1. Run Fake Loading Bar with 99% Stall
-  await runFakeLoading();
-
-  // 2. Fetch Initial Data from Backend
+  // 1. Fetch Initial Data from Backend
   try {
     const [fetchedMembers, fetchedNotes, visitData] = await Promise.all([
       API.getMembers(),
@@ -64,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     PortfolioHumor.showToast('⚠️ Could not reach Spring Boot backend. Running in offline fallback mode.');
   }
 
-  // 3. Initialize ClearBook Engine
+  // 2. Initialize ClearBook Engine
   clearBook = new ClearBook({
     containerId: 'bookOverlayRoot',
     onClose: () => {
@@ -77,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 4. Initialize 3D Desk Scene
+  // 3. Initialize 3D Desk Scene
   deskScene = new DeskScene({
     containerId: 'scene-container',
     members: members,
@@ -93,51 +88,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 5. Connect Easy Easter Eggs (Keys 'E', 'G', 'F' or Konami) to Desk Anti-Gravity
+  // 4. Connect Easy Easter Eggs (Keys 'E', 'G', 'F' or Konami) to Desk Anti-Gravity
   PortfolioHumor.initEasterEggs(() => {
     if (deskScene && typeof deskScene.toggleAntiGravity === 'function') {
       deskScene.toggleAntiGravity();
     }
   });
 
-  // 6. Connect Guestbook Form & "sudo" Easter Egg
+  // 5. Connect Guestbook Form & "sudo" Easter Egg
   setupGuestbook();
 
-  // 7. Wire Note Viewer Modal close buttons
+  // 6. Wire Note Viewer Modal close buttons
   setupNoteViewerModal();
 
-  // 8. Dismiss Loading Screen
-  finishLoading();
+  // 7. Complete Eye-Blink Loading Screen after 3 blinks (2100ms)
+  setTimeout(() => {
+    finishLoading();
+  }, 2100);
 
   /* ========================================================================
      HELPER FUNCTIONS
      ======================================================================== */
 
-  async function runFakeLoading() {
-    const steps = [
-      { pct: 18, text: 'Warming up coffee machines...' },
-      { pct: 45, text: 'Counting missing semicolons in src/...' },
-      { pct: 72, text: 'Centering divs with CSS Flexbox...' },
-      { pct: 99, text: 'Loading personality... 99% (Please wait)' }
-    ];
-
-    for (let s of steps) {
-      progressBar.style.width = s.pct + '%';
-      loadingStatus.textContent = s.text;
-      await new Promise(r => setTimeout(r, 400));
-    }
-
-    // Deliberate humorous stall at 99%
-    await new Promise(r => setTimeout(r, 1400));
-
-    progressBar.style.width = '100%';
-    loadingStatus.textContent = 'Ready! Welcome to The Messy Desk.';
-    await new Promise(r => setTimeout(r, 400));
-  }
-
   function finishLoading() {
     if (loadingScreen) {
-      loadingScreen.classList.add('hidden');
+      loadingScreen.classList.add('done');
+      loadingScreen.style.display = 'none';
+      loadingScreen.style.pointerEvents = 'none';
     }
     PortfolioHumor.playSound('pop');
   }

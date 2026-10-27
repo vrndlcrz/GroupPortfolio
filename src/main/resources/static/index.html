@@ -18,24 +18,10 @@
 </head>
 <body>
 
-  <!-- 1. FAKE LOADING SCREEN (Stalls at 99%) -->
-  <div class="loading-screen" id="loadingScreen">
-    <div class="loading-card">
-      <div class="loading-icon-wrap">
-        <svg class="loading-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
-      </div>
-      <h1 class="loading-title">The Messy Desk</h1>
-      <p class="loading-subtitle">Advanced Emerging Technologies • Group Portfolio</p>
-
-      <div class="loading-progress-container">
-        <div class="loading-progress-bar" id="progressBar"></div>
-      </div>
-      <div class="loading-status-text" id="loadingStatus">Initializing 180° desk environment...</div>
-
-      <div class="loading-tip">
-        "Pro tip: If your code doesn't work, stare at it intensely until it feels guilty."
-      </div>
-    </div>
+  <!-- 1. EYE-BLINK LOADING SCREEN (3x blink then open to reveal desk) -->
+  <div class="eye-blink-overlay" id="loadingScreen">
+    <div class="eyelid eyelid-top" id="eyelidTop"></div>
+    <div class="eyelid eyelid-bottom" id="eyelidBottom"></div>
   </div>
 
   <!-- 3. THREE.JS 3D SCENE CONTAINER -->
