@@ -1,0 +1,21 @@
+# Compiled output
+target/
+*.class
+
+# Project specific data files (auto-generated)
+notes.json
+counter.json
+
+# IDE and Editor files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+*.log
+
+# OS generated
+Thumbs.db
+Desktop.ini
+.DS_Store

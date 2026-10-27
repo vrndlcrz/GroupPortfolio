@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" fill="none" width="100%" height="100%">
+  <defs>
+    <style>
+      :root {
+        --drip-purple: #9333EA;
+        --drip-pink: #EC4899;
+        --drip-light: #F472B6;
+      }
+      .drip-main { fill: var(--border-primary, var(--drip-purple)); }
+      .drip-second { fill: var(--border-secondary, var(--drip-pink)); opacity: 0.9; }
+      .drip-splat { fill: var(--border-accent, var(--drip-light)); }
+      .drip-frame { stroke: var(--border-primary, var(--drip-purple)); stroke-width: 2.5; stroke-dasharray: 6 6; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Top Dripping Paint Border Layer 1 (Purple) -->
+  <path class="drip-main" d="
+    M 0 0
+    L 600 0
+    L 600 35
+    C 580 35, 570 65, 560 65 C 550 65, 545 30, 530 30
+    C 515 30, 505 85, 490 85 C 475 85, 470 40, 450 40
+    C 435 40, 425 110, 410 110 C 395 110, 390 35, 370 35
+    C 355 35, 345 55, 330 55 C 315 55, 310 30, 290 30
+    C 270 30, 260 95, 245 95 C 230 95, 225 35, 205 35
+    C 190 35, 180 120, 165 120 C 150 120, 145 40, 125 40
+    C 110 40, 100 70, 85 70 C 70 70, 65 30, 45 30
+    C 30 30, 20 50, 0 50 Z" />
+
+  <!-- Top Dripping Paint Layer 2 (Pink overlay) -->
+  <path class="drip-second" d="
+    M 0 0
+    L 600 0
+    L 600 25
+    C 570 25, 560 45, 545 45 C 530 45, 525 20, 505 20
+    C 490 20, 480 65, 465 65 C 450 65, 445 25, 425 25
+    C 405 25, 395 50, 380 50 C 365 50, 360 20, 340 20
+    C 320 20, 310 75, 295 75 C 280 75, 275 25, 255 25
+    C 240 25, 230 50, 215 50 C 200 50, 195 20, 175 20
+    C 160 20, 150 70, 135 70 C 120 70, 115 25, 95 25
+    C 80 25, 70 45, 55 45 C 40 45, 30 20, 0 20 Z" />
+
+  <!-- Detached falling drips from top -->
+  <circle class="drip-main" cx="165" cy="135" r="5" />
+  <circle class="drip-main" cx="410" cy="125" r="4.5" />
+  <circle class="drip-second" cx="295" cy="90" r="4" />
+  <circle class="drip-splat" cx="490" cy="100" r="3.5" />
+
+  <!-- Bottom Rising Paint Drips Layer 1 (Purple) -->
+  <path class="drip-main" d="
+    M 0 800
+    L 600 800
+    L 600 765
+    C 580 765, 570 735, 560 735 C 550 735, 545 770, 530 770
+    C 515 770, 505 715, 490 715 C 475 715, 470 760, 450 760
+    C 435 760, 425 690, 410 690 C 395 690, 390 765, 370 765
+    C 355 765, 345 745, 330 745 C 315 745, 310 770, 290 770
+    C 270 770, 260 705, 245 705 C 230 705, 225 765, 205 765
+    C 190 765, 180 680, 165 680 C 150 680, 145 760, 125 760
+    C 110 760, 100 730, 85 730 C 70 730, 65 770, 45 770
+    C 30 770, 20 750, 0 750 Z" />
+
+  <!-- Bottom Rising Paint Drips Layer 2 (Pink overlay) -->
+  <path class="drip-second" d="
+    M 0 800
+    L 600 800
+    L 600 775
+    C 570 775, 560 755, 545 755 C 530 755, 525 780, 505 780
+    C 490 780, 480 735, 465 735 C 450 735, 445 775, 425 775
+    C 405 775, 395 750, 380 750 C 365 750, 360 780, 340 780
+    C 320 780, 310 725, 295 725 C 280 725, 275 775, 255 775
+    C 240 775, 230 750, 215 750 C 200 750, 195 780, 175 780
+    C 160 780, 150 730, 135 730 C 120 730, 115 775, 95 775
+    C 80 775, 70 755, 55 755 C 40 755, 30 780, 0 780 Z" />
+
+  <circle class="drip-main" cx="165" cy="665" r="5" />
+  <circle class="drip-main" cx="410" cy="675" r="4.5" />
+  <circle class="drip-second" cx="245" cy="690" r="4" />
+
+  <!-- Side framing lines with dripping splatters -->
+  <rect class="drip-frame" x="45" y="110" width="510" height="580" rx="18" />
+  <circle class="drip-second" cx="45" cy="350" r="6" />
+  <circle class="drip-main" cx="45" cy="450" r="5" />
+  <circle class="drip-splat" cx="555" cy="320" r="5" />
+  <circle class="drip-second" cx="555" cy="480" r="6" />
+</svg>

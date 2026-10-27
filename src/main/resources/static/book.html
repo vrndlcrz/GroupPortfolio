@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clear-Book Standalone Engine Test</title>
+  <link rel="stylesheet" href="css/book.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800;900&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
+      color: #F8FAFC;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .test-panel {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 600px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+      color: #38BDF8;
+    }
+
+    p {
+      color: #94A3B8;
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .member-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .member-select-btn {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      color: #FFFFFF;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .member-select-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.15);
+    }
+
+    .status-msg {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #64748B;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="test-panel">
+    <h1>Clear-Book Engine Tester</h1>
+    <p>Select any of the 5 members to load their portfolio directly from <code>/api/members/{id}</code> and test the 3D page flip, SVG borders, and cover styling.</p>
+
+    <div class="member-btn-group">
+      <button class="member-select-btn" style="background:#FF7A00;" onclick="loadAndOpen(1)">1. Joshua</button>
+      <button class="member-select-btn" style="background:#8B5CF6;" onclick="loadAndOpen(2)">2. Maria</button>
+      <button class="member-select-btn" style="background:#0284C7;" onclick="loadAndOpen(3)">3. Kenji</button>
+      <button class="member-select-btn" style="background:#059669;" onclick="loadAndOpen(4)">4. Sophia</button>
+      <button class="member-select-btn" style="background:#E11D48;" onclick="loadAndOpen(5)">5. Liam</button>
+    </div>
+
+    <div class="status-msg" id="statusMessage">Click a member button to open their clear-book</div>
+  </div>
+
+  <div id="bookOverlayRoot"></div>
+
+  <script src="js/book.js"></script>
+  <script>
+    const book = new ClearBook({
+      containerId: 'bookOverlayRoot',
+      onClose: () => {
+        document.getElementById('statusMessage').textContent = 'Book closed. Ready to select another member.';
+      },
+      onOpenGuestbook: (memberId) => {
+        alert('Guestbook trigger clicked for Member #' + memberId + '! (Will dock to 3D desk in full app)');
+      }
+    });
+
+    async function loadAndOpen(id) {
+      const status = document.getElementById('statusMessage');
+      status.textContent = `Fetching /api/members/${id}...`;
+      try {
+        const res = await fetch(`/api/members/${id}`);
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        const member = await res.json();
+        status.textContent = `Loaded ${member.name}. Opening portfolio...`;
+        book.open(member);
+      } catch (err) {
+        status.textContent = `Error loading member: ${err.message}`;
+      }
+    }
+
+    // Auto-open Member 1 on page load for immediate testing
+    window.addEventListener('DOMContentLoaded', () => {
+      loadAndOpen(1);
+    });
+  </script>
+</body>
+</html>

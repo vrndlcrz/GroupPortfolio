@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" fill="none" width="100%" height="100%">
+  <defs>
+    <style>
+      :root {
+        --blob-orange: #FF7A00;
+        --blob-red: #EF4444;
+        --blob-yellow: #FBBF24;
+        --blob-peach: #FED7AA;
+      }
+      .blob-primary { fill: var(--border-primary, var(--blob-orange)); opacity: 0.85; }
+      .blob-secondary { fill: var(--border-secondary, var(--blob-red)); opacity: 0.85; }
+      .blob-accent { fill: var(--border-accent, var(--blob-yellow)); opacity: 0.9; }
+      .blob-outline { stroke: #451A03; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .blob-doodle { stroke: #D97706; stroke-width: 2; stroke-dasharray: 4 4; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Top-Left Blob Cluster -->
+  <path class="blob-primary" d="M10 20 C30 -5, 90 10, 110 35 C130 60, 95 100, 65 105 C35 110, -5 80, 10 20 Z" />
+  <path class="blob-secondary" d="M70 15 C95 5, 140 25, 145 50 C150 75, 120 90, 100 85 C80 80, 50 60, 70 15 Z" />
+  <circle class="blob-accent" cx="135" cy="85" r="14" />
+  <circle class="blob-secondary" cx="165" cy="45" r="9" />
+  <circle class="blob-primary" cx="40" cy="125" r="12" />
+
+  <!-- Top-Right Blob Cluster -->
+  <path class="blob-secondary" d="M590 20 C570 -5, 510 10, 490 35 C470 60, 505 100, 535 105 C565 110, 605 80, 590 20 Z" />
+  <path class="blob-primary" d="M530 15 C505 5, 460 25, 455 50 C450 75, 480 90, 500 85 C520 80, 550 60, 530 15 Z" />
+  <circle class="blob-accent" cx="465" cy="85" r="14" />
+  <circle class="blob-primary" cx="435" cy="45" r="9" />
+  <circle class="blob-secondary" cx="560" cy="125" r="12" />
+
+  <!-- Bottom-Left Blob Cluster -->
+  <path class="blob-secondary" d="M10 780 C30 805, 90 790, 110 765 C130 740, 95 700, 65 695 C35 690, -5 720, 10 780 Z" />
+  <path class="blob-primary" d="M70 785 C95 795, 140 775, 145 750 C150 725, 120 710, 100 715 C80 720, 50 740, 70 785 Z" />
+  <circle class="blob-accent" cx="135" cy="715" r="14" />
+  <circle class="blob-primary" cx="165" cy="755" r="9" />
+  <circle class="blob-secondary" cx="40" cy="675" r="12" />
+
+  <!-- Bottom-Right Blob Cluster -->
+  <path class="blob-primary" d="M590 780 C570 805, 510 790, 490 765 C470 740, 505 700, 535 695 C565 690, 605 720, 590 780 Z" />
+  <path class="blob-secondary" d="M530 785 C505 795, 460 775, 455 750 C450 725, 480 710, 500 715 C520 720, 550 740, 530 785 Z" />
+  <circle class="blob-accent" cx="465" cy="715" r="14" />
+  <circle class="blob-secondary" cx="435" cy="755" r="9" />
+  <circle class="blob-primary" cx="560" cy="675" r="12" />
+
+  <!-- Subtle edge decorative drops -->
+  <ellipse class="blob-accent" cx="15" cy="400" rx="8" ry="25" />
+  <ellipse class="blob-primary" cx="585" cy="400" rx="8" ry="25" />
+  <ellipse class="blob-secondary" cx="300" cy="18" rx="28" ry="7" />
+  <ellipse class="blob-accent" cx="300" cy="782" rx="28" ry="7" />
+
+  <!-- Hand drawn inner frame -->
+  <rect class="blob-outline" x="42" y="42" width="516" height="716" rx="24" />
+  <rect class="blob-doodle" x="50" y="50" width="500" height="700" rx="18" />
+</svg>

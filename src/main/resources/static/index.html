@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A humorous 3D interactive portfolio website for Advanced Emerging Technologies featuring 5 member clear books on a messy student desk.">
+  <meta name="author" content="AET Group 5">
+  <title>The Messy Desk • AET 3D Group Portfolio</title>
+
+  <!-- Typography: Outfit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Application Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/book.css">
+</head>
+<body>
+
+  <!-- 1. FAKE LOADING SCREEN (Stalls at 99%) -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-card">
+      <div class="loading-icon-wrap">📁✨</div>
+      <h1 class="loading-title">The Messy Desk</h1>
+      <p class="loading-subtitle">Advanced Emerging Technologies • Group Portfolio</p>
+
+      <div class="loading-progress-container">
+        <div class="loading-progress-bar" id="progressBar"></div>
+      </div>
+      <div class="loading-status-text" id="loadingStatus">Initializing 180° desk environment...</div>
+
+      <div class="loading-tip">
+        "Pro tip: If your code doesn't work, stare at it intensely until it feels guilty."
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MINIMALIST FLOATING HUD (NO TOP NAVBAR) -->
+  <!-- Top Left: Floating Branding & Visitor Humor -->
+  <div class="floating-badge-top-left">
+    <div class="brand-chip">
+      <span class="chip-tag">AET 3D</span>
+      <span class="chip-title">The Messy Desk</span>
+    </div>
+    <div class="visitor-joke-chip" id="visitorCountBadge" title="Backend visitor counter">
+      Loading visitor records...
+    </div>
+  </div>
+
+  <!-- Bottom Center: 180° Look Around & Control Guide -->
+  <aside class="floating-look-guide" id="lookGuide">
+    <span class="guide-icon">👀</span>
+    <span><strong>180° Free Look:</strong> Click &amp; drag or move mouse to look around • Press <span class="kbd-hint">E</span> for Zero-G • Click folders to open</span>
+  </aside>
+
+  <!-- Bottom Right: Floating Action Dock -->
+  <div class="floating-hud-dock">
+    <button class="hud-btn primary" id="openGuestbookNavBtn" title="Leave a sticky note on the desk">
+      ✍️ <span class="hud-label">Leave Note</span>
+    </button>
+    <button class="hud-btn easter-egg-btn" id="easterEggBtn" title="Toggle Anti-Gravity Easter Egg (Press 'E')">
+      ✨ <span class="hud-label">Zero-G</span>
+    </button>
+    <button class="hud-btn" id="muteToggleBtn" title="Mute/Unmute sound effects">
+      🔊 <span class="hud-label">Sound</span>
+    </button>
+    <button class="hud-btn" id="termsBtn" title="Read humorous Terms & Conditions">
+      📜 <span class="hud-label">Terms</span>
+    </button>
+    <button class="hud-btn" id="safeModeBtn" title="Toggle 2D Safe Mode">
+      🖥️ <span class="hud-label">2D Mode</span>
+    </button>
+  </div>
+
+  <!-- 3. THREE.JS 3D SCENE CONTAINER -->
+  <main id="scene-container" aria-label="Interactive 3D Student Desk with 180 Degree Look Around"></main>
+
+  <!-- Interactive 3D Tooltip -->
+  <div class="desk-tooltip" id="deskTooltip"></div>
+
+  <!-- 4. GUESTBOOK MODAL (Sticky Note Creator) -->
+  <div class="guestbook-modal-overlay" id="guestbookModal" role="dialog" aria-modal="true" aria-label="Guestbook Modal">
+    <div class="guestbook-card">
+      <div class="guestbook-header">
+        <div>
+          <h3>Leave a Sticky Note 📝</h3>
+          <p style="font-size:0.8rem; color:#4B5563;">Your message will land directly on the 3D desk!</p>
+        </div>
+        <button class="guestbook-close-x" id="guestbookCloseBtn" title="Close" aria-label="Close">✕</button>
+      </div>
+
+      <form class="guestbook-form" id="guestbookForm">
+        <div>
+          <label class="guestbook-field-label" for="memberSelectDropdown">Dedicate to Member:</label>
+          <select class="guestbook-input" id="memberSelectDropdown" style="margin-top:4px;">
+            <option value="1">1. Joshua Deliva</option>
+            <option value="2">2. Maria Santos</option>
+            <option value="3">3. Kenji Sato</option>
+            <option value="4">4. Sophia Reyes</option>
+            <option value="5">5. Liam Garcia</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="guestbook-field-label" for="noteAuthorInput">Your Name or Alias:</label>
+          <input class="guestbook-input" type="text" id="noteAuthorInput" placeholder="e.g. Professor X or Code Reviewer" maxlength="40" style="margin-top:4px;">
+        </div>
+
+        <div>
+          <label class="guestbook-field-label" for="noteTextInput">Your Note (Max 120 chars):</label>
+          <textarea class="guestbook-textarea" id="noteTextInput" rows="3" maxlength="120" placeholder="Type a friendly comment, joke, or review..." required style="margin-top:4px;"></textarea>
+          <div class="char-counter" id="charCounter">0 / 120</div>
+        </div>
+
+        <button class="guestbook-submit-btn" type="submit">
+          📌 Stick Note to Desk
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. ROOT CONTAINER FOR CLEAR-BOOK OVERLAY -->
+  <div id="bookOverlayRoot"></div>
+
+  <!-- 6. VENDORED OFFLINE LIBRARIES -->
+  <script src="js/lib/three.min.js"></script>
+  <script src="js/lib/gsap.min.js"></script>
+
+  <!-- 7. APPLICATION MODULES -->
+  <script src="js/api.js"></script>
+  <script src="js/humor.js"></script>
+  <script src="js/book.js"></script>
+  <script src="js/scene.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

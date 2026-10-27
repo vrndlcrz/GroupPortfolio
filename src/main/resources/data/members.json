@@ -1,0 +1,242 @@
+[
+  {
+    "id": 1,
+    "name": "Joshua Deliva",
+    "section": "BSIT-1A",
+    "subject": "Advanced Emerging Technologies",
+    "tagline": "Emerging technologies, emerging deadlines",
+    "folderLabel": "FINAL_v7_REALLYFINAL_dontopen",
+    "photo": "assets/photos/member1.svg",
+    "coverColor": "#FF7A00",
+    "pages": [
+      {
+        "title": "About Me",
+        "content": "Hi! I am [Member 1 Name], an aspiring technologist in BSIT-1A. I love tinkering with computers, building weird web experiments, and converting excessive caffeine into lines of working code. Motto: 'If it works, don't touch it!'",
+        "border": "wavy-pink.svg"
+      },
+      {
+        "title": "Hobbies",
+        "content": "• [Member 1 hobby: Mechanical keyboards & soldering]\n• [Member 1 hobby: Late night gaming sessions]\n• [Member 1 hobby: Watching 3-hour long video essays on tech history]\n• [Member 1 hobby: Hunting for rare stickers to put on my laptop]",
+        "border": "blobs-orange.svg"
+      },
+      {
+        "title": "Skills & Superpowers",
+        "content": "Comfortable with Java, JavaScript, and emerging web technologies. Special ability: figuring out why code throws NullPointerException at 2:00 AM after staring at the screen in silence for 45 minutes.",
+        "border": "vines-flowers.svg"
+      },
+      {
+        "title": "Projects",
+        "content": "• The Messy Desk 3D Portfolio (This website! Built with Spring Boot & Three.js)\n• [Member 1 Project: Discord Bot for automated study timers]\n• [Member 1 Project: Terminal-based budget tracker written in Java]",
+        "border": "dripping-paint.svg"
+      },
+      {
+        "title": "Fun Facts & Roast Me",
+        "content": "Has 47 browser tabs open right now and believes every single one is critical. Still uses console.log() as a primary life debugging tool. Believes dark mode is an internationally recognized human right.",
+        "border": "bows-stars.svg"
+      },
+      {
+        "title": "Contact & Goals",
+        "content": "Email: [joshua.member1@university.edu]\nGitHub: @joshua-dev\nTech Goal: Master distributed systems, build software that millions of people actually enjoy using, and finally get 8 hours of sleep.",
+        "border": "dotted-frame.svg"
+      }
+    ],
+    "skills": [
+      { "name": "Ctrl+C, Ctrl+V", "level": 98, "funnyLabel": "Certified Copy-Paste Architect" },
+      { "name": "Java Spring Boot", "level": 82, "funnyLabel": "Autowired everything, hope it wires" },
+      { "name": "Googling Errors", "level": 94, "funnyLabel": "Finds answers from 2011 Indian tutorials" },
+      { "name": "Rubber Duck Debugging", "level": 90, "funnyLabel": "The duck knows all my deepest secrets" }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Maria Santos",
+    "section": "BSIT-1A",
+    "subject": "Advanced Emerging Technologies",
+    "tagline": "Powered by coffee, panic, and StackOverflow",
+    "folderLabel": "Do Not Open (Seriously)",
+    "photo": "assets/photos/member2.svg",
+    "coverColor": "#8B5CF6",
+    "pages": [
+      {
+        "title": "About Me",
+        "content": "Hello! I am [Member 2 Name], a front-end enthusiast and UI lover in BSIT-1A. I believe websites should look like art galleries and run as fast as lightning. My life goal is centering divs on the first try without weeping.",
+        "border": "wavy-pink.svg"
+      },
+      {
+        "title": "Hobbies",
+        "content": "• [Member 2 hobby: Digital illustration & vector art]\n• [Member 2 hobby: Collecting aesthetic Notion templates]\n• [Member 2 hobby: Organizing Spotify playlists by emotional weather]\n• [Member 2 hobby: Exploring aesthetic coffee shops]",
+        "border": "blobs-orange.svg"
+      },
+      {
+        "title": "Skills & Superpowers",
+        "content": "Proficient in modern CSS layout, SVG animation, and component design. Superpower: can spot a misaligned element by 1 single pixel from across the lecture hall without squinting.",
+        "border": "vines-flowers.svg"
+      },
+      {
+        "title": "Projects",
+        "content": "• [Member 2 Project: Interactive Design System in Vanilla CSS]\n• [Member 2 Project: Daily Habit Tracker with pastel gradients]\n• [Member 2 Project: Clear-Book 3D Flip Engine for our AET portfolio]",
+        "border": "dripping-paint.svg"
+      },
+      {
+        "title": "Fun Facts & Roast Me",
+        "content": "Spends 4 hours picking the perfect color palette and 15 minutes writing the actual code. Owns 12 water bottles but only drinks iced caramel macchiato. Favorite CSS property: filter: drop-shadow().",
+        "border": "bows-stars.svg"
+      },
+      {
+        "title": "Contact & Goals",
+        "content": "Email: [maria.member2@university.edu]\nPortfolio: behance.net/maria-ui\nTech Goal: Become a lead product designer at an innovative creative studio and author a book on accessible design.",
+        "border": "dotted-frame.svg"
+      }
+    ],
+    "skills": [
+      { "name": "CSS Flexbox & Grid", "level": 92, "funnyLabel": "Can center a div (first try 50% of the time)" },
+      { "name": "Color Theory", "level": 88, "funnyLabel": "Knows 40 shades of off-white" },
+      { "name": "Coffee Brewing", "level": 99, "funnyLabel": "Converts caffeine directly into pixels" },
+      { "name": "Figma Prototyping", "level": 85, "funnyLabel": "Auto-layout wizard" }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Kenji Sato",
+    "section": "BSIT-1A",
+    "subject": "Advanced Emerging Technologies",
+    "tagline": "99% skill, 1% luck, 100% procrastination",
+    "folderLabel": "Homework (Unfinished)",
+    "photo": "assets/photos/member3.svg",
+    "coverColor": "#0284C7",
+    "pages": [
+      {
+        "title": "About Me",
+        "content": "Hey there! I am [Member 3 Name], an aspiring systems engineer and 3D graphics enthusiast in BSIT-1A. I love understanding how things tick under the hood, from computer graphics pipelines to Linux kernels.",
+        "border": "wavy-pink.svg"
+      },
+      {
+        "title": "Hobbies",
+        "content": "• [Member 3 hobby: 3D modeling in Blender & shaders]\n• [Member 3 hobby: Speedrunning retro games]\n• [Member 3 hobby: Customizing Linux desktop dotfiles for 6 hours]\n• [Member 3 hobby: Playing electric bass]",
+        "border": "blobs-orange.svg"
+      },
+      {
+        "title": "Skills & Superpowers",
+        "content": "Strong grasp of Three.js, WebGL mathematics, and algorithm analysis. Superpower: can read compiler error messages without panicking and immediately know which semicolon is missing.",
+        "border": "vines-flowers.svg"
+      },
+      {
+        "title": "Projects",
+        "content": "• [Member 3 Project: 3D Solar System simulation in WebGL]\n• [Member 3 Project: The Messy Desk 3D Environment & Raycasting]\n• [Member 3 Project: Lightweight physics engine in JavaScript]",
+        "border": "dripping-paint.svg"
+      },
+      {
+        "title": "Fun Facts & Roast Me",
+        "content": "Spends more time customizing his terminal theme than actually writing code in it. Refuses to use an IDE without vim keybindings. Will talk your ear off about quaternions if you ask him for the time.",
+        "border": "bows-stars.svg"
+      },
+      {
+        "title": "Contact & Goals",
+        "content": "Email: [kenji.member3@university.edu]\nGitHub: @kenji-3d\nTech Goal: Build real-time 3D simulation tools for scientific research and contribute to open-source graphics libraries.",
+        "border": "dotted-frame.svg"
+      }
+    ],
+    "skills": [
+      { "name": "Three.js / WebGL", "level": 89, "funnyLabel": "Turns vectors into rotating cubes" },
+      { "name": "Turning Off and On", "level": 99, "funnyLabel": "Universal Master of IT Support" },
+      { "name": "Vim Keybindings", "level": 80, "funnyLabel": "Knows how to exit Vim (:wq!)" },
+      { "name": "Git Command Line", "level": 86, "funnyLabel": "Never uses git push --force (almost)" }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Sophia Reyes",
+    "section": "BSIT-1A",
+    "subject": "Advanced Emerging Technologies",
+    "tagline": "My code works, but nobody knows why (especially me)",
+    "folderLabel": "secret_thesis_do_not_delete",
+    "photo": "assets/photos/member4.svg",
+    "coverColor": "#059669",
+    "pages": [
+      {
+        "title": "About Me",
+        "content": "Hi! I am [Member 4 Name], backend architect and data enthusiast in BSIT-1A. I love making robust RESTful APIs, clean data architectures, and bulletproof validations so systems never fail even under chaos.",
+        "border": "wavy-pink.svg"
+      },
+      {
+        "title": "Hobbies",
+        "content": "• [Member 4 hobby: Solving algorithmic puzzles on LeetCode]\n• [Member 4 hobby: Baking sourdough bread and measuring grams precisely]\n• [Member 4 hobby: Urban gardening & plant propagation]\n• [Member 4 hobby: Board game strategy nights with friends]",
+        "border": "blobs-orange.svg"
+      },
+      {
+        "title": "Skills & Superpowers",
+        "content": "Experienced with REST design, JSON serialization, security sanitization, and concurrent operations. Superpower: can spot an SQL injection vulnerability or unescaped HTML tag from a mile away.",
+        "border": "vines-flowers.svg"
+      },
+      {
+        "title": "Projects",
+        "content": "• [Member 4 Project: Thread-safe Guestbook & Visit Counter API]\n• [Member 4 Project: Student Grade Predictor using regression]\n• [Member 4 Project: Encrypted note-taking app with AES]",
+        "border": "dripping-paint.svg"
+      },
+      {
+        "title": "Fun Facts & Roast Me",
+        "content": "Commented 'Do not delete this comment, it makes the code run' in a production file once. Takes notes in Markdown even when writing a grocery shopping list. Has 14 houseplants named after HTTP status codes.",
+        "border": "bows-stars.svg"
+      },
+      {
+        "title": "Contact & Goals",
+        "content": "Email: [sophia.member4@university.edu]\nLinkedIn: linkedin.com/in/sophia-reyes-dev\nTech Goal: Architect scalable cloud microservices that withstand Black Friday traffic surges without flinching.",
+        "border": "dotted-frame.svg"
+      }
+    ],
+    "skills": [
+      { "name": "REST APIs", "level": 91, "funnyLabel": "200 OK is my spiritual state of mind" },
+      { "name": "Input Sanitization", "level": 95, "funnyLabel": "Little Bobby Tables was stopped here" },
+      { "name": "Documentation", "level": 84, "funnyLabel": "Writes comments future me will understand" },
+      { "name": "Debugging", "level": 88, "funnyLabel": "Follows stack traces like a detective" }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Liam Garcia",
+    "section": "BSIT-1A",
+    "subject": "Advanced Emerging Technologies",
+    "tagline": "Professional tab accumulator & dark mode advocate",
+    "folderLabel": "Project_Backup_Of_Backup_FINAL",
+    "photo": "assets/photos/member5.svg",
+    "coverColor": "#E11D48",
+    "pages": [
+      {
+        "title": "About Me",
+        "content": "Hey! I am [Member 5 Name], full-stack explorer and humor coordinator in BSIT-1A. I believe tech projects should not only solve hard problems, but also bring a genuine smile to everyone who interacts with them.",
+        "border": "wavy-pink.svg"
+      },
+      {
+        "title": "Hobbies",
+        "content": "• [Member 5 hobby: Writing humorous tech blogs & sketches]\n• [Member 5 hobby: Sound design & synthwave audio loops]\n• [Member 5 hobby: Drone flying & aerial photography]\n• [Member 5 hobby: Building mechanical desk gadgets]",
+        "border": "blobs-orange.svg"
+      },
+      {
+        "title": "Skills & Superpowers",
+        "content": "Expert in GSAP timeline sequencing, web audio synthesis, interactive humor easter eggs, and user onboarding flows. Superpower: can defuse high-stress group project tension with a well-timed meme.",
+        "border": "vines-flowers.svg"
+      },
+      {
+        "title": "Projects",
+        "content": "• [Member 5 Project: Konami Code Gravity Inverter for 3D Desk]\n• [Member 5 Project: Synthesized Web Audio Soundboard]\n• [Member 5 Project: Fake Error Dialog generator for stress relief]",
+        "border": "dripping-paint.svg"
+      },
+      {
+        "title": "Fun Facts & Roast Me",
+        "content": "Believes 99% of computer errors can be solved by restarting the universe. Has committed with message 'asdfghjk' more than twice. Owns 3 rubber ducks, each dedicated to a different programming language.",
+        "border": "bows-stars.svg"
+      },
+      {
+        "title": "Contact & Goals",
+        "content": "Email: [liam.member5@university.edu]\nTwitter/X: @liam_codes\nTech Goal: Build interactive web experiences that win Awwwards and make programming accessible to younger students.",
+        "border": "dotted-frame.svg"
+      }
+    ],
+    "skills": [
+      { "name": "GSAP Animation", "level": 94, "funnyLabel": "Makes everything bounce smoothly" },
+      { "name": "Web Audio API", "level": 83, "funnyLabel": "Beeps, boops, and coffee spill sounds" },
+      { "name": "Easter Egg Crafting", "level": 97, "funnyLabel": "Hides secrets everywhere" },
+      { "name": "Meme Engineering", "level": 99, "funnyLabel": "Certified Senior Humor Architect" }
+    ]
+  }
+]

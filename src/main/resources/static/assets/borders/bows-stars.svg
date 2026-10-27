@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" fill="none" width="100%" height="100%">
+  <defs>
+    <style>
+      :root {
+        --bow-pink: #FB7185;
+        --bow-shadow: #E11D48;
+        --star-gold: #FBBF24;
+        --ribbon-line: #FDA4AF;
+      }
+      .bow-body { fill: var(--border-primary, var(--bow-pink)); stroke: var(--border-secondary, var(--bow-shadow)); stroke-width: 2.5; stroke-linejoin: round; }
+      .bow-knot { fill: var(--border-secondary, var(--bow-shadow)); }
+      .star-sparkle { fill: var(--border-accent, var(--star-gold)); stroke: #D97706; stroke-width: 1; }
+      .frame-scallop { stroke: var(--border-primary, var(--ribbon-line)); stroke-width: 2.5; stroke-dasharray: 8 6; stroke-linecap: round; fill: none; }
+      .inner-outline { stroke: var(--border-secondary, var(--bow-shadow)); stroke-width: 2; rx: 16; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Frame guides -->
+  <rect class="inner-outline" x="45" y="45" width="510" height="710" rx="20" />
+  <rect class="frame-scallop" x="55" y="55" width="490" height="690" rx="14" />
+
+  <!-- Macro for Star (4-point sparkle) -->
+  <!-- Top stars -->
+  <path class="star-sparkle" d="M150 45 Q150 35 155 30 Q150 25 150 15 Q150 25 145 30 Q150 35 150 45 Z" />
+  <path class="star-sparkle" d="M450 45 Q450 35 455 30 Q450 25 450 15 Q450 25 445 30 Q450 35 450 45 Z" />
+  <path class="star-sparkle" d="M220 40 Q220 33 223 30 Q220 27 220 20 Q220 27 217 30 Q220 33 220 40 Z" />
+  <path class="star-sparkle" d="M380 40 Q380 33 383 30 Q380 27 380 20 Q380 27 377 30 Q380 33 380 40 Z" />
+
+  <!-- Bottom stars -->
+  <path class="star-sparkle" d="M150 785 Q150 775 155 770 Q150 765 150 755 Q150 765 145 770 Q150 775 150 785 Z" />
+  <path class="star-sparkle" d="M450 785 Q450 775 455 770 Q450 765 450 755 Q450 765 445 770 Q450 775 450 785 Z" />
+  <path class="star-sparkle" d="M300 775 Q300 768 303 765 Q300 762 300 755 Q300 762 297 765 Q300 768 300 775 Z" />
+
+  <!-- Left & Right stars -->
+  <path class="star-sparkle" d="M40 250 Q40 240 45 235 Q40 230 40 220 Q40 230 35 235 Q40 240 40 250 Z" />
+  <path class="star-sparkle" d="M40 550 Q40 540 45 535 Q40 530 40 520 Q40 530 35 535 Q40 540 40 550 Z" />
+  <path class="star-sparkle" d="M560 250 Q560 240 565 235 Q560 230 560 220 Q560 230 555 235 Q560 240 560 250 Z" />
+  <path class="star-sparkle" d="M560 550 Q560 540 565 535 Q560 530 560 520 Q560 530 555 535 Q560 540 560 550 Z" />
+
+  <!-- Top-Center Cute Bow -->
+  <g transform="translate(300, 45)">
+    <!-- Left Loop -->
+    <path class="bow-body" d="M0 0 C-15 -18, -35 -15, -35 0 C-35 15, -15 12, 0 0 Z" />
+    <!-- Right Loop -->
+    <path class="bow-body" d="M0 0 C15 -18, 35 -15, 35 0 C35 15, 15 12, 0 0 Z" />
+    <!-- Tails -->
+    <path class="bow-body" d="M-5 4 C-15 18, -25 24, -28 32 C-20 28, -12 24, -5 12 Z" />
+    <path class="bow-body" d="M5 4 C15 18, 25 24, 28 32 C20 28, 12 24, 5 12 Z" />
+    <!-- Knot -->
+    <circle class="bow-knot" cx="0" cy="0" r="7" />
+  </g>
+
+  <!-- Top-Left Bow -->
+  <g transform="translate(50, 50)">
+    <path class="bow-body" d="M0 0 C-14 -14, -28 -10, -26 4 C-24 16, -10 12, 0 0 Z" />
+    <path class="bow-body" d="M0 0 C12 -16, 26 -12, 26 2 C26 14, 12 12, 0 0 Z" />
+    <path class="bow-body" d="M-3 3 C-10 14, -18 20, -22 28 C-16 23, -10 18, -3 9 Z" />
+    <path class="bow-body" d="M3 3 C10 14, 18 20, 22 28 C16 23, 10 18, 3 9 Z" />
+    <circle class="bow-knot" cx="0" cy="0" r="6" />
+  </g>
+
+  <!-- Top-Right Bow -->
+  <g transform="translate(550, 50)">
+    <path class="bow-body" d="M0 0 C-14 -14, -28 -10, -26 4 C-24 16, -10 12, 0 0 Z" />
+    <path class="bow-body" d="M0 0 C12 -16, 26 -12, 26 2 C26 14, 12 12, 0 0 Z" />
+    <path class="bow-body" d="M-3 3 C-10 14, -18 20, -22 28 C-16 23, -10 18, -3 9 Z" />
+    <path class="bow-body" d="M3 3 C10 14, 18 20, 22 28 C16 23, 10 18, 3 9 Z" />
+    <circle class="bow-knot" cx="0" cy="0" r="6" />
+  </g>
+
+  <!-- Bottom-Left Bow -->
+  <g transform="translate(50, 750)">
+    <path class="bow-body" d="M0 0 C-14 -14, -28 -10, -26 4 C-24 16, -10 12, 0 0 Z" />
+    <path class="bow-body" d="M0 0 C12 -16, 26 -12, 26 2 C26 14, 12 12, 0 0 Z" />
+    <path class="bow-body" d="M-3 3 C-10 14, -18 20, -22 28 C-16 23, -10 18, -3 9 Z" />
+    <path class="bow-body" d="M3 3 C10 14, 18 20, 22 28 C16 23, 10 18, 3 9 Z" />
+    <circle class="bow-knot" cx="0" cy="0" r="6" />
+  </g>
+
+  <!-- Bottom-Right Bow -->
+  <g transform="translate(550, 750)">
+    <path class="bow-body" d="M0 0 C-14 -14, -28 -10, -26 4 C-24 16, -10 12, 0 0 Z" />
+    <path class="bow-body" d="M0 0 C12 -16, 26 -12, 26 2 C26 14, 12 12, 0 0 Z" />
+    <path class="bow-body" d="M-3 3 C-10 14, -18 20, -22 28 C-16 23, -10 18, -3 9 Z" />
+    <path class="bow-body" d="M3 3 C10 14, 18 20, 22 28 C16 23, 10 18, 3 9 Z" />
+    <circle class="bow-knot" cx="0" cy="0" r="6" />
+  </g>
+</svg>

@@ -1,0 +1,742 @@
+/* ==========================================================================
+   MAIN STYLESHEET - AET GROUP PORTFOLIO: THE MESSY DESK (style.css)
+   Immersive Fullscreen 3D Desk, Floating HUD, and 180° Look-Around Controls
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;800&display=swap');
+
+:root {
+  --bg-primary: #0B0F19;
+  --bg-secondary: #1E293B;
+  --accent-cyan: #38BDF8;
+  --accent-orange: #FF7A00;
+  --accent-purple: #8B5CF6;
+  --accent-rose: #F43F5E;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --border-glass: rgba(255, 255, 255, 0.15);
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  user-select: none;
+}
+
+/* ==========================================================================
+   1. FAKE LOADING SCREEN (Stalls at 99%)
+   ========================================================================== */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: radial-gradient(circle at center, #1E293B 0%, #080D1A 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+}
+
+.loading-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-card {
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(18px);
+}
+
+.loading-icon-wrap {
+  font-size: 3.5rem;
+  margin-bottom: 16px;
+  animation: bounceSlow 2s infinite ease-in-out;
+}
+
+.loading-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  margin-bottom: 8px;
+}
+
+.loading-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.loading-progress-container {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.loading-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #38BDF8, #8B5CF6, #F43F5E);
+  border-radius: 999px;
+  transition: width 0.3s ease-out;
+}
+
+.loading-status-text {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent-cyan);
+  min-height: 1.5em;
+}
+
+.loading-tip {
+  margin-top: 24px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-top: 14px;
+}
+
+/* ==========================================================================
+   2. IMMERSIVE FLOATING HUD (NO TOP NAVBAR)
+   ========================================================================== */
+
+/* Top-Left: Floating Branding & Visitor Joke */
+.floating-badge-top-left {
+  position: fixed;
+  top: 18px;
+  left: 20px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.brand-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(12px);
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.chip-tag {
+  background: linear-gradient(135deg, #FF7A00, #F43F5E);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.75rem;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.chip-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #FFFFFF;
+}
+
+.visitor-joke-chip {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(12px);
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #FBBF24;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease;
+}
+
+.visitor-joke-chip:hover {
+  transform: scale(1.02);
+  border-color: #FBBF24;
+}
+
+/* Bottom-Center: 180° Look Guide */
+.floating-look-guide {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(12px);
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.guide-icon {
+  font-size: 1.1rem;
+}
+
+.kbd-hint {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+/* Bottom-Right: Floating HUD Action Dock */
+.floating-hud-dock {
+  position: fixed;
+  bottom: 20px;
+  right: 22px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(16px);
+  padding: 6px 12px;
+  border-radius: 999px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+}
+
+.hud-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.hud-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.hud-btn.primary {
+  background: linear-gradient(135deg, #0284C7, #0369A1);
+  border-color: #38BDF8;
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+}
+
+.hud-btn.primary:hover {
+  background: linear-gradient(135deg, #0369A1, #0284C7);
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
+}
+
+.hud-btn.easter-egg-btn {
+  background: linear-gradient(135deg, #7C3AED, #EC4899);
+  border-color: #F472B6;
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+  animation: pulseGlow 3s infinite alternate;
+}
+
+.hud-btn.easter-egg-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.6);
+}
+
+/* ==========================================================================
+   3. 3D SCENE CONTAINER & TOOLTIPS
+   ========================================================================== */
+#scene-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  cursor: grab;
+}
+
+#scene-container:active {
+  cursor: grabbing;
+}
+
+.desk-tooltip {
+  position: fixed;
+  z-index: 400;
+  display: none;
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  color: #FFFFFF;
+  padding: 10px 15px;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  max-width: 260px;
+  backdrop-filter: blur(10px);
+}
+
+/* ==========================================================================
+   4. GUESTBOOK MODAL / STICKY NOTE CREATOR
+   ========================================================================== */
+.guestbook-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2500;
+  background: rgba(10, 15, 30, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.guestbook-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.guestbook-card {
+  background: #FEF08A; /* Real yellow sticky note styling! */
+  color: #1E293B;
+  border-radius: 8px;
+  padding: 30px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(254, 240, 138, 0.25);
+  transform: rotate(-1.5deg);
+  position: relative;
+}
+
+.guestbook-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.05);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.guestbook-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.guestbook-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.guestbook-close-x {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: #4B5563;
+  padding: 2px 6px;
+}
+
+.guestbook-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.guestbook-field-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #4B5563;
+  letter-spacing: 0.5px;
+}
+
+.guestbook-input, .guestbook-textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: #0F172A;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.guestbook-input:focus, .guestbook-textarea:focus {
+  background: #FFFFFF;
+  border-color: #0284C7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+}
+
+.char-counter {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #6B7280;
+  margin-top: -8px;
+}
+
+.guestbook-submit-btn {
+  background: #0F172A;
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.guestbook-submit-btn:hover {
+  background: #1E293B;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   5. RETRO ERROR DIALOG (Motivation.exe) & TERMS JOKE
+   ========================================================================== */
+.error-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.error-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.retro-error-window {
+  background: #ECE9D8;
+  border: 3px solid #0055EA;
+  border-radius: 8px 8px 0 0;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+  color: #000000;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  overflow: hidden;
+}
+
+.retro-window-header {
+  background: linear-gradient(90deg, #0055EA 0%, #3B82F6 100%);
+  color: #FFFFFF;
+  font-weight: bold;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.retro-close-x {
+  background: #EF4444;
+  color: #FFFFFF;
+  border: 1px solid #FFFFFF;
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.retro-window-body {
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: #F5F5F5;
+}
+
+.retro-error-icon {
+  font-size: 2.2rem;
+}
+
+.retro-error-details h4 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+  color: #B91C1C;
+}
+
+.retro-error-details p {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.retro-window-footer {
+  padding: 12px 16px;
+  background: #ECE9D8;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #D1D5DB;
+}
+
+.retro-btn {
+  background: #F3F4F6;
+  border: 2px outset #D1D5DB;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.retro-btn:active {
+  border-style: inset;
+}
+
+.retro-btn.secondary {
+  background: #E5E7EB;
+}
+
+/* Terms Modal */
+.terms-window {
+  max-width: 580px;
+}
+
+.terms-body {
+  flex-direction: column;
+}
+
+.terms-scroll-box {
+  width: 100%;
+  height: 200px;
+  background: #FFFFFF;
+  border: 1px solid #9CA3AF;
+  padding: 14px;
+  overflow-y: scroll;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ==========================================================================
+   6. HUMOR TOAST NOTIFICATION
+   ========================================================================== */
+.humor-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(40px);
+  z-index: 9000;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--accent-cyan);
+  color: #FFFFFF;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.humor-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================================================
+   7. 2D SAFE MODE FALLBACK
+   ========================================================================== */
+.fallback-2d-desk {
+  position: absolute;
+  inset: 0;
+  padding: 60px 30px 40px;
+  overflow-y: auto;
+  background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
+}
+
+.fallback-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.fallback-header h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--accent-cyan);
+  margin-bottom: 8px;
+}
+
+.fallback-header p {
+  color: var(--text-secondary);
+}
+
+.fallback-folders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.fallback-folder-card {
+  background: rgba(30, 41, 59, 0.8);
+  border: 2px solid transparent;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  display: flex;
+  transition: all 0.25s ease;
+}
+
+.fallback-folder-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.6);
+}
+
+.fallback-folder-spine {
+  width: 24px;
+  background: #FF7A00;
+}
+
+.fallback-folder-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.fallback-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #F87171;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.fallback-name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: #FFFFFF;
+}
+
+.fallback-tagline {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.fallback-open-btn {
+  border: none;
+  color: #FFFFFF;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* Animations */
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35); }
+  100% { box-shadow: 0 4px 20px rgba(236, 72, 153, 0.75); }
+}
+
+@media (max-width: 900px) {
+  .floating-look-guide {
+    display: none;
+  }
+  .floating-hud-dock {
+    bottom: 12px;
+    right: 12px;
+    padding: 4px 8px;
+    gap: 6px;
+  }
+  .hud-btn {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+}

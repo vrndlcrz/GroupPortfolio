@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#6D28D9" />
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="100" fill="url(#grad2)" />
+  <circle cx="100" cy="78" r="38" fill="#FDF2F8" />
+  <path d="M48 175 C55 130 145 130 152 175 Z" fill="#4C1D95" />
+  <!-- Long hair / hair bun -->
+  <circle cx="100" cy="40" r="14" fill="#3B0764" />
+  <!-- Eyes & smile -->
+  <circle cx="88" cy="75" r="4" fill="#3B0764" />
+  <circle cx="112" cy="75" r="4" fill="#3B0764" />
+  <path d="M90 94 Q100 102 110 94" fill="none" stroke="#3B0764" stroke-width="3" stroke-linecap="round" />
+  <text x="100" y="192" font-family="sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">MEMBER 2</text>
+</svg>

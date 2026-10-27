@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" fill="none" width="100%" height="100%">
+  <defs>
+    <style>
+      :root {
+        --dot-primary: #3B82F6;
+        --dot-secondary: #93C5FD;
+        --dot-dark: #1E3A8A;
+      }
+      .dot-outer { stroke: var(--border-primary, var(--dot-primary)); stroke-width: 3.5; stroke-dasharray: 4 10; stroke-linecap: round; fill: none; }
+      .dot-inner { stroke: var(--border-secondary, var(--dot-secondary)); stroke-width: 2; stroke-dasharray: 2 6; stroke-linecap: round; fill: none; }
+      .dot-accent { fill: var(--border-primary, var(--dot-primary)); }
+      .solid-guide { stroke: var(--border-secondary, var(--dot-secondary)); stroke-width: 1.5; opacity: 0.5; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Solid fine background guideline -->
+  <rect class="solid-guide" x="38" y="38" width="524" height="724" rx="16" />
+
+  <!-- Outer bold dotted frame -->
+  <rect class="dot-outer" x="46" y="46" width="508" height="708" rx="18" />
+
+  <!-- Inner delicate stitched line -->
+  <rect class="dot-inner" x="58" y="58" width="484" height="684" rx="12" />
+
+  <!-- Corner cross-stitch details -->
+  <!-- Top Left -->
+  <g transform="translate(46, 46)">
+    <circle class="dot-accent" cx="0" cy="0" r="5" />
+    <circle class="dot-accent" cx="16" cy="0" r="3" />
+    <circle class="dot-accent" cx="0" cy="16" r="3" />
+    <line x1="-8" y1="-8" x2="8" y2="8" stroke="var(--border-primary, var(--dot-primary))" stroke-width="2" stroke-linecap="round" />
+    <line x1="8" y1="-8" x2="-8" y2="8" stroke="var(--border-primary, var(--dot-primary))" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- Top Right -->
+  <g transform="translate(554, 46)">
+    <circle class="dot-accent" cx="0" cy="0" r="5" />
+    <circle class="dot-accent" cx="-16" cy="0" r="3" />
+    <circle class="dot-accent" cx="0" cy="16" r="3" />
+    <line x1="-8" y1="-8" x2="8" y2="8" stroke="var(--border-primary, var(--dot-primary))" stroke-width="2" stroke-linecap="round" />
+    <line x1="8" y1="-8" x2="-8" y2="8" stroke="var(--border-primary, var(--dot-primary))" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- Bottom Left -->
+  <g transform="translate(46, 754)">
+    <circle class="dot-accent" cx="0" cy="0" r="5" />
+    <circle class="dot-accent" cx="16" cy="0" r="3" />
+    <circle class="dot-accent" cx="0" cy="-16" r="3" />
+    <line x1="-8" y1="-8" x2="8" y2="8" stroke="var(--border-primary, var(--dot-primary))" stroke-width="2" stroke-linecap="round" />
+    <line x1="8" y1="-8" x2="-8" y2="8" stroke="var(--border-primary, var(--dot-primary))" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- Bottom Right -->
+  <g transform="translate(554, 754)">
+    <circle class="dot-accent" cx="0" cy="0" r="5" />
+    <circle class="dot-accent" cx="-16" cy="0" r="3" />
+    <circle class="dot-accent" cx="0" cy="-16" r="3" />
+    <line x1="-8" y1="-8" x2="8" y2="8" stroke="var(--border-primary, var(--dot-primary))" stroke-width="2" stroke-linecap="round" />
+    <line x1="8" y1="-8" x2="-8" y2="8" stroke="var(--border-primary, var(--dot-primary))" stroke-width="2" stroke-linecap="round" />
+  </g>
+</svg>

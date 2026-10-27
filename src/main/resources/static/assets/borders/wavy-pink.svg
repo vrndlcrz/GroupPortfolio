@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" fill="none" width="100%" height="100%">
+  <defs>
+    <style>
+      :root {
+        --wavy-pink-1: #FF80BF;
+        --wavy-pink-2: #FF4D94;
+        --wavy-pink-3: #FFD1E8;
+      }
+      .wave-outer { stroke: var(--border-primary, var(--wavy-pink-2)); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+      .wave-inner { stroke: var(--border-secondary, var(--wavy-pink-1)); stroke-width: 2; stroke-dasharray: 8 6; stroke-linecap: round; fill: none; }
+      .wave-accent { fill: var(--border-accent, var(--wavy-pink-3)); opacity: 0.7; }
+    </style>
+  </defs>
+
+  <!-- Corner accent soft clouds -->
+  <path class="wave-accent" d="M25 25 Q 50 15 70 30 Q 90 20 100 45 Q 85 70 60 65 Q 35 75 25 50 Z" />
+  <path class="wave-accent" d="M575 25 Q 550 15 530 30 Q 510 20 500 45 Q 515 70 540 65 Q 565 75 575 50 Z" />
+  <path class="wave-accent" d="M25 775 Q 50 785 70 770 Q 90 780 100 755 Q 85 730 60 735 Q 35 725 25 750 Z" />
+  <path class="wave-accent" d="M575 775 Q 550 785 530 770 Q 510 780 500 755 Q 515 730 540 735 Q 565 725 575 750 Z" />
+
+  <!-- Outer continuous organic wavy frame -->
+  <path class="wave-outer" d="
+    M 35 45
+    C 45 35, 65 35, 75 45 C 85 55, 105 55, 115 45 C 125 35, 145 35, 155 45 C 165 55, 185 55, 195 45
+    C 205 35, 225 35, 235 45 C 245 55, 265 55, 275 45 C 285 35, 305 35, 315 45 C 325 55, 345 55, 355 45
+    C 365 35, 385 35, 395 45 C 405 55, 425 55, 435 45 C 445 35, 465 35, 475 45 C 485 55, 505 55, 515 45
+    C 530 35, 550 35, 560 50
+    C 570 65, 555 85, 565 100 C 575 115, 555 135, 565 150 C 575 165, 555 185, 565 200
+    C 575 215, 555 235, 565 250 C 575 265, 555 285, 565 300 C 575 315, 555 335, 565 350
+    C 575 365, 555 385, 565 400 C 575 415, 555 435, 565 450 C 575 465, 555 485, 565 500
+    C 575 515, 555 535, 565 550 C 575 565, 555 585, 565 600 C 575 615, 555 635, 565 650
+    C 575 665, 555 685, 565 700 C 575 715, 555 735, 565 750
+    C 555 765, 530 765, 515 755
+    C 505 745, 485 745, 475 755 C 465 765, 445 765, 435 755 C 425 745, 405 745, 395 755
+    C 385 765, 365 765, 355 755 C 345 745, 325 745, 315 755 C 305 765, 285 765, 275 755
+    C 265 745, 245 745, 235 755 C 225 765, 205 765, 195 755 C 185 745, 165 745, 155 755
+    C 145 765, 125 765, 115 755 C 105 745, 85 745, 75 755 C 65 765, 45 765, 35 750
+    C 25 735, 45 715, 35 700 C 25 685, 45 665, 35 650 C 25 635, 45 615, 35 600
+    C 25 585, 45 565, 35 550 C 25 535, 45 515, 35 500 C 25 485, 45 465, 35 450
+    C 25 435, 45 415, 35 400 C 25 385, 45 365, 35 350 C 25 335, 45 315, 35 300
+    C 25 285, 45 265, 35 250 C 25 235, 45 215, 35 200 C 25 185, 45 165, 35 150
+    C 25 135, 45 115, 35 100 C 25 85, 40 65, 35 45 Z" />
+
+  <!-- Inner dashed framing line -->
+  <rect class="wave-inner" x="48" y="58" width="504" height="684" rx="20" />
+
+  <!-- Cute decorative corner dots -->
+  <circle cx="32" cy="32" r="4" fill="var(--border-primary, var(--wavy-pink-2))" />
+  <circle cx="568" cy="32" r="4" fill="var(--border-primary, var(--wavy-pink-2))" />
+  <circle cx="32" cy="768" r="4" fill="var(--border-primary, var(--wavy-pink-2))" />
+  <circle cx="568" cy="768" r="4" fill="var(--border-primary, var(--wavy-pink-2))" />
+</svg>

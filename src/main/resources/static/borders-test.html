@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG Borders Test - Clear-Book Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0F172A;
+      --text: #F8FAFC;
+      --card-bg: #1E293B;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      padding: 30px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      color: #38BDF8;
+      margin-bottom: 10px;
+    }
+
+    p.subtitle {
+      color: #94A3B8;
+      font-size: 1.1rem;
+    }
+
+    .borders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .border-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+      color: #F1F5F9;
+      text-align: center;
+    }
+
+    .page-sheet {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background: #FFFFFF;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .page-sheet img.svg-border {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .page-inner-content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      padding: 45px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      color: #1E293B;
+    }
+
+    .page-inner-content h2 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+      color: #0F172A;
+    }
+
+    .page-inner-content p {
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: #475569;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      border-radius: 999px;
+      background: #F1F5F9;
+      color: #334155;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Clear-Book SVG Borders Showcase</h1>
+    <p class="subtitle">6 hand-drawn style decorative borders with clear center text zones</p>
+  </header>
+
+  <main class="borders-grid">
+    <!-- Border 1 -->
+    <div class="border-card">
+      <div class="card-title">1. Wavy Outline (Pink)</div>
+      <div class="page-sheet">
+        <img class="svg-border" src="assets/borders/wavy-pink.svg" alt="Wavy Outline">
+        <div class="page-inner-content">
+          <h2>About Me</h2>
+          <p>Hi! I am Joshua Deliva from BSIT-1A. Love turning caffeine into clean code.</p>
+          <div><span class="badge">wavy-pink.svg</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Border 2 -->
+    <div class="border-card">
+      <div class="card-title">2. Colorful Blobs (Orange &amp; Red)</div>
+      <div class="page-sheet">
+        <img class="svg-border" src="assets/borders/blobs-orange.svg" alt="Colorful Blobs">
+        <div class="page-inner-content">
+          <h2>Hobbies</h2>
+          <p>• Mechanical keyboards<br>• Late night gaming<br>• Video essays on tech</p>
+          <div><span class="badge">blobs-orange.svg</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Border 3 -->
+    <div class="border-card">
+      <div class="card-title">3. Vines &amp; Flowers</div>
+      <div class="page-sheet">
+        <img class="svg-border" src="assets/borders/vines-flowers.svg" alt="Vines & Flowers">
+        <div class="page-inner-content">
+          <h2>Skills &amp; Powers</h2>
+          <p>Java, Three.js, CSS Flexbox. Certified Duck Debugger.</p>
+          <div><span class="badge">vines-flowers.svg</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Border 4 -->
+    <div class="border-card">
+      <div class="card-title">4. Dripping Paint (Pink &amp; Purple)</div>
+      <div class="page-sheet">
+        <img class="svg-border" src="assets/borders/dripping-paint.svg" alt="Dripping Paint">
+        <div class="page-inner-content">
+          <h2>Projects</h2>
+          <p>• The Messy Desk 3D<br>• Clear-Book Flip Engine<br>• Discord Bot</p>
+          <div><span class="badge">dripping-paint.svg</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Border 5 -->
+    <div class="border-card">
+      <div class="card-title">5. Bows &amp; Stars</div>
+      <div class="page-sheet">
+        <img class="svg-border" src="assets/borders/bows-stars.svg" alt="Bows & Stars">
+        <div class="page-inner-content">
+          <h2>Fun Facts</h2>
+          <p>Has 47 open tabs and swears every single tab is totally necessary.</p>
+          <div><span class="badge">bows-stars.svg</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Border 6 -->
+    <div class="border-card">
+      <div class="card-title">6. Simple Dotted Frame</div>
+      <div class="page-sheet">
+        <img class="svg-border" src="assets/borders/dotted-frame.svg" alt="Simple Dotted Frame">
+        <div class="page-inner-content">
+          <h2>Contact &amp; Goals</h2>
+          <p>Email: joshua@example.com<br>Goal: Master emerging tech and get sleep.</p>
+          <div><span class="badge">dotted-frame.svg</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

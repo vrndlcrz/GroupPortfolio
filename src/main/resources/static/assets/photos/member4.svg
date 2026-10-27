@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="100" fill="url(#grad4)" />
+  <circle cx="100" cy="78" r="38" fill="#ECFDF5" />
+  <path d="M48 175 C55 130 145 130 152 175 Z" fill="#064E3B" />
+  <!-- Stylish hair + glasses -->
+  <path d="M62 70 Q100 40 138 70 Q100 50 62 70 Z" fill="#064E3B" />
+  <circle cx="86" cy="76" r="8" fill="none" stroke="#064E3B" stroke-width="2.5" />
+  <circle cx="114" cy="76" r="8" fill="none" stroke="#064E3B" stroke-width="2.5" />
+  <line x1="94" y1="76" x2="106" y2="76" stroke="#064E3B" stroke-width="2.5" />
+  <circle cx="86" cy="76" r="3" fill="#064E3B" />
+  <circle cx="114" cy="76" r="3" fill="#064E3B" />
+  <path d="M92 95 Q100 101 108 95" fill="none" stroke="#064E3B" stroke-width="3" stroke-linecap="round" />
+  <text x="100" y="192" font-family="sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">MEMBER 4</text>
+</svg>
