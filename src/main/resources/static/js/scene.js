@@ -103,6 +103,9 @@ class DeskScene {
 
     // 7. Raycasting & Events
     this.raycaster = new THREE.Raycaster();
+    // CRITICAL: Enable layer 1 so raycaster can hit invisible hitboxes on that layer.
+    // Camera only renders layer 0 (default), so layer-1 meshes are NEVER drawn but are always intersectable.
+    this.raycaster.layers.enable(1);
     this.bindEvents();
 
     // 8. Render Loop
@@ -664,11 +667,11 @@ class DeskScene {
         originalRot: { x: 0, y: layout.rotY, z: layout.rotZ }
       };
 
-      // Full-coverage generous hit-box mesh ensuring EVERY part of the clearbook is effortlessly clickable
-      // CRITICAL: Three.js Raycaster ignores visible=false! We use transparent=true and opacity=0 so it's invisible to eyes but 100% detectable by raycaster!
+      // Full-coverage generous hit-box mesh on Layer 1 (raycaster-only, never rendered by camera)
       const hitBoxGeo = new THREE.BoxGeometry(1.7, 0.9, 2.3);
-      const hitBoxMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, depthTest: false });
+      const hitBoxMat = new THREE.MeshBasicMaterial();
       const folderHitBox = new THREE.Mesh(hitBoxGeo, hitBoxMat);
+      folderHitBox.layers.set(1);  // Layer 1 = invisible to camera, visible to raycaster
       folderHitBox.position.set(0, 0.38, 0);
       folderHitBox.userData = {
         type: 'folder',
@@ -741,11 +744,12 @@ class DeskScene {
     screenMesh.userData = { type: 'laptop' };
     laptopGroup.add(screenMesh);
 
-    // Full-coverage generous hit box for laptop
+    // Full-coverage hit box for laptop on Layer 1 (camera-invisible, raycaster-visible)
     const laptopHitBox = new THREE.Mesh(
       new THREE.BoxGeometry(2.8, 2.2, 2.4),
-      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+      new THREE.MeshBasicMaterial()
     );
+    laptopHitBox.layers.set(1);
     laptopHitBox.position.set(0, 0.85, -0.6);
     laptopHitBox.userData = { type: 'laptop' };
     laptopGroup.add(laptopHitBox);
@@ -786,11 +790,12 @@ class DeskScene {
     handleMesh.userData = { type: 'coffee' };
     cupGroup.add(handleMesh);
 
-    // Full-coverage generous hit box for coffee cup
+    // Full-coverage hit box for coffee cup on Layer 1 (camera-invisible, raycaster-visible)
     const coffeeHitBox = new THREE.Mesh(
       new THREE.CylinderGeometry(0.9, 0.9, 1.5, 16),
-      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+      new THREE.MeshBasicMaterial()
     );
+    coffeeHitBox.layers.set(1);
     coffeeHitBox.position.set(0.1, 0.5, 0);
     coffeeHitBox.userData = { type: 'coffee' };
     cupGroup.add(coffeeHitBox);
@@ -951,8 +956,18 @@ class DeskScene {
       originalY: 0.205
     };
 
+    // Add a thick box hitbox on Layer 1 — PlaneGeometry is zero-thickness and hard to raycast
+    const noteHitBox = new THREE.Mesh(
+      new THREE.BoxGeometry(0.7, 0.12, 0.7),
+      new THREE.MeshBasicMaterial()
+    );
+    noteHitBox.layers.set(1);
+    noteHitBox.userData = { type: 'sticky-note', note: note, originalY: 0.205 };
+    mesh.add(noteHitBox);
+
     this.scene.add(mesh);
     this.interactiveObjects.push(mesh);
+    this.interactiveObjects.push(noteHitBox);
   }
 
   bindEvents() {
@@ -1026,7 +1041,7 @@ class DeskScene {
 
     // Horizontal 180 degrees (-90° to +90°) and vertical look up (-0.65 to +1.15)
     const yawDelta = -(dx / window.innerWidth) * Math.PI;
-    const pitchDelta = -(dy / window.innerHeight) * 1.5;
+    const pitchDelta = (dy / window.innerHeight) * 1.5;
 
     this.targetYaw = THREE.MathUtils.clamp(this.dragStartAngles.yaw + yawDelta, -Math.PI / 2, Math.PI / 2);
     this.targetPitch = THREE.MathUtils.clamp(this.dragStartAngles.pitch + pitchDelta, -0.65, 1.15);
@@ -1050,7 +1065,7 @@ class DeskScene {
 
       // Dragging UP looks UP (dy < 0 -> pitchDelta > 0)
       const yawDelta = -(dx / window.innerWidth) * (Math.PI * 1.15);
-      const pitchDelta = -(dy / window.innerHeight) * 1.5;
+      const pitchDelta = (dy / window.innerHeight) * 1.5;
 
       this.targetYaw = THREE.MathUtils.clamp(this.dragStartAngles.yaw + yawDelta, -Math.PI / 2, Math.PI / 2);
       this.targetPitch = THREE.MathUtils.clamp(this.dragStartAngles.pitch + pitchDelta, -0.65, 1.15);
@@ -1385,12 +1400,16 @@ class DeskScene {
   }
 
   viewStickyNote(stickyMesh) {
-    const note = stickyMesh.userData.note;
+    // If clicked object is a child hitbox, walk up to the visual parent note mesh
+    const visualMesh = (stickyMesh.parent && stickyMesh.parent.userData && stickyMesh.parent.userData.type === 'sticky-note')
+      ? stickyMesh.parent
+      : stickyMesh;
+    const note = visualMesh.userData.note || stickyMesh.userData.note;
     if (!note) return;
 
     this.isCameraZoomed = true;
     this.hideTooltip();
-    this.activeStickyMesh = stickyMesh;
+    this.activeStickyMesh = visualMesh;
 
     if (window.PortfolioHumor) {
       window.PortfolioHumor.playSound('pageFlip');
@@ -1399,7 +1418,7 @@ class DeskScene {
     // Animate camera zooming close to the sticky note
     if (typeof gsap !== 'undefined') {
       const noteWorldPos = new THREE.Vector3();
-      stickyMesh.getWorldPosition(noteWorldPos);
+      visualMesh.getWorldPosition(noteWorldPos);
 
       gsap.to(this.camera.position, {
         x: noteWorldPos.x,
@@ -1409,9 +1428,9 @@ class DeskScene {
         ease: 'power3.inOut'
       });
 
-      // Lift and tilt the sticky note toward the camera
-      gsap.to(stickyMesh.position, {
-        y: stickyMesh.position.y + 0.55,
+      // Lift the sticky note toward the camera with a spring bounce
+      gsap.to(visualMesh.position, {
+        y: visualMesh.position.y + 0.55,
         duration: 0.5,
         ease: 'back.out(1.5)',
         onComplete: () => {
@@ -1432,17 +1451,29 @@ class DeskScene {
     if (!modal) return;
 
     if (authorEl) authorEl.textContent = note.author || 'Anonymous Visitor';
-    if (dedicatedEl) dedicatedEl.textContent = `Left on the 3D Desk`;
+    if (dedicatedEl) dedicatedEl.textContent = 'Left on the 3D Desk';
     if (bodyEl) bodyEl.textContent = `"${note.text || 'No message written.'}"`;
 
-    modal.classList.add('active');
+    // Set display:flex first, then add .active next frame so CSS opacity/transform transition fires
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        modal.classList.add('active');
+      });
+    });
   }
 
   closeNoteViewerModal() {
     const modal = document.getElementById('noteViewModal');
-    if (modal) modal.classList.remove('active');
+    if (modal) {
+      modal.classList.remove('active');
+      // After opacity transition ends, fully remove from layout
+      modal.addEventListener('transitionend', () => {
+        modal.style.display = 'none';
+      }, { once: true });
+    }
 
-    // Animate sticky note back to desk
+    // Animate sticky note back to desk surface
     if (this.activeStickyMesh && typeof gsap !== 'undefined') {
       gsap.to(this.activeStickyMesh.position, {
         y: this.activeStickyMesh.userData.originalY !== undefined

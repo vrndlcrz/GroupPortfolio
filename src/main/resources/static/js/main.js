@@ -169,16 +169,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // Safe Mode (2D) button
-    const safeModeBtn = document.getElementById('safeModeBtn');
-    if (safeModeBtn) {
-      safeModeBtn.addEventListener('click', () => {
-        deskScene.initFallback2D();
-        safeModeBtn.style.display = 'none';
-        PortfolioHumor.showToast('🖥️ Switched to 2D Safe Mode desk view.');
-      });
-    }
-
     // Floating Dock Guestbook Button
     const openGuestbookNavBtn = document.getElementById('openGuestbookNavBtn');
     if (openGuestbookNavBtn) {
@@ -193,8 +183,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       memberSelectDropdown.value = memberId;
       activeMemberIdForNote = memberId;
     }
-    guestbookModal.classList.add('active');
-    noteTextInput.focus();
+    // Show modal: set display first, then add .active next frame for CSS transition to run
+    guestbookModal.style.display = 'flex';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        guestbookModal.classList.add('active');
+      });
+    });
+    setTimeout(() => noteTextInput && noteTextInput.focus(), 100);
     PortfolioHumor.playSound('pop');
   }
 
@@ -229,6 +225,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function closeGuestbookModal() {
     guestbookModal.classList.remove('active');
+    // After transition, set display:none to fully remove from layout/accessibility
+    guestbookModal.addEventListener('transitionend', () => {
+      guestbookModal.style.display = 'none';
+    }, { once: true });
     guestbookForm.reset();
     charCounter.textContent = '0 / 120';
   }

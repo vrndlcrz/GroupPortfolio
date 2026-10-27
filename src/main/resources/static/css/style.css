@@ -317,12 +317,12 @@ html, body {
    4. GUESTBOOK MODAL / STICKY NOTE CREATOR
    ========================================================================== */
 .guestbook-modal-overlay {
+  display: none; /* Fully hidden when inactive - not just visually */
   position: fixed;
   inset: 0;
   z-index: 2500;
   background: rgba(10, 15, 30, 0.85);
   backdrop-filter: blur(8px);
-  display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
@@ -335,13 +335,13 @@ html, body {
    4. CINEMATIC NOTE VIEWER MODAL (Clear-book style animation for sticky notes)
    ========================================================================== */
 .note-view-modal-overlay {
+  display: none; /* Fully hidden when inactive */
   position: fixed;
   inset: 0;
   z-index: 3000;
   background: rgba(8, 12, 22, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
@@ -352,6 +352,7 @@ html, body {
 }
 
 .note-view-modal-overlay.active {
+  display: flex;
   opacity: 1;
   pointer-events: auto;
 }
@@ -488,6 +489,7 @@ html, body {
 
 
 .guestbook-modal-overlay.active {
+  display: flex;
   opacity: 1;
   pointer-events: auto;
 }
