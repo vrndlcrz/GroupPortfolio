@@ -18,14 +18,25 @@
 </head>
 <body>
 
-  <!-- 1. EYE-BLINK LOADING SCREEN (3x blink then open to reveal desk) -->
+  <!-- 1. REALISTIC EYE-BLINK LOADING SCREEN (3x Blink with Curved Eye Aperture) -->
   <div class="eye-blink-overlay" id="loadingScreen">
-    <div class="eyelid eyelid-top" id="eyelidTop"></div>
-    <div class="eyelid eyelid-bottom" id="eyelidBottom"></div>
+    <div class="eye-vignette"></div>
+    <div class="eyelid-panel eyelid-top" id="eyelidTop">
+      <svg viewBox="0 0 1000 500" preserveAspectRatio="none" class="eyelid-svg">
+        <path d="M 0 0 L 1000 0 L 1000 500 C 750 435, 250 435, 0 500 Z" fill="#070A14" />
+        <path d="M 0 500 C 250 435, 750 435, 1000 500" stroke="#020408" stroke-width="14" fill="none" opacity="0.9" />
+      </svg>
+    </div>
+    <div class="eyelid-panel eyelid-bottom" id="eyelidBottom">
+      <svg viewBox="0 0 1000 500" preserveAspectRatio="none" class="eyelid-svg">
+        <path d="M 0 500 L 1000 500 L 1000 0 C 750 65, 250 65, 0 0 Z" fill="#070A14" />
+        <path d="M 0 0 C 250 65, 750 65, 1000 0" stroke="#020408" stroke-width="10" fill="none" opacity="0.8" />
+      </svg>
+    </div>
   </div>
 
   <!-- 3. THREE.JS 3D SCENE CONTAINER -->
-  <main id="scene-container" aria-label="Interactive 3D Student Desk with 180 Degree Look Around"></main>
+  <main id="scene-container" class="scene-waking-blur" aria-label="Interactive 3D Student Desk with 180 Degree Look Around"></main>
 
   <!-- 2. TOP NAVBAR (Floating on top of scene container with guaranteed clickability) -->
   <header class="top-navbar-dock" id="topNavbar">

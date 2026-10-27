@@ -76,18 +76,19 @@ class DeskScene {
     const width = this.container.clientWidth || window.innerWidth;
     const height = this.container.clientHeight || window.innerHeight;
 
-    // 2. Setup Camera
-    this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-    this.adjustCameraForScreen();
-    this.updateCameraLookAt();
-
-    // 3. Setup Renderer
+    // 2. Setup Renderer FIRST so it is immediately available
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.container.appendChild(this.renderer.domElement);
+
+    // 3. Setup Camera with default position guaranteed
+    this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
+    this.camera.position.copy(this.defaultCameraPos);
+    this.adjustCameraForScreen();
+    this.updateCameraLookAt();
 
     // 4. Lighting & Ambience
     this.setupLighting();
@@ -110,6 +111,14 @@ class DeskScene {
 
     // 8. Render Loop
     this.animate();
+
+    // 9. Guarantee proper camera framing after DOM layout without needing Inspect
+    requestAnimationFrame(() => {
+      this.adjustCameraForScreen();
+    });
+    setTimeout(() => {
+      this.adjustCameraForScreen();
+    }, 100);
   }
 
   setupLighting() {
@@ -1011,11 +1020,12 @@ class DeskScene {
   }
 
   adjustCameraForScreen() {
-    if (!this.camera || !this.renderer) return;
-    const width = this.container.clientWidth || window.innerWidth;
-    const height = this.container.clientHeight || window.innerHeight;
-    const aspect = width / height;
+    if (!this.camera) return;
+    const width = (this.container && this.container.clientWidth) ? this.container.clientWidth : window.innerWidth;
+    const height = (this.container && this.container.clientHeight) ? this.container.clientHeight : window.innerHeight;
+    if (!width || !height) return;
 
+    const aspect = width / height;
     this.camera.aspect = aspect;
 
     // Responsive camera framing:
@@ -1041,7 +1051,9 @@ class DeskScene {
     }
 
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(width, height);
+    if (this.renderer) {
+      this.renderer.setSize(width, height);
+    }
   }
 
   onWindowResize() {

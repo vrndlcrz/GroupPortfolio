@@ -101,10 +101,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 6. Wire Note Viewer Modal close buttons
   setupNoteViewerModal();
 
-  // 7. Complete Eye-Blink Loading Screen after 3 blinks (2100ms)
+  // 7. Complete Eye-Blink Loading Screen after 3 blinks (2300ms)
   setTimeout(() => {
     finishLoading();
-  }, 2100);
+  }, 2300);
 
   /* ========================================================================
      HELPER FUNCTIONS
