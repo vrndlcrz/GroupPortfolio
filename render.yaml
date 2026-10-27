@@ -1,10 +1,13 @@
 services:
   - type: web
     name: group-portfolio
-    runtime: java
+    runtime: docker
     plan: free
-    buildCommand: "./mvnw clean package -DskipTests"
-    startCommand: "java -jar target/portfolio-1.0.0.jar"
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
     envVars:
-      - key: JAVA_VERSION
-        value: 17
+      - key: PORT
+        value: "8080"
+
