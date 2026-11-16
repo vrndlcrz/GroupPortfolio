@@ -97,6 +97,10 @@
 
   <div id="bookOverlayRoot"></div>
 
+  <script src="js/handwriting.js"></script>
+  <script src="js/sketches.js"></script>
+  <script src="js/lib/gsap.min.js"></script>
+  <script src="js/themesong.js"></script>
   <script src="js/book.js"></script>
   <script>
     const book = new ClearBook({
@@ -109,7 +113,12 @@
       }
     });
 
+    const memberCache = new Map();
     async function loadAndOpen(id) {
+      if (memberCache.has(id)) {
+        book.open(memberCache.get(id));
+        return;
+      }
       const status = document.getElementById('statusMessage');
       status.textContent = `Fetching /api/members/${id}...`;
       try {
@@ -117,6 +126,7 @@
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
         const member = await res.json();
         status.textContent = `Loaded ${member.name}. Opening portfolio...`;
+        memberCache.set(id, member);
         book.open(member);
       } catch (err) {
         status.textContent = `Error loading member: ${err.message}`;

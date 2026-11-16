@@ -4,6 +4,25 @@
  */
 
 const classroomDefaults = {
+
+  "board": {
+    "title": "Sean Dyogi Truthers",
+    "subtitle": "Group 1",
+    "names": [
+      "Riam Jaye Santiago",
+      "John Vernie Dela Cruz",
+      "Charella Magalpoc",
+      "Nicole De Guzman"
+    ]
+  },
+  "mission": {
+    "title": "MISSION",
+    "text": "TODO: write our mission"
+  },
+  "vision": {
+    "title": "VISION",
+    "text": "TODO: write our vision"
+  },
   "whiteboardLines": [
     "AET Group Portfolio",
     "07:30   Filipino",
@@ -24,17 +43,35 @@ const classroomDefaults = {
   ]
 };
 
+function fetchWithTimeout(url, options = {}) {
+  return fetch(url, { ...options, signal: AbortSignal.timeout(3000) });
+}
+
 const API = {
-  async getClassroom() {
+  getClassroom() {
+    return this.classroomRequest ??= this.loadClassroom();
+  },
+  async loadClassroom() {
     try {
-      const response = await fetch(this.baseUrl + '/api/site/classroom');
+      const response = await fetchWithTimeout(this.baseUrl + '/api/site/classroom');
       if (!response.ok) throw new Error('Classroom unavailable');
       const data = await response.json();
-      for (const key of Object.keys(classroomDefaults)) {
+      for (const key of ['whiteboardLines', 'tvSlides', 'teacherLines']) {
         if (!Array.isArray(data[key]) || !data[key].length ||
             !data[key].every(line => typeof line === 'string' && line.trim())) return classroomDefaults;
       }
-      return data;
+      const text = (value, fallback) => typeof value === 'string' && value.trim() ? value : fallback;
+      const result = { ...classroomDefaults, ...data };
+      for (const key of ['board', 'mission', 'vision']) {
+        result[key] = { ...classroomDefaults[key] };
+        for (const [field, fallback] of Object.entries(result[key])) {
+          const value = data[key]?.[field];
+          result[key][field] = Array.isArray(fallback)
+            ? (Array.isArray(value) && value.length && value.every(v => text(v, '')) ? value : fallback)
+            : text(value, fallback);
+        }
+      }
+      return result;
     } catch {
       return classroomDefaults;
     }
@@ -48,7 +85,7 @@ const API = {
    */
   async getMembers() {
     try {
-      const response = await fetch(`${this.baseUrl}/api/members`);
+      const response = await fetchWithTimeout(`${this.baseUrl}/api/members`);
       if (!response.ok) {
         throw new Error(`Server returned HTTP ${response.status}`);
       }
@@ -66,7 +103,7 @@ const API = {
    */
   async getMember(id) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/members/${id}`);
+      const response = await fetchWithTimeout(`${this.baseUrl}/api/members/${id}`);
       if (!response.ok) {
         throw new Error(`Member #${id} not found (HTTP ${response.status})`);
       }
@@ -84,7 +121,7 @@ const API = {
    */
   async getMemberNotes(memberId) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/members/${memberId}/notes`);
+      const response = await fetchWithTimeout(`${this.baseUrl}/api/members/${memberId}/notes`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
@@ -101,7 +138,7 @@ const API = {
    */
   async getAllNotes() {
     try {
-      const response = await fetch(`${this.baseUrl}/api/notes`);
+      const response = await fetchWithTimeout(`${this.baseUrl}/api/notes`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
@@ -121,7 +158,7 @@ const API = {
    */
   async postNote(memberId, text, author) {
     try {
-      const response = await fetch(`${this.baseUrl}/api/members/${memberId}/notes`, {
+      const response = await fetchWithTimeout(`${this.baseUrl}/api/members/${memberId}/notes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -149,7 +186,7 @@ const API = {
    */
   async recordVisit() {
     try {
-      const response = await fetch(`${this.baseUrl}/api/visit`, {
+      const response = await fetchWithTimeout(`${this.baseUrl}/api/visit`, {
         method: 'POST'
       });
       if (!response.ok) {

@@ -4,8 +4,11 @@
  * back cover, realistic slow & smooth double-sided page flips, and easy easter eggs.
  */
 
+const CLEARBOOK_BUILD = 'spiral-cover-v2';
+
 class ClearBook {
   constructor(options = {}) {
+    console.info('ClearBook', CLEARBOOK_BUILD);
     this.options = Object.assign({
       containerId: 'book-overlay-container',
       theme: null,
@@ -24,6 +27,7 @@ class ClearBook {
     this.dragStartX = 0;
     this.isFlipping = false; // Prevents animation overlap during slow turn
 
+    this.pageCache = new WeakMap();
     this.initDOM();
     this.bindGlobalKeys();
   }
@@ -43,6 +47,7 @@ class ClearBook {
             <span class="member-color-indicator" id="memberColorDot"></span>
             <span id="memberPillName">Member Portfolio</span>
           </div>
+          <button type="button" hidden class="book-nav-btn book-music-btn">Mute</button>
           <button class="book-close-btn" id="bookCloseBtn" title="Close Portfolio (Esc)" aria-label="Close">✕</button>
         </div>
 
@@ -59,11 +64,13 @@ class ClearBook {
           <button class="book-nav-btn" id="nextPageBtn" title="Next Page (→)">Next Page ›</button>
         </div>
 
+        <small hidden class="music-credit"></small>
         <div class="book-key-hints">Tip: Use [←] [→] arrow keys to flip smoothly • [Esc] to return to desk</div>
       </div>
     `;
 
     this.overlayElement = document.getElementById('bookOverlay');
+    this.bookContainer = document.getElementById('bookContainer');
     this.deckElement = document.getElementById('pagesDeck');
     this.dotsContainer = document.getElementById('bookPageDots');
     this.prevBtn = document.getElementById('prevPageBtn');
@@ -72,6 +79,7 @@ class ClearBook {
     this.memberPillName = document.getElementById('memberPillName');
     this.memberColorDot = document.getElementById('memberColorDot');
 
+    this.music = new ThemeSong(container.querySelector('.book-music-btn'), container.querySelector('.music-credit'));
     this.closeBtn.addEventListener('click', () => this.close());
     this.prevBtn.addEventListener('click', () => this.prevPage());
     this.nextBtn.addEventListener('click', () => this.nextPage());
@@ -140,12 +148,28 @@ class ClearBook {
   }
 
   open(memberData, { theme = this.options.theme || memberData.deskItem } = {}) {
+    if (memberData.themeSong && !navigator.userActivation?.hasBeenActive) {
+      this.music.stop(false);
+      this.overlayElement.addEventListener('click', this.activatePreviewMusic = () => this.music.start(memberData.themeSong), { once: true, capture: true });
+    } else if (!this.musicPrepared) this.music.start(memberData.themeSong);
+    this.musicPrepared = false;
+    this.bookContainer.dataset.build = CLEARBOOK_BUILD;
     this.overlayElement.classList.toggle('theme-pad', theme === 'pad' || theme === 'intermediate-pad');
     this.overlayElement.classList.toggle('theme-folder', theme === 'folder' || theme === 'long-folder');
     this.overlayElement.classList.toggle('theme-themebook', theme === 'themebook' || theme === 'theme-book');
     this.overlayElement.classList.toggle('theme-spiral', theme === 'spiral' || theme === 'spiral-notebook');
     for (const item of ['spiral-notebook', 'long-folder', 'theme-book', 'intermediate-pad']) {
       this.overlayElement.classList.toggle('theme-' + item, item === theme);
+    }
+    this.spiralTurn?.kill();
+    this.bookContainer.style.removeProperty('--book-offset');
+    this.bookContainer.style.removeProperty('--left-opacity');
+    this.isSpiral = this.overlayElement.classList.contains('theme-spiral');
+    // The standalone book tester loads ClearBook without the classroom's GSAP script.
+    if (this.isSpiral && !window.gsap && !document.querySelector('script[src$="/gsap.min.js"]')) {
+      const script = document.createElement('script');
+      script.src = 'js/lib/gsap.min.js';
+      document.head.appendChild(script);
     }
     this.currentMember = memberData;
     this.currentPageIndex = 0;
@@ -156,36 +180,74 @@ class ClearBook {
     this.memberPillName.textContent = memberData.name + " (" + memberData.section + ")";
     this.memberColorDot.style.backgroundColor = memberData.coverColor || '#FF7A00';
 
-    this.renderPages();
+    const pages = this.preparePages(memberData, theme);
+    this.deckElement.replaceChildren(...pages.deck);
+    this.dotsContainer.replaceChildren(...pages.dotsElements);
+    this.pagesElements = pages.pagesElements;
+    this.dotsElements = pages.dotsElements;
+    this.totalPages = pages.totalPages;
     this.overlayElement.classList.add('active');
     this.updatePageStates();
   }
 
+  prepareMusic(member) {
+    this.musicPrepared = true;
+    this.music.start(member.themeSong);
+  }
+
   close() {
     if (!this.isOpen()) return;
+    this.spiralTurn?.kill();
+    this.bookContainer.style.removeProperty('--book-offset');
+    this.bookContainer.style.removeProperty('--left-opacity');
+    this.isDragging = false;
+    this.overlayElement.removeEventListener('click', this.activatePreviewMusic, true);
+    clearTimeout(this.flipTimer);
+    for (const leaf of this.pagesElements) {
+      leaf.classList.remove('turning', 'spiral-turning');
+      leaf.style.removeProperty('transform');
+    }
+    this.deckElement.querySelector('.spiral-shadow')?.removeAttribute('style');
+    this.music.stop();
     this.overlayElement.classList.remove('active');
     if (typeof this.options.onClose === 'function') {
       this.options.onClose();
     }
   }
 
-  renderPages() {
-    const member = this.currentMember;
+  preparePages(member, theme = member.deskItem) {
+    let entry = this.pageCache.get(member);
+    if (!entry || entry.theme !== theme) {
+      entry = { theme, pages: this.renderPages(member, theme) };
+      this.pageCache.set(member, entry);
+    }
+    return entry.pages;
+  }
+
+  renderPages(member, theme) {
+    const isSpiral = theme === 'spiral' || theme === 'spiral-notebook';
+    const deckElement = document.createElement('div');
+    const dotsContainer = document.createElement('div');
+    const pagesElements = [], dotsElements = [];
     const coverColor = member.coverColor || '#FF7A00';
-    this.deckElement.innerHTML = '';
-    this.dotsContainer.innerHTML = '';
-    this.pagesElements = [];
-    this.dotsElements = [];
 
     const pageConfigs = [];
-    const folderSheets = this.overlayElement.classList.contains('theme-folder');
-    const looseSheets = folderSheets || this.overlayElement.classList.contains('theme-pad');
+    const folderSheets = (theme === 'folder' || theme === 'long-folder');
+    const looseSheets = folderSheets || (theme === 'pad' || theme === 'intermediate-pad');
 
     // Page 0: Cover
     if (!looseSheets) pageConfigs.push({
       type: 'cover',
       title: 'Cover'
     });
+
+    if (isSpiral) {
+      pageConfigs.push({ type: 'divider', title: '1st Semester' }, { type: 'profile', title: 'Profile' });
+      const rings = '<i></i>'.repeat(18);
+      deckElement.innerHTML = `<div class="spiral-left" aria-hidden="true"></div>
+        <div class="spiral-shadow" aria-hidden="true"></div>
+        <div class="spiral-coil" aria-hidden="true">${rings}</div>`;
+    }
 
     // Pages 1 to 6 from JSON
     const titles = ['About Me', 'Hobbies', 'Skills', 'Projects', 'Fun Facts', 'Contact/Goals'];
@@ -209,19 +271,23 @@ class ClearBook {
       title: 'Back Cover'
     });
 
-    this.totalPages = pageConfigs.length;
+    const totalPages = pageConfigs.length;
 
     pageConfigs.forEach((cfg, idx) => {
       const pageEl = document.createElement('div');
       pageEl.className = 'book-page';
       pageEl.dataset.pageIndex = idx;
 
+      const seed = isSpiral ? Handwriting.hash(member.id + ':' + idx) : 0;
+      const write = text => Handwriting.handwrite(text, { seed });
       let frontHTML = '';
-      let backHTML = `
+      let backHTML = isSpiral ? (Sketches.SKETCH_LAYOUT[idx + 1] || []).map(({ name, x, y, size, rot }) =>
+        `<div class="leaf-doodle" aria-hidden="true" style="left:${x}%;top:${y}%;width:${size}%;--tilt:${rot}deg">${Sketches.get(name)}</div>`
+      ).join('') : `
         <div class="backside-pocket-decor">
-          <div class="backside-sleeve-seal">
+          <span>
             <svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-          </div>
+          </span>
           <h4>Clear-Book Sleeve #${idx + 1}</h4>
           <p>Official student submission for <em>Advanced Emerging Technologies</em>.</p>
           <div style="font-size:0.75rem; color:#94A3B8; margin-top:8px;">Turn backward or forward with arrows</div>
@@ -250,7 +316,7 @@ class ClearBook {
           </div>
         `;
 
-        if (this.overlayElement.classList.contains('theme-spiral')) {
+        if (isSpiral) {
           frontHTML = `<div class="riam-collage-cover">
             <div class="riam-collage-tag"><img src="${member.photo}" alt="">
             <span><strong>PORTFOLIO</strong><b>${member.name}</b><small>★ SECTION &nbsp; ${member.section}</small></span></div>
@@ -287,16 +353,26 @@ class ClearBook {
           }
         }, 0);
 
+      } else if (cfg.type === 'divider') {
+        pageEl.classList.add('spiral-divider');
+        frontHTML = '<div class="semester-sheet"><div class="semester-flap"><h2>1st Semester</h2></div></div><span class="semester-tab">1st Sem</span>';
+      } else if (cfg.type === 'profile') {
+        frontHTML = `<div class="page-inner"><div class="page-body-content spiral-profile">
+          <span class="page-category-tag">Page 1 of 7</span><h3 class="page-title">${write('Profile')}</h3>
+          <figure class="snapshot"><img src="${member.photo}" alt="Portrait of ${member.name}"><figcaption>${member.subject}</figcaption></figure>
+          <h4 class="signed-name">${write(member.name)}<svg aria-hidden="true" viewBox="0 0 150 10" preserveAspectRatio="none"><path d="M2 7Q28 3 50 5T94 4T148 3" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></h4>
+          <span class="section-callout">${write(member.section)}</span>
+          <p class="page-text">${write(member.tagline)}</p></div></div>`;
       } else if (cfg.type === 'inside') {
         const borderFile = cfg.pageData.border || 'wavy-pink.svg';
         const borderSrc = `assets/borders/${borderFile}`;
 
         let extraHTML = '';
-        if (cfg.skills?.length && this.overlayElement.classList.contains('theme-spiral')) {
+        if (cfg.skills?.length && isSpiral) {
           extraHTML = '<ul class="spiral-skills">' + cfg.skills.map(skill =>
             `<li><strong>${skill.name}</strong> — ${skill.funnyLabel}</li>`
           ).join('') + '</ul>';
-        } else if (cfg.skills?.length && this.overlayElement.classList.contains('theme-themebook')) {
+        } else if (cfg.skills?.length && (theme === 'themebook' || theme === 'theme-book')) {
           extraHTML = '<ol class="themebook-skills">' + cfg.skills.map(skill =>
             `<li>${skill.name}</li>`
           ).join('') + '</ol>';
@@ -346,9 +422,9 @@ class ClearBook {
             <img class="page-svg-border" src="${borderSrc}" alt="Page Border">
             <div class="page-body-content">
               ${folderSheets ? `<header class="folder-letterhead"><span>${member.name}</span><span>${member.section}</span></header>` : ''}
-              <span class="page-category-tag">Page ${cfg.index} of 6</span>
-              <h3 class="page-title">${cfg.pageData.title}</h3>
-              <div class="page-text">${cfg.pageData.content}</div>
+              <span class="page-category-tag">Page ${isSpiral ? cfg.index + 1 : cfg.index} of ${isSpiral ? 7 : 6}</span>
+              <h3 class="page-title">${isSpiral ? write(cfg.pageData.title) : cfg.pageData.title}</h3>
+              <div class="page-text">${isSpiral ? cfg.pageData.content.split(/\n\s*\n/).map(paragraph => `<p>${write(paragraph)}</p>`).join('') : cfg.pageData.content}</div>
               ${extraHTML}
               ${folderSheets && cfg.index === 6 ? '<span class="folder-stamp">APPROVED</span>' : ''}
             </div>
@@ -415,6 +491,16 @@ class ClearBook {
         `;
       }
 
+      if (isSpiral) {
+        pageEl.style.setProperty('--tint', (seed % 45) / 1000);
+        pageEl.style.setProperty('--pen', ['#252422', '#244787', '#a64812'][(idx + 1) % 3]);
+        pageEl.style.setProperty('--ink-opacity', 0.88 + (seed % 13) / 100);
+        if (cfg.type === 'profile' || cfg.type === 'inside') {
+          const mark = cfg.type === 'profile' ? 'stars' : ['stars', 'hearts', 'music'][idx % 3];
+          frontHTML += `<div class="margin-doodle" aria-hidden="true">${Sketches.get(mark)}</div>`;
+          if (cfg.type === 'profile') frontHTML += '<svg class="profile-arrow" aria-hidden="true" viewBox="0 0 40 48"><path d="M32 3Q44 28 8 37m8-9-9 10 13 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+        }
+      }
       if (looseSheets) backHTML = '<div class="folder-sheet-back"></div>';
 
       // Assemble double-sided page with dynamic bending shadow
@@ -437,22 +523,26 @@ class ClearBook {
         }
       });
 
-      this.deckElement.appendChild(pageEl);
-      this.pagesElements.push(pageEl);
+      deckElement.appendChild(pageEl);
+      pagesElements.push(pageEl);
 
       const dot = document.createElement('div');
       dot.className = 'page-dot';
-      dot.title = looseSheets ? cfg.pageData.title : (idx === 0) ? 'Cover' : (idx === this.totalPages - 1) ? 'Back Cover' : `Page ${idx}`;
+      dot.title = isSpiral ? (cfg.title || cfg.pageData.title) : looseSheets ? cfg.pageData.title : (idx === 0) ? 'Cover' : (idx === totalPages - 1) ? 'Back Cover' : `Page ${idx}`;
       dot.addEventListener('click', () => {
         if (!this.isFlipping) this.goToPage(idx);
       });
-      this.dotsContainer.appendChild(dot);
-      this.dotsElements.push(dot);
+      dotsContainer.appendChild(dot);
+      dotsElements.push(dot);
     });
+    return { pagesElements, dotsElements, deck: Array.from(deckElement.children), totalPages };
   }
 
   updatePageStates() {
+    this.bookContainer.classList.toggle('is-cover', this.isSpiral && this.currentPageIndex === 0);
+    this.bookContainer.classList.toggle('is-back', this.isSpiral && this.currentPageIndex === this.totalPages - 1);
     this.pagesElements.forEach((pageEl, idx) => {
+      if (this.isSpiral) pageEl.classList.toggle('visible-verso', idx === this.currentPageIndex - 1);
       pageEl.classList.remove('flipped', 'active-page', 'next-page');
 
       if (idx < this.currentPageIndex) {
@@ -480,6 +570,7 @@ class ClearBook {
   nextPage() {
     if (this.isFlipping || this.currentPageIndex >= this.totalPages - 1) return;
 
+    if (this.isSpiral) return this.turnSpiral(this.currentPageIndex + 1);
     this.isFlipping = true;
     const flippingPage = this.pagesElements[this.currentPageIndex];
     flippingPage.classList.add('turning');
@@ -491,7 +582,7 @@ class ClearBook {
     this.currentPageIndex++;
     this.updatePageStates();
 
-    setTimeout(() => {
+    this.flipTimer = setTimeout(() => {
       flippingPage.classList.remove('turning');
       this.isFlipping = false;
       this.updatePageStates();
@@ -501,6 +592,7 @@ class ClearBook {
   prevPage() {
     if (this.isFlipping || this.currentPageIndex <= 0) return;
 
+    if (this.isSpiral) return this.turnSpiral(this.currentPageIndex - 1);
     this.isFlipping = true;
     this.currentPageIndex--;
     const returningPage = this.pagesElements[this.currentPageIndex];
@@ -512,7 +604,7 @@ class ClearBook {
 
     this.updatePageStates();
 
-    setTimeout(() => {
+    this.flipTimer = setTimeout(() => {
       returningPage.classList.remove('turning');
       this.isFlipping = false;
       this.updatePageStates();
@@ -521,11 +613,55 @@ class ClearBook {
 
   goToPage(idx) {
     if (this.isFlipping || idx === this.currentPageIndex || idx < 0 || idx >= this.totalPages) return;
+    if (this.isSpiral) return this.turnSpiral(idx);
     this.currentPageIndex = idx;
     this.updatePageStates();
     if (window.PortfolioHumor && typeof window.PortfolioHumor.playSound === 'function') {
       window.PortfolioHumor.playSound('pageFlipSlow');
     }
+  }
+
+  turnSpiral(destination) {
+    const wasClosed = this.currentPageIndex === 0 || this.currentPageIndex === this.totalPages - 1;
+    const willClose = destination === 0 || destination === this.totalPages - 1;
+    const forward = destination > this.currentPageIndex;
+    const leaf = this.pagesElements[forward ? this.currentPageIndex : destination];
+    const shadow = this.deckElement.querySelector('.spiral-shadow');
+    this.currentPageIndex = destination;
+    this.isFlipping = true;
+    this.updatePageStates();
+    const finish = () => {
+      leaf.classList.remove('spiral-turning');
+      leaf.style.removeProperty('transform');
+      this.bookContainer.style.removeProperty('--book-offset');
+      this.bookContainer.style.removeProperty('--left-opacity');
+      shadow.style.removeProperty('opacity');
+      shadow.style.removeProperty('transform');
+      this.isFlipping = false;
+      this.spiralTurn = null;
+      this.updatePageStates();
+    };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.gsap) {
+      finish();
+      return;
+    }
+    window.PortfolioHumor?.playSound('spiralPaper');
+    leaf.classList.add('spiral-turning');
+    leaf.style.zIndex = 90;
+    const start = forward ? 0 : -180;
+    this.spiralTurn = gsap.timeline({ onComplete: finish });
+    if (wasClosed !== willClose) {
+      this.spiralTurn.fromTo(this.bookContainer,
+        { '--book-offset': wasClosed ? '-25%' : '0%' },
+        { '--book-offset': willClose ? '-25%' : '0%', duration: 0.9, ease: 'power2.inOut' }, 0)
+        .fromTo(this.bookContainer, { '--left-opacity': wasClosed ? 0 : 1 },
+          { '--left-opacity': willClose ? 0 : 1, duration: 0.27, ease: 'power2.inOut' }, willClose ? 0.63 : 0);
+    }
+    this.spiralTurn.fromTo(leaf, { rotationY: start, z: 0, skewY: 0 },
+      { rotationY: -180 - start, duration: 0.9, ease: 'power2.inOut' }, 0)
+      .to(leaf, { z: 12, skewY: forward ? -1.4 : 1.4, duration: 0.45, repeat: 1, yoyo: true, ease: 'sine.inOut' }, 0)
+      .fromTo(shadow, { xPercent: forward ? 100 : -100 }, { xPercent: forward ? -100 : 100, duration: 0.9, ease: 'power2.inOut' }, 0)
+      .fromTo(shadow, { opacity: 0 }, { opacity: 0.32, duration: 0.45, repeat: 1, yoyo: true }, 0);
   }
 
   adjustColorBrightness(hex, percent) {

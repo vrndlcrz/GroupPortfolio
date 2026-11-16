@@ -267,7 +267,7 @@
   gap: 12px;
 }
 
-.backside-sleeve-seal {
+.backside-pocket-decor > span {
   width: 55px;
   height: 55px;
   border-radius: 50%;
@@ -821,10 +821,8 @@
 }
 .theme-spiral .page-svg-border { display: none; }
 .theme-spiral .page-body-content { padding-left: max(44px, 12%); }
-.theme-spiral .page-body-content :is(.page-title, .page-text, .page-category-tag, .spiral-skills) { color: #244c86; }
 .theme-spiral .page-text, .theme-spiral .spiral-skills { font-size: 1.12rem; line-height: 26px; }
 .theme-spiral .page-title { display: block; border: 0; margin-bottom: 4px; }
-.theme-spiral .page-title::after { content: '〰 ☆'; display: block; font-size: 16px; line-height: 14px; }
 .theme-spiral .spiral-skills { list-style: none; margin: 0; padding: 0; }
 .theme-spiral .spiral-skills li { position: relative; padding-left: 1.4em; }
 .theme-spiral .spiral-skills li::before { content: '✓'; position: absolute; left: 0; }
@@ -921,3 +919,177 @@
 @media (prefers-reduced-motion: reduce) {
   .theme-pad .book-page.turning, .theme-pad .book-page.turning .page-front { animation-duration: 1ms; }
 }
+
+/* Riam's open spiral notebook. Each leaf occupies the right half before it turns. */
+.theme-spiral .book-container {
+  width: min(920px, 87vw);
+  height: min(620px, 75dvh);
+  --book-offset: 0%;
+  --left-opacity: 1;
+  transform: translateX(var(--book-offset)) rotate(-0.4deg);
+  transition: none;
+  transform-style: flat;
+  border-radius: 4px;
+  box-shadow: none;
+  --edge-shadow: 1px 2px #bcb6a9, 2px 4px #eeeae1, 3px 5px #aaa599,
+              4px 7px #e7e3d9, 6px 22px 40px #0007;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.84' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' opacity='.075' filter='url(%23g)' d='M0 0h128v128H0z'/%3E%3C/svg%3E");
+  --rules: repeating-linear-gradient(transparent 0 25px, #a9c6df80 25px 26px);
+  --holes: radial-gradient(circle, #312e29 0 2px, #928b7a 3px, transparent 4px);
+}
+.theme-spiral .book-container:is(.is-cover, .is-back) {
+  --book-offset: -25%;
+  --left-opacity: 0;
+}
+.theme-spiral .spiral-left,
+.theme-spiral .book-page.flipped:not(.spiral-turning) { opacity: var(--left-opacity); }
+.theme-spiral .book-container:is(.is-cover, .is-back):not(:has(.spiral-turning))
+  :is(.spiral-left, .book-page:not(.active-page)) { visibility: hidden; }
+.theme-spiral #pagesDeck::before {
+  content: ''; position: absolute; inset: 0 0 0 50%;
+  border-radius: 3px; box-shadow: var(--edge-shadow); pointer-events: none;
+}
+.theme-spiral .spiral-left { box-shadow: var(--edge-shadow); }
+.theme-spiral #pagesDeck { perspective: 2200px; }
+.theme-spiral .book-spine, .theme-spiral .page-bend-shadow { display: none; }
+.theme-spiral .book-page {
+  left: 50%; width: 50%; transition: none; border-radius: 3px;
+  transform-origin: left center; will-change: transform;
+}
+.theme-spiral .spiral-left, .theme-spiral .page-face.page-back, .theme-spiral .page-face.page-front {
+  --gutter-direction: to left;
+  --hole-side: right;
+  background: var(--holes) var(--hole-side) top / 24px calc(100% / 18) repeat-y,
+    linear-gradient(var(--gutter-direction), transparent 87%, #54432126), var(--grain),
+    linear-gradient(rgb(156 125 60 / var(--tint, 0)), rgb(156 125 60 / var(--tint, 0))),
+    var(--margin, linear-gradient(transparent, transparent)), var(--rules), #fbfaf6;
+  border: 0; border-radius: 3px;
+}
+.theme-spiral .spiral-left { position: absolute; inset: 0 50% 0 0; }
+.theme-spiral .page-face.page-front {
+  --gutter-direction: to right; --hole-side: left;
+  --margin: linear-gradient(to right, transparent 11%, #c66d7780 11% calc(11% + 1px), transparent calc(11% + 1px));
+}
+.theme-spiral .page-inner { background: transparent; }
+.theme-spiral .page-face::after { display: none; }
+.theme-spiral .page-front:has(.page-inner)::after {
+  display: block; inset: auto 0 0 auto; width: 19px; height: 19px;
+  background: linear-gradient(135deg, transparent 45%, #e0dacc 68%, #fffcf5 87%, #a99c86);
+  border-radius: 0 0 3px 0;
+}
+.theme-spiral .spiral-coil {
+  position: absolute; inset: 0 auto 0 50%; transform: translateX(-50%);
+  width: 29px; display: grid; grid-template-rows: repeat(18, 1fr);
+  align-items: center; z-index: 100; pointer-events: none;
+}
+.theme-spiral .spiral-coil i {
+  height: 8px; border: 2px solid; border-color: #f7f8f7 #707675 #434746 #b5b8b7;
+  border-radius: 65%; transform: rotate(-7deg); box-shadow: 0 2px 2px #322c244d;
+}
+.theme-spiral .spiral-shadow {
+  position: absolute; top: 0; bottom: 0; width: 36%; left: 32%; opacity: 0;
+  background: linear-gradient(90deg, transparent, #4c4232, transparent);
+  pointer-events: none; z-index: 75;
+}
+.theme-spiral .spiral-divider .page-front { overflow: visible; }
+.theme-spiral .semester-sheet {
+  position: absolute; inset: 0;
+  filter: drop-shadow(1px 2px 2px #514c413d) drop-shadow(-1px -1px 1px #453f3522);
+}
+.theme-spiral .semester-flap {
+  position: absolute; inset: 0; container-type: inline-size;
+  clip-path: polygon(10% 0, 78% 48%, 3% 100%);
+  background: var(--grain), repeating-linear-gradient(transparent 0 25px, #bad1e565 25px 26px), #fffefb;
+}
+.theme-spiral .semester-flap::before {
+  content: ''; position: absolute; inset: 0; background: #fff;
+  clip-path: polygon(10% 0, 78% 48%, 3% 100%, 77.4% 48%);
+}
+.theme-spiral .semester-flap h2 {
+  position: absolute; top: 49%; left: 31%; margin: 0;
+  color: #191917; font: normal clamp(12px, 8cqw, 38px)/1.15 'Patrick Hand', cursive;
+  white-space: nowrap; transform: translate(-50%, -50%) rotate(-3deg);
+  text-decoration: underline double; text-underline-offset: .13em;
+}
+.theme-spiral .semester-tab {
+  position: absolute; left: 100%; top: 18%; writing-mode: vertical-rl;
+  padding: 8px 3px; background: #e9903f; color: #312116; border-radius: 0 5px 5px 0;
+}
+.theme-spiral .spiral-portrait { width: min(48%, 116px); align-self: flex-start; margin: 14px 0; }
+@media (max-width: 600px) {
+  .theme-spiral .page-body-content, .theme-spiral .book-back-cover { padding: 24px 8px 20px max(22px, 13%); }
+  .theme-spiral .page-body-content { overflow-wrap: anywhere; }
+  .theme-spiral .page-text, .theme-spiral .spiral-skills { font-size: 1rem; }
+  .theme-spiral .book-back-cover { overflow: auto; }
+  .theme-spiral .riam-collage-tag { inset: auto 3% 5%; padding: 3px; flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .book-overlay.theme-spiral, .theme-spiral .book-container, .theme-spiral .page-dot { transition: none; }
+}
+
+@font-face { font-family: 'Gochi Hand'; src: url('../fonts/GochiHand-Regular.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: Caveat; src: url('../fonts/Caveat.ttf') format('truetype'); font-weight: 400 700; font-display: swap; }
+
+.theme-spiral .ink-word {
+  display: inline-block; max-width: 100%; font: inherit; letter-spacing: var(--spacing);
+  transform: translateY(var(--rise)) rotate(var(--turn));
+}
+.theme-spiral :is(.page-text, .spiral-skills, .section-callout, .signed-name) {
+  color: var(--pen); opacity: var(--ink-opacity);
+}
+.theme-spiral :is(.page-text, .spiral-skills) { font-size: 1.3rem; line-height: 33px; }
+.theme-spiral :is(.page-text p, p.page-text, .spiral-skills li) {
+  margin: 12px 0; transform: translateY(-6px) rotate(-1.2deg);
+}
+.theme-spiral .page-body-content .page-title {
+  color: #ff9635; font: 400 2rem/1.1 'Gochi Hand', cursive;
+  -webkit-text-stroke: 2px #1b1b1b; paint-order: stroke fill;
+}
+.theme-spiral .page-text p:first-child .ink-word:nth-child(5) {
+  background: linear-gradient(transparent 55%, #ffe94f99 55%);
+}
+.theme-spiral [data-page-index="7"] .page-text p:first-child .ink-word:first-child::after {
+  content: '46'; display: inline-block; text-decoration: line-through double; margin-left: .35em;
+}
+.theme-spiral [data-page-index="7"] .page-text p:first-child .ink-word:nth-child(2) {
+  background: #fff; box-shadow: 1px 1px 2px #51413044;
+}
+.theme-spiral .spiral-profile { gap: 8px; }
+.theme-spiral .snapshot {
+  box-sizing: border-box; width: min(64%, 170px); margin: 8px 0 10px 5%;
+  position: relative; padding: 7px 7px 5px; background: #fffdf8;
+  box-shadow: 0 2px 5px #42372142; transform: rotate(-4deg);
+}
+.theme-spiral .snapshot img { display: block; width: 100%; }
+.theme-spiral .snapshot figcaption { text-align: center; font: 500 1rem/1 Caveat, cursive; margin-top: 3px; color: #44413e; }
+.theme-spiral .snapshot::before, .theme-spiral .snapshot::after {
+  content: ''; position: absolute; width: 35%; height: 13px; top: -5px;
+  background: repeating-linear-gradient(90deg,#e6cf9bbd 0 3px,#e2c891b8 3px 4px);
+}
+.theme-spiral .snapshot::before { left: -9%; transform: rotate(-29deg); }
+.theme-spiral .snapshot::after { right: -9%; transform: rotate(24deg); }
+.theme-spiral .signed-name { position: relative; align-self: flex-start; margin: 0 0 .4em; font: 400 clamp(1.45rem,3vw,2.5rem)/1 'Gochi Hand', cursive; }
+.theme-spiral .signed-name svg { position: absolute; left: 0; bottom: -.23em; width: 100%; height: .25em; }
+.theme-spiral .section-callout { align-self: flex-start; padding: 3px 9px; border: 3px solid #f58a1f; border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px; }
+.theme-spiral .leaf-doodle, .theme-spiral .margin-doodle, .theme-spiral .profile-arrow {
+  position: absolute; pointer-events: none; transform: rotate(var(--tilt, -8deg));
+}
+.theme-spiral .margin-doodle { right: 2%; top: 4%; width: min(9%, 33px); }
+.theme-spiral .profile-arrow { top: 29%; right: 18%; width: 10%; color: var(--pen); }
+.theme-spiral :is(.leaf-doodle,.margin-doodle) svg { width: 100%; display: block; }
+@media (prefers-reduced-motion: no-preference) {
+  .theme-spiral .visible-verso .page-back path, .theme-spiral .active-page .margin-doodle path {
+    stroke-dasharray: 1; animation: spiral-pencil-in 1.2s ease-out both;
+  }
+  @keyframes spiral-pencil-in { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+}
+.theme-spiral .page-body-content .page-text p {
+  font: inherit; color: inherit; opacity: 1;
+}
+
+.book-music-btn { margin-left: auto; margin-right: 8px; padding: 5px 10px; }
+.book-overlay .music-credit { color: #fff; text-align: center; }
+.book-overlay [hidden] { display: none; }
+
+.book-overlay { contain: layout paint; }
+.book-overlay:not(.active) .book-page { pointer-events: none; }

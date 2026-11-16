@@ -1,7 +1,7 @@
-# AET Group Portfolio: "The Messy Desk"
+# Sean Dyogi Truthers — Group 1 Portfolio: "The Messy Desk"
 
 **Subject:** Advanced Emerging Technologies (AET)
-**Team size:** 5 members
+**Team size:** 4 members
 **Stack:** HTML, CSS, JavaScript (Three.js + GSAP) on the frontend, Java Spring Boot on the backend
 **Runs on:** `http://localhost:8080` (no database, no hosting)
 
@@ -15,7 +15,7 @@ Inside each clear book, every page has its **own hand-drawn style border** (wavy
 
 **Humor is the theme.** The desk is chaotic on purpose, the file names are jokes, the skill levels are jokes, and clicking props triggers small surprises.
 
-**One-line pitch:** *"A group portfolio you can actually touch: 5 members, 5 clear books, 1 very messy desk."*
+**One-line pitch:** *"A group portfolio you can actually touch: 4 members, 4 portfolios, 1 very messy desk."*
 
 ### Goals
 - Meet the professor's requirement to add humor.
@@ -179,7 +179,7 @@ group-portfolio/
 
 | Method | Endpoint | Purpose |
 |---|---|---|
-| GET | `/api/members` | List the 5 members (id, name, folder label, cover color) |
+| GET | `/api/members` | List the 4 members (id, name, folder label, cover color) |
 | GET | `/api/members/{id}` | Full portfolio: cover, pages, skills |
 | GET | `/api/members/{id}/notes` | Read guestbook notes |
 | POST | `/api/members/{id}/notes` | Add a guestbook note |
@@ -194,7 +194,7 @@ Agree on this shape as a team before coding. It connects the backend and the fro
   {
     "id": 1,
     "name": "Joshua Deliva",
-    "section": "BSIT-1A",
+    "section": "BSIT 3-1",
     "subject": "Advanced Emerging Technologies",
     "tagline": "Emerging technologies, emerging deadlines",
     "folderLabel": "FINAL_v7_REALLYFINAL_dontopen",
@@ -219,7 +219,7 @@ Agree on this shape as a team before coding. It connects the backend and the fro
 ]
 ```
 
-Use the same keys for all 5 members. Validate the file at jsonlint.com before every commit, because one typo breaks the whole site.
+Use the same keys for all 4 members. Validate the file at jsonlint.com before every commit, because one typo breaks the whole site.
 
 ### 5.5 Data storage (no database)
 

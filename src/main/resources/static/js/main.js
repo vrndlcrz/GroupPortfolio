@@ -73,21 +73,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  const idle = window.requestIdleCallback
+    ? callback => window.requestIdleCallback(callback, { timeout: 1500 })
+    : callback => setTimeout(callback, 30);
+  const pendingBooks = members.slice();
+  function prepareNextBook() {
+    if (!pendingBooks.length) return;
+    clearBook.preparePages(pendingBooks.shift());
+    if (pendingBooks.length) idle(prepareNextBook);
+  }
+  idle(prepareNextBook);
+  for (const family of ['Gochi Hand', 'Caveat', 'Patrick Hand', 'Dancing Script', 'Plus Jakarta Sans']) {
+    document.fonts.load('16px "' + family + '"').catch(() => {});
+  }
+
   // 3. Initialize 3D Desk Scene
   deskScene = new DeskScene({
     classroom: await classroomRequest,
     containerId: 'scene-container',
     members: members,
     notes: notes,
-    onFolderSelect: async (member) => {
-      try {
-        // Fetch fresh member details from /api/members/{id}
-        const fullMember = await API.getMember(member.id);
-        clearBook.open(fullMember);
-      } catch (e) {
-        clearBook.open(member);
-      }
-    }
+    onFolderClick: member => clearBook.prepareMusic(member),
+    onFolderSelect: member => clearBook.open(member)
   });
 
   // 4. Connect Easy Easter Eggs (Keys 'E', 'G', 'F' or Konami) to Desk Anti-Gravity

@@ -26,6 +26,11 @@ public class MemberControllerTest {
                 .andExpect(jsonPath("$", hasSize(4)))
                 .andExpect(jsonPath("$[*].name", contains("Riam Jaye Santiago", "John Vernie Dela Cruz", "Charella Magalpoc", "Nicole De Guzman")))
                 .andExpect(jsonPath("$[*].deskItem", contains("spiral-notebook", "long-folder", "theme-book", "intermediate-pad")))
+                .andExpect(jsonPath("$[0].themeSong.provider", is("file")))
+                .andExpect(jsonPath("$[0].themeSong.src", is("assets/audio/notebook-theme.mp3")))
+                .andExpect(jsonPath("$[0].themeSong.title", is("Notebook theme")))
+                .andExpect(jsonPath("$[0].themeSong.credit", is("")))
+                .andExpect(jsonPath("$[1].themeSong").doesNotHaveJsonPath())
                 .andExpect(jsonPath("$[0].coverColor", is("#FF7A00")))
                 .andExpect(jsonPath("$[0].pages", hasSize(6)))
                 .andExpect(jsonPath("$[0].skills", not(empty())));

@@ -32,15 +32,38 @@ const PortfolioHumor = (function() {
     "Calls a missing semicolon 'an unexpected design pause'."
   ];
 
-  function getAudioContext() {
+  const paperBuffers = new Map();
+  function paperBuffer(ctx, spiral) {
+    if (paperBuffers.has(spiral)) return paperBuffers.get(spiral);
+    const length = Math.ceil(ctx.sampleRate * (spiral ? 0.19 : 1.1));
+    const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+    const samples = buffer.getChannelData(0);
+    for (let i = 0; i < length; i++) {
+      const envelope = spiral ? 1 : Math.sin(i / length * Math.PI) * 0.7;
+      samples[i] = (Math.random() * 2 - 1) * envelope;
+    }
+    paperBuffers.set(spiral, buffer);
+    return buffer;
+  }
+  function warmAudio() {
+    laptopDialog();
+    try {
+      const ctx = getAudioContext(false);
+      if (ctx) { paperBuffer(ctx, true); paperBuffer(ctx, false); }
+    } catch { /* Audio is optional. */ }
+  }
+  if (window.requestIdleCallback) window.requestIdleCallback(warmAudio, { timeout: 1000 });
+  else setTimeout(warmAudio, 0);
+
+  function getAudioContext(resume = true) {
     if (!audioCtx) {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       if (AudioContext) {
         audioCtx = new AudioContext();
       }
     }
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
+    if (resume && audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
     }
     return audioCtx;
   }
@@ -53,17 +76,27 @@ const PortfolioHumor = (function() {
 
       const now = ctx.currentTime;
 
+      if (type === 'spiralPaper') {
+        const duration = 0.19;
+        const buffer = paperBuffer(ctx, true);
+        const noise = ctx.createBufferSource();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+        noise.buffer = buffer;
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(3100, now);
+        filter.frequency.exponentialRampToValueAtTime(1000, now + duration);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(0.18, now + 0.045);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        noise.connect(filter).connect(gain).connect(ctx.destination);
+        noise.start(now);
+        return;
+      }
       if (type === 'pageFlipSlow' || type === 'pageFlip') {
         // Slow, realistic, soothing paper & plastic sleeve glide sound (1.1s)
         const dur = 1.1;
-        const bufferSize = Math.floor(ctx.sampleRate * dur);
-        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          const envelope = Math.sin((i / bufferSize) * Math.PI);
-          data[i] = (Math.random() * 2 - 1) * envelope * 0.7;
-        }
-
+        const buffer = paperBuffer(ctx, false);
         const noise = ctx.createBufferSource();
         noise.buffer = buffer;
 
@@ -235,8 +268,7 @@ const PortfolioHumor = (function() {
     }, duration);
   }
 
-  function showLaptopErrorDialog() {
-    playSound('error');
+  function laptopDialog() {
     let dialog = document.getElementById('laptopErrorModal');
     if (!dialog) {
       dialog = document.createElement('div');
@@ -266,7 +298,12 @@ const PortfolioHumor = (function() {
       `;
       document.body.appendChild(dialog);
     }
-    dialog.classList.add('active');
+    return dialog;
+  }
+
+  function showLaptopErrorDialog() {
+    playSound('error');
+    laptopDialog().classList.add('active');
   }
 
   function closeLaptopError() {

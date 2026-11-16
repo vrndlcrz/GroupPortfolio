@@ -18,6 +18,7 @@ class ClassroomControllerTest {
     void servesConfiguredClassroom() throws Exception {
         mvc.perform(get("/api/site/classroom"))
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$.board.title").value("Sean Dyogi Truthers"))
             .andExpect(jsonPath("$.whiteboardLines[0]").value("AET Group Portfolio"))
             .andExpect(jsonPath("$.tvSlides", hasSize(3)))
             .andExpect(jsonPath("$.tvSlides[2]").value("Click the laptop"))

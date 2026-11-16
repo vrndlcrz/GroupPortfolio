@@ -18,6 +18,12 @@ public class Member {
     private String tagline;
     private String folderLabel;
     private String deskItem;
+    private ThemeSong themeSong;
+
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+    public ThemeSong getThemeSong() { return themeSong; }
+    public void setThemeSong(ThemeSong themeSong) { this.themeSong = themeSong; }
+
     private String photo;
     private String coverColor;
     private List<PageContent> pages = new ArrayList<>();

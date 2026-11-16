@@ -1,8 +1,9 @@
 [
   {
     "id": 1,
+    "themeSong": { "provider": "file", "src": "assets/audio/notebook-theme.mp3", "title": "Notebook theme", "credit": "" },
     "name": "Riam Jaye Santiago",
-    "section": "BSIT-1A",
+    "section": "BSIT 3-1",
     "subject": "Advanced Emerging Technologies",
     "tagline": "Emerging technologies, emerging deadlines",
     "folderLabel": "FINAL_v7_REALLYFINAL_dontopen",
@@ -11,7 +12,7 @@
     "pages": [
       {
         "title": "About Me",
-        "content": "Hi! I am Riam Jaye Santiago, an aspiring technologist in BSIT-1A. I love tinkering with computers, building weird web experiments, and converting excessive caffeine into lines of working code. Motto: 'If it works, don't touch it!'\n\nOpen the cover and follow the pages in order, or skip ahead to the projects. Each section shows a different side of the person behind this little corner of the desk.",
+        "content": "Hi! I am Riam Jaye Santiago, an aspiring technologist in BSIT 3-1. I love tinkering with computers, building weird web experiments, and converting excessive caffeine into lines of working code. Motto: 'If it works, don't touch it!'\n\nOpen the cover and follow the pages in order, or skip ahead to the projects. Each section shows a different side of the person behind this little corner of the desk.",
         "border": "wavy-pink.svg"
       },
       {
@@ -67,7 +68,7 @@
   {
     "id": 2,
     "name": "John Vernie Dela Cruz",
-    "section": "BSIT-1A",
+    "section": "BSIT 3-1",
     "subject": "Advanced Emerging Technologies",
     "tagline": "Powered by coffee, panic, and StackOverflow",
     "folderLabel": "Do Not Open (Seriously)",
@@ -76,7 +77,7 @@
     "pages": [
       {
         "title": "About Me",
-        "content": "Hello! I am John Vernie Dela Cruz, a front-end enthusiast and UI lover in BSIT-1A. I believe websites should look like art galleries and run as fast as lightning. My life goal is centering divs on the first try without weeping.\n\nOpen the cover and follow the pages in order, or skip ahead to the projects. Each section shows a different side of the person behind this little corner of the desk.",
+        "content": "Hello! I am John Vernie Dela Cruz, a front-end enthusiast and UI lover in BSIT 3-1. I believe websites should look like art galleries and run as fast as lightning. My life goal is centering divs on the first try without weeping.\n\nOpen the cover and follow the pages in order, or skip ahead to the projects. Each section shows a different side of the person behind this little corner of the desk.",
         "border": "wavy-pink.svg"
       },
       {
@@ -197,7 +198,7 @@
   {
     "id": 4,
     "name": "Nicole De Guzman",
-    "section": "BSIT-1A",
+    "section": "BSIT 3-1",
     "subject": "Advanced Emerging Technologies",
     "tagline": "My code works, but nobody knows why (especially me)",
     "folderLabel": "secret_thesis_do_not_delete",
@@ -206,7 +207,7 @@
     "pages": [
       {
         "title": "About Me",
-        "content": "Hi! I am Nicole De Guzman, backend architect and data enthusiast in BSIT-1A. I love making robust RESTful APIs, clean data architectures, and bulletproof validations so systems never fail even under chaos.\n\nOpen the cover and follow the pages in order, or skip ahead to the projects. Each section shows a different side of the person behind this little corner of the desk.",
+        "content": "Hi! I am Nicole De Guzman, backend architect and data enthusiast in BSIT 3-1. I love making robust RESTful APIs, clean data architectures, and bulletproof validations so systems never fail even under chaos.\n\nOpen the cover and follow the pages in order, or skip ahead to the projects. Each section shows a different side of the person behind this little corner of the desk.",
         "border": "wavy-pink.svg"
       },
       {

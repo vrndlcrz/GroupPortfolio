@@ -1,4 +1,11 @@
 /** Interactive group portfolio desk in a Philippine high school classroom. */
+// Keyboard look direction; drag keeps its original direction.
+const INVERT_X = false;
+const INVERT_Y = false;
+const MOUSE_YAW_RANGE = Math.PI * 1.15;
+const PITCH_RANGE = 1.5;
+const KEY_LOOK_VIEWPORTS_PER_SECOND = 0.5;
+const DEFAULT_PITCH = -Math.atan2(2.2, 6);
 const tabletopLayout = [
   { item: 'spiral-notebook', x: -2.9, z: 1.05, yaw: 0.14 },
   { item: 'long-folder', x: -0.95, z: 0.55, yaw: -0.11 },
@@ -10,17 +17,50 @@ const tabletopLayout = [
 class CameraRig {
   constructor(camera) {
     this.camera = camera;
-    this.mode = 'seated';
+    this.keys = new Set();
     this.seat = new THREE.Vector3(0, 4, 5.2);
     camera.position.copy(this.seat);
     camera.rotation.order = 'YXZ';
     this.yaw = this.targetYaw = 0;
-    this.pitch = this.targetPitch = -Math.atan2(2.2, 6);
+    this.pitch = this.targetPitch = DEFAULT_PITCH;
     this.applyLook();
   }
 
-  enableWalk() {
-    // TODO: Implement walk mode with WASD and classroom collision boxes.
+  bindKeyboardLook(isZoomed) {
+    this.lookBlocked = () => isZoomed() || document.activeElement?.matches('input, textarea') ||
+      document.querySelector('#bookOverlay.active');
+    const controls = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'ShiftRight', 'KeyR']);
+    window.addEventListener('keydown', event => {
+      if (!controls.has(event.code) || event.repeat || event.ctrlKey || event.metaKey ||
+          event.altKey || this.lookBlocked()) return;
+      if (event.code === 'KeyR') {
+        this.keys.clear();
+        this.yaw = this.targetYaw = 0;
+        this.pitch = this.targetPitch = DEFAULT_PITCH;
+        this.applyLook();
+      } else {
+        this.keys.add(event.code);
+      }
+    });
+    window.addEventListener('keyup', event => this.keys.delete(event.code));
+    window.addEventListener('blur', () => this.keys.clear());
+    document.addEventListener('focusin', event => {
+      if (event.target.matches?.('input, textarea')) this.keys.clear();
+    });
+  }
+
+  updateKeyboardLook(dt) {
+    if (!this.keys.size) return;
+    if (this.lookBlocked()) {
+      this.keys.clear();
+      return;
+    }
+    const horizontal = Number(this.keys.has('KeyD')) - Number(this.keys.has('KeyA'));
+    const vertical = Number(this.keys.has('KeyW')) - Number(this.keys.has('KeyS'));
+    const fast = this.keys.has('ShiftLeft') || this.keys.has('ShiftRight');
+    const distance = dt * KEY_LOOK_VIEWPORTS_PER_SECOND * (fast ? 1.8 : 1);
+    this.aim(this.targetYaw + horizontal * (INVERT_X ? -1 : 1) * distance * MOUSE_YAW_RANGE,
+      this.targetPitch + vertical * (INVERT_Y ? -1 : 1) * distance * PITCH_RANGE);
   }
 
   aim(yaw, pitch) {
@@ -42,6 +82,7 @@ class CameraRig {
 class DeskScene {
   constructor(options = {}) {
     this.container = document.getElementById(options.containerId || 'scene-container');
+    this.onFolderClick = options.onFolderClick;
     this.onFolderSelect = options.onFolderSelect || null;
     this.members = options.members || [];
     this.classroom = options.classroom || classroomDefaults;
@@ -96,8 +137,11 @@ class DeskScene {
     // 2. Setup Renderer FIRST so it is immediately available
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     this.renderer.setSize(width, height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.autoUpdate = false;
+    this.renderer.shadowMap.needsUpdate = true;
+    this.lastShadowUpdate = 0;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.container.appendChild(this.renderer.domElement);
 
@@ -123,6 +167,7 @@ class DeskScene {
     // CRITICAL: Enable layer 1 so raycaster can hit invisible hitboxes on that layer.
     // Camera only renders layer 0 (default), so layer-1 meshes are NEVER drawn but are always intersectable.
     this.raycaster.layers.enable(1);
+    this.bookOverlay = document.getElementById('bookOverlay');
     this.bindEvents();
 
     // 8. Render Loop
@@ -184,21 +229,21 @@ class DeskScene {
       face.rotation.y = yaw;
       face.receiveShadow = true;
       room.add(face);
+      return face;
     };
-    const concrete = texture(256, 256, ctx => {
-      ctx.fillStyle = '#aaa9a5'; ctx.fillRect(0, 0, 256, 256);
-      for (let i = 0; i < 260; i++) {
-        const x = i * 137 % 256, y = i * 79 % 256;
-        ctx.strokeStyle = i % 2 ? 'rgba(255,255,250,.09)' : 'rgba(55,58,58,.07)';
-        ctx.beginPath(); ctx.moveTo(x, y);
-        ctx.quadraticCurveTo(x + 11, y - 3, x + 24, y + 2); ctx.stroke();
-      }
+    const tile = texture(128, 128, ctx => {
+      ctx.fillStyle = '#F0EEEE'; ctx.fillRect(0, 0, 128, 128);
+      ctx.strokeStyle = '#d9d7d5'; ctx.strokeRect(0, 0, 128, 128);
     });
-    concrete.wrapS = concrete.wrapT = THREE.RepeatWrapping;
-    concrete.repeat.set(6, 7);
-    box(room, new THREE.MeshStandardMaterial({ map: concrete, roughness: 0.96 }), 0, floor - 0.08, -3, 22, 0.16, 24);
+    tile.wrapS = tile.wrapT = THREE.RepeatWrapping;
+    tile.repeat.set(11, 12);
+    box(room, new THREE.MeshStandardMaterial({ map: tile, roughness: 0.9 }), 0, floor - 0.08, -3, 22, 0.16, 24);
+    const wallHeight = ceiling - floor;
+    box(room, paint(0xe8d59a), 0, floor + wallHeight / 2, front, 22, wallHeight, 0.18);
+    box(room, paint(0x7fb069), 0, floor + wallHeight * .05, front + .11, 22, wallHeight * .1, .08);
+    box(room, paint(0xb49c63), 0, ceiling - .25, front + .14, 22, .12, .12);
     box(room, white, 0, ceiling + 0.1, -3, 22, 0.2, 24);
-    for (const z of [front, back]) {
+    for (const z of [back]) {
       box(room, white, 0, (ceiling + floor) / 2, z, 22, ceiling - floor, 0.18);
       box(room, green, 0, floor + 0.23, z + (z === front ? 0.11 : -0.11), 22, 0.46, 0.07);
       for (const x of [-10.75, 10.75]) box(room, yellow, x, (ceiling + floor) / 2, z + (z === front ? 0.2 : -0.2), 0.5, ceiling - floor, 0.5);
@@ -241,52 +286,68 @@ class DeskScene {
       }
     }
 
-    const wood = paint(0x493025);
-    box(room, wood, 0, 2.65, front + 0.17, 11.5, 4.3, 0.16);
-    const board = texture(1536, 560, () => {});
+    const boardX = 0, boardWidth = 22 * .75, boardHeight = wallHeight * .37, boardY = 3.5;
+    box(room, paint(0x4a7a3a), boardX, boardY, front + .18, boardWidth, boardHeight, .2);
+    const board = texture(2048, 560, () => {});
     const writeBoard = () => {
       const ctx = board.image.getContext('2d');
-      ctx.fillStyle = '#fffef9'; ctx.fillRect(0, 0, 1536, 560);
-      const rows = this.classroom.whiteboardLines;
-      const step = Math.min(75, 470 / rows.length);
-      rows.forEach((line, i) => {
-        ctx.fillStyle = i === 0 ? '#195c48' : '#193f71';
-        ctx.font = Math.floor(step * (i === 0 ? 0.94 : 0.7)) + 'px "Patrick Hand", cursive';
-        ctx.fillText(line, 68, 65 + i * step, 1390);
-      });
+      const { title, subtitle, names } = this.classroom.board;
+      ctx.fillStyle = '#F7F7F5'; ctx.fillRect(0, 0, 2048, 560);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#202021'; ctx.font = 'bold 76px "Gochi Hand", sans-serif';
+      ctx.fillText(title, 1940, 94, 1010);
+      ctx.fillStyle = '#b3333b'; ctx.font = 'bold 56px Caveat, cursive';
+      ctx.fillText(subtitle, 1935, 161, 970);
+      const step = Math.min(82, 322 / Math.max(1, names.length));
+      ctx.font = Math.floor(step * .86) + 'px Caveat, cursive'; ctx.fillStyle = '#265294';
+      names.forEach((name, i) => ctx.fillText(name, 1940 - (i % 3) * 5, 183 + step * (i + .8), 970));
+      ctx.strokeStyle = '#4c7397'; ctx.lineWidth = 4; ctx.lineJoin = 'round';
+      for (const [x,y,r] of [[185,125,24],[245,158,12],[470,365,15]]) {
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const angle = i * Math.PI * .8 - Math.PI / 2;
+          ctx[i ? 'lineTo' : 'moveTo'](x + r * Math.cos(angle), y + r * Math.sin(angle));
+        }
+        ctx.closePath(); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.moveTo(155,195); ctx.quadraticCurveTo(210,183,270,191); ctx.stroke();
       board.needsUpdate = true;
     };
     writeBoard();
-    document.fonts.load('64px "Patrick Hand"').then(writeBoard);
-    panel(board, 11.16, 3.98, 0, 2.65, front + 0.27);
-    box(room, wood, 0, 0.55, front + 0.38, 11.4, 0.09, 0.42);
+    Promise.all([document.fonts.load('76px "Gochi Hand"'), document.fonts.load('70px Caveat')]).then(writeBoard);
+    panel(board, boardWidth - .36, boardHeight - .36, boardX, boardY, front + .29);
+    const trayY = boardY - boardHeight / 2;
+    box(room, silver, boardX, trayY, front + .37, boardWidth, .12, .45);
     [0x205587,0xc14741,0x242628].forEach((color,i) => {
-      box(room, white, i - 1, 0.65, front + 0.41, 0.61, 0.09, 0.09);
-      box(room, paint(color), i - 0.72, 0.65, front + 0.41, 0.12, 0.1, 0.1);
+      box(room, white, i - 1, trayY + .11, front + .42, .61, .09, .09);
+      box(room, paint(color), i - .72, trayY + .11, front + .42, .12, .1, .1);
     });
-    // 55-inch diagonal at four units per metre.
-    box(room, frame, 0, 6.58, front + 0.28, 4.87, 2.75, 0.2);
-    box(room, frame, 1.34, 5.03, front + 0.2, 0.035, 0.43, 0.035).rotation.z = -0.13;
+    for (const [key, x] of [['mission', -5.5], ['vision', 5.5]]) {
+      const content = this.classroom[key];
+      const sign = texture(768, 320, ctx => {
+        ctx.fillStyle = '#D9D9D9'; ctx.fillRect(0, 0, 768, 320);
+        ctx.textAlign = 'center'; ctx.fillStyle = '#24282a'; ctx.font = 'bold 74px sans-serif';
+        ctx.fillText(content.title, 384, 102, 710);
+        ctx.font = '42px sans-serif';
+        const words = content.text.trim().split(/\s+/);
+        const middle = Math.ceil(words.length / 2);
+        ctx.fillText(words.slice(0, middle).join(' '), 384, 195, 700);
+        ctx.fillText(words.slice(middle).join(' '), 384, 250, 700);
+      });
+      const face = panel(sign, 22 * .17, 1.65, x, 7.75, front + .25);
+      face.userData = { type: 'placard', content };
+      this.interactiveObjects.push(face);
+    }
+    const tv = new THREE.Group(); room.add(tv);
+    tv.position.set(boardX, boardY + boardHeight / 2 + .35 + 2.75 / 2, front + .21);
+    box(tv, frame, 0, 0, 0, 4.87, 2.75, .2);
     this.tvTexture = texture(768,432,() => {});
     const screen = new THREE.Mesh(new THREE.PlaneGeometry(4.72,2.61),
       new THREE.MeshStandardMaterial({map:this.tvTexture, emissiveMap:this.tvTexture, emissive:0xffffff, emissiveIntensity:0.35, roughness:0.65}));
-    screen.position.set(0,6.58,front+0.39); room.add(screen);
+    screen.position.z = .11; tv.add(screen);
     this.tvStart = performance.now();
     this.drawTVSlide(0);
     this.buildTeacher(room, floor, box, paint, texture);
-    const motto = 'MISTAKES ARE PROOFS THAT YOU ARE TRYING!';
-    const letters = texture(2048, 96, ctx => {
-      const step = 2048 / motto.length;
-      ctx.fillStyle = '#fcfaf1'; ctx.fillRect(0, 0, 2048, 96);
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = 'bold 59px sans-serif';
-      ctx.fillStyle = ctx.strokeStyle = '#202124'; ctx.lineWidth = 2;
-      Array.from(motto).forEach((c, i) => {
-        if (c === ' ') return;
-        ctx.strokeRect(i * step + 2, 5, step - 4, 85);
-        ctx.fillText(c, (i + 0.5) * step, 50, step - 8);
-      });
-    });
-    panel(letters, 18, 0.85, 0, 8.7, front + 0.14);
     const notices = texture(1024, 560, ctx => {
       ctx.fillStyle = '#aa7952'; ctx.fillRect(0,0,1024,560);
       const cards = [
@@ -338,7 +399,7 @@ class DeskScene {
     const seats = [];
     for (const z of [-12,-8.9,-5.8,0.1,3.7]) {
       for (const x of [-8.2,-4.2,4.2,8.2]) {
-        if (z === -12 && x > 0) continue;
+        if (z === -12 && (x > 0 || x === -4.2)) continue;
         if (z >= 0 && Math.abs(x) < 6) continue;
         seats.push([x,z]);
       }
@@ -391,17 +452,24 @@ class DeskScene {
   }
 
   buildTeacher(room, floor, box, paint, texture) {
-    const desk = paint(0x702b2b), black = paint(0x202426);
-    box(room,desk,4.4,floor+3,-11.75,3.9,0.19,1.85);
-    box(room,desk,4.4,floor+2.25,-10.94,3.65,1.5,0.13);
-    for (const x of [2.68,6.12]) for (const z of [-12.49,-11.01]) box(room,black,x,floor+1.47,z,0.15,2.94,0.15);
-    box(room,black,4.4,floor+1.74,-13.45,1.72,0.16,1.62);
-    box(room,black,4.4,floor+2.58,-14.13,1.72,1.65,0.15);
-    for (const dx of [-0.66,0.66]) for (const dz of [-0.6,0.6]) box(room,black,4.4+dx,floor+0.86,-13.45+dz,0.15,1.72,0.15);
+    const desk = paint(0x735742), black = paint(0x202426), mint = paint(0x93d3ae);
+    const top = box(room, paint(0x5e4636), 0, floor + 3, -11.55, 22 * .36, .21, 2);
+    top.geometry = top.geometry.clone();
+    const corners = top.geometry.attributes.position;
+    for (let i = 0; i < corners.count; i++) {
+      if (corners.getZ(i) < 0) corners.setX(i, corners.getX(i) * .93);
+    }
+    top.geometry.computeVertexNormals();
+    box(room, desk, 0, floor + 2.54, -10.68, 7.4, .75, .14);
+    for (const x of [-3.5,3.5]) for (const z of [-12.37,-10.75]) box(room,desk,x,floor+1.47,z,.23,2.94,.23);
+    box(room,mint,0,floor+1.74,-13.44,1.82,.18,1.65);
+    box(room,mint,0,floor+3.05,-14.15,1.82,2.4,.16);
+    for (const x of [-.48,-.24,0,.24,.48]) box(room,paint(0xfffdf6),x,floor+3.35,-14.05,.09,1.28,.02);
+    for (const x of [-.7,.7]) for (const z of [-14.04,-12.84]) box(room,mint,x,floor+.86,z,.15,1.72,.15);
 
     const person = new THREE.Group();
     person.position.set(7.72,floor,-11.6); person.rotation.y = -0.23;
-    person.userData.type = 'teacher'; room.add(person); this.interactiveObjects.push(person);
+    person.userData.type = 'teacher'; room.add(person); 
     const skin = paint(0xb98058), slacks = paint(0x35373d), hair = paint(0x242021);
     this.teacherJacket = paint(0x22262d);
     const oval = (parent, material, x,y,z, w,h,d) => {
@@ -445,6 +513,13 @@ class DeskScene {
       box(head,black,Math.sign(x)*0.51,0.11,0.33,0.045,0.045,0.55);
     }
     box(head,black,0,0.14,0.60,0.14,0.04,0.05);
+    // Four scene units per metre. Reuse the unit cube from the room builder.
+    const hitbox = box(person, new THREE.MeshBasicMaterial({ visible: false }), 0, 3.8, 0, 3.2, 7.6, 2);
+    this.interactiveObjects.push(hitbox);
+    hitbox.castShadow = hitbox.receiveShadow = false;
+    person.traverse(child => {
+      if (child.isMesh) Object.assign(child.userData, { type: 'teacher', interactive: true });
+    });
     this.speechAnchor = new THREE.Object3D();this.speechAnchor.position.y=1.23;head.add(this.speechAnchor);
     this.speechPoint = new THREE.Vector3();
     this.speechIndex=0; this.speechUntil=0;
@@ -468,9 +543,10 @@ class DeskScene {
     this.camera.updateMatrixWorld();
     this.speechAnchor.getWorldPosition(this.speechPoint).project(this.camera);
     const p=this.speechPoint, rect=this.renderer.domElement.getBoundingClientRect();
-    this.teacherBubble.style.left=(rect.left+(p.x+1)*rect.width/2)+'px';
-    this.teacherBubble.style.top=(rect.top+(1-p.y)*rect.height/2)+'px';
-    this.teacherBubble.classList.toggle('visible', Math.abs(p.x)<1 && Math.abs(p.y)<1 && Math.abs(p.z)<1 && !this.isCameraZoomed);
+    const half = this.teacherBubble.offsetWidth / 2 + 8;
+    this.teacherBubble.style.left = THREE.MathUtils.clamp(rect.left + (p.x + 1) * rect.width / 2, half, window.innerWidth - half) + 'px';
+    this.teacherBubble.style.top = THREE.MathUtils.clamp(rect.top + (1 - p.y) * rect.height / 2, this.teacherBubble.offsetHeight + 8, window.innerHeight - 8) + 'px';
+    this.teacherBubble.classList.toggle('visible', Math.abs(p.z)<1 && !this.isCameraZoomed);
   }
 
   buildDesk() {
@@ -861,7 +937,7 @@ class DeskScene {
       {
             "id": 4,
             "name": "Nicole De Guzman",
-            "section": "BSIT-1A",
+            "section": "BSIT 3-1",
             "deskItem": "intermediate-pad",
             "tagline": "My code works, but nobody knows why (especially me)",
             "folderLabel": "secret_thesis_do_not_delete",
@@ -918,7 +994,7 @@ class DeskScene {
         originalPos: { x: layout.x, y: posY, z: layout.z },
         originalRot: { x: 0, y: layout.yaw, z: 0 }
       });
-      this.interactiveObjects.push(folderMesh);
+
       this.interactiveObjects.push(folderHitBox);
     });
   }
@@ -990,10 +1066,10 @@ class DeskScene {
 
     laptopGroup.userData = { type: 'laptop' };
     this.scene.add(laptopGroup);
-    this.interactiveObjects.push(laptopGroup);
-    this.interactiveObjects.push(laptopBase);
-    this.interactiveObjects.push(laptopLid);
-    this.interactiveObjects.push(screenMesh);
+
+
+
+
     this.interactiveObjects.push(laptopHitBox);
     this.laptop = laptopGroup;
 
@@ -1035,10 +1111,10 @@ class DeskScene {
     cupGroup.position.set(4.0, 0.18, -1.2);
     cupGroup.userData = { type: 'coffee' };
     this.scene.add(cupGroup);
-    this.interactiveObjects.push(cupGroup);
-    this.interactiveObjects.push(cupMesh);
-    this.interactiveObjects.push(liquidMesh);
-    this.interactiveObjects.push(handleMesh);
+
+
+
+
     this.interactiveObjects.push(coffeeHitBox);
     this.coffeeCup = cupGroup;
 
@@ -1098,7 +1174,7 @@ class DeskScene {
     stickyNote.add(dontTouchHitBox);
 
     this.scene.add(stickyNote);
-    this.interactiveObjects.push(stickyNote);
+
     this.interactiveObjects.push(dontTouchHitBox);
     this.dontTouchNote = stickyNote;
 
@@ -1211,11 +1287,12 @@ class DeskScene {
     mesh.add(noteHitBox);
 
     this.scene.add(mesh);
-    this.interactiveObjects.push(mesh);
+
     this.interactiveObjects.push(noteHitBox);
   }
 
   bindEvents() {
+    this.rig.bindKeyboardLook(() => this.isCameraZoomed);
     window.addEventListener('resize', () => this.onWindowResize());
 
     // Seated Look Around Event Listeners
@@ -1295,14 +1372,14 @@ class DeskScene {
     const dx = e.touches[0].clientX - this.dragStartPos.x;
     const dy = e.touches[0].clientY - this.dragStartPos.y;
 
-    if (Math.hypot(dx, dy) > 18) {
+    if (Math.hypot(dx, dy) >= 5) {
       this.hasDraggedMeaningfully = true;
     }
 
     // Horizontal 180 degrees (-90° to +90°) and vertical look up (-0.65 to +1.15)
     // Consistent drag directions across all axes
     const yawDelta = -(dx / window.innerWidth) * Math.PI;
-    const pitchDelta = -(dy / window.innerHeight) * 1.5;
+    const pitchDelta = -(dy / window.innerHeight) * PITCH_RANGE;
 
     this.rig.aim(this.dragStartAngles.yaw + yawDelta, this.dragStartAngles.pitch + pitchDelta);
   }
@@ -1318,26 +1395,30 @@ class DeskScene {
       const dx = e.clientX - this.dragStartPos.x;
       const dy = e.clientY - this.dragStartPos.y;
 
-      if (Math.hypot(dx, dy) > 18) {
+      if (Math.hypot(dx, dy) >= 5) {
         this.hasDraggedMeaningfully = true;
         this.hideTooltip();
       }
 
       // Dragging UP looks UP (consistent negative sign with yaw)
-      const yawDelta = -(dx / window.innerWidth) * (Math.PI * 1.15);
-      const pitchDelta = -(dy / window.innerHeight) * 1.5;
+      const yawDelta = -(dx / window.innerWidth) * MOUSE_YAW_RANGE;
+      const pitchDelta = -(dy / window.innerHeight) * PITCH_RANGE;
 
       this.rig.aim(this.dragStartAngles.yaw + yawDelta, this.dragStartAngles.pitch + pitchDelta);
       return;
     }
 
+    this.pendingHover = e;
+  }
+
+  updateHover(e) {
     // Raycast hovered props & folders
     const rect = this.renderer.domElement.getBoundingClientRect();
     this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(this.interactiveObjects, true);
+    const intersects = this.raycaster.intersectObjects(this.interactiveObjects, false);
 
     if (intersects.length > 0) {
       // NOTE TOP PRIORITY: If any sticky note or dont-touch-note is intersected, prioritize it over folders
@@ -1350,7 +1431,7 @@ class DeskScene {
         return cur.userData && (cur.userData.type === 'sticky-note' || cur.userData.type === 'dont-touch-note');
       });
 
-      if (noteIntersect) {
+      if (noteIntersect && chosenIntersect.object.userData.type !== 'teacher') {
         chosenIntersect = noteIntersect;
       }
 
@@ -1374,7 +1455,10 @@ class DeskScene {
   applyHoverState(obj, e) {
     document.body.style.cursor = 'pointer';
 
-    if (obj.userData.type === 'teacher') {
+    if (obj.userData.type === 'placard') {
+      obj.material.emissive.setHex(0x39331b);
+      this.showTooltip('Click to read placard', e);
+    } else if (obj.userData.type === 'teacher') {
       this.teacherJacket.emissive.setHex(0x594626);
       this.showTooltip('Sean Dyogi · Click to talk', e);
     } else if (obj.userData.type === 'folder') {
@@ -1407,6 +1491,7 @@ class DeskScene {
   }
 
   resetHoverState() {
+    if (this.hoveredObject?.userData.type === 'placard') this.hoveredObject.material.emissive.setHex(0);
     if (this.hoveredObject?.userData.type === 'teacher') this.teacherJacket.emissive.setHex(0);
     if (this.hoveredObject) {
       if (this.hoveredObject.userData.type === 'folder' && !this.isCameraZoomed) {
@@ -1462,7 +1547,7 @@ class DeskScene {
     const dragDist = Math.hypot(e.clientX - startX, e.clientY - startY);
 
     // Only abort if the user deliberately dragged across screen for look-around
-    if (dragDist > 22) {
+    if (dragDist >= 5 || this.hasDraggedMeaningfully) {
       return;
     }
 
@@ -1471,7 +1556,7 @@ class DeskScene {
     this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(this.interactiveObjects, true);
+    const intersects = this.raycaster.intersectObjects(this.interactiveObjects, false);
 
     if (intersects.length > 0) {
       // NOTE TOP PRIORITY: If any sticky note or dont-touch-note is intersected, prioritize it over folders
@@ -1484,7 +1569,7 @@ class DeskScene {
         return cur.userData && (cur.userData.type === 'sticky-note' || cur.userData.type === 'dont-touch-note');
       });
 
-      if (noteIntersect) {
+      if (noteIntersect && chosenIntersect.object.userData.type !== 'teacher') {
         chosenIntersect = noteIntersect;
       }
 
@@ -1493,14 +1578,22 @@ class DeskScene {
         hit = hit.parent;
       }
       this.handleObjectClick(hit);
+    } else {
+      console.warn("[Sean] No interactive hit at the clicked position.");
     }
   }
 
   handleObjectClick(obj) {
     const type = obj.userData.type;
 
-    if (type === 'teacher') {
-      const lines=this.classroom.teacherLines;
+    if (type === 'placard') {
+      this.openPlacard(obj);
+    } else if (type === 'teacher') {
+      let lines = this.classroom.teacherLines;
+      if (!Array.isArray(lines) || !lines.length) {
+        console.warn('[Sean] Empty teacher lines; using classroom defaults.');
+        lines = classroomDefaults.teacherLines;
+      }
       this.teacherBubble.textContent=lines[this.speechIndex];
       this.speechIndex=(this.speechIndex+1)%lines.length;
       this.speechUntil=performance.now()+4000;
@@ -1531,6 +1624,46 @@ class DeskScene {
     }
   }
 
+  openPlacard(face) {
+    if (this.isCameraZoomed) return;
+    this.resetHoverState();
+    this.isDraggingView = false;
+    this.rig.keys.clear();
+    this.rig.targetYaw = this.rig.yaw;
+    this.rig.targetPitch = this.rig.pitch;
+    this.preZoomOrientation = this.camera.quaternion.clone();
+    this.isCameraZoomed = true;
+    const target = face.getWorldPosition(new THREE.Vector3());
+    this.camera.position.copy(target);
+    this.camera.position.z += 5;
+    this.camera.lookAt(target);
+    const card = document.createElement('div');
+    card.className = 'note-view-modal-overlay active';
+    card.style.display = 'flex';
+    card.setAttribute('role', 'dialog');
+    card.setAttribute('aria-modal', 'true');
+    card.setAttribute('aria-labelledby', 'placard-heading');
+    card.innerHTML = '<div class="note-view-card"><h2 id="placard-heading"></h2><p class="note-view-body"></p><button class="note-view-return-btn">Return to Desk</button></div>';
+    card.querySelector('h2').textContent = face.userData.content.title;
+    card.querySelector('p').textContent = face.userData.content.text;
+    const previousFocus = document.activeElement;
+    const close = () => {
+      document.removeEventListener('keydown', onKey, true);
+      card.remove();
+      this.returnToDesk();
+      previousFocus?.focus();
+    };
+    const onKey = event => {
+      if (event.key === 'Escape') { event.stopImmediatePropagation(); close(); }
+      if (event.key === 'Tab') event.preventDefault();
+    };
+    document.body.appendChild(card);
+    const button = card.querySelector('button');
+    button.addEventListener('click', close);
+    button.focus();
+    document.addEventListener('keydown', onKey, true);
+  }
+
   handleStickyNoteClick() {
     const now = Date.now();
     if (this.lastStickyClick && (now - this.lastStickyClick) < 450) {
@@ -1545,9 +1678,13 @@ class DeskScene {
   selectFolder(obj) {
     const folderMesh = obj.userData.folderMesh || obj;
     const member = folderMesh.userData.member;
+    this.onFolderClick?.(member);
     this.activeFolder = folderMesh;
     this.isCameraZoomed = true;
-    this.seatedOrientation = this.camera.quaternion.clone();
+    this.preZoomOrientation = this.camera.quaternion.clone();
+    this.rig.targetYaw = this.rig.yaw;
+    this.rig.targetPitch = this.rig.pitch;
+    this.rig.keys.clear();
     this.isDraggingView = false;
     this.hideTooltip();
 
@@ -1616,7 +1753,7 @@ class DeskScene {
       const turn = { progress: 0 };
       gsap.to(turn, {
         progress: 1, duration: 0.8, ease: 'power3.inOut',
-        onUpdate: () => this.camera.quaternion.slerpQuaternions(fromOrientation, this.seatedOrientation, turn.progress)
+        onUpdate: () => this.camera.quaternion.slerpQuaternions(fromOrientation, this.preZoomOrientation, turn.progress)
       });
       gsap.to(this.camera.position, {
         overwrite: true,
@@ -1627,12 +1764,14 @@ class DeskScene {
         ease: 'power3.inOut',
         onComplete: () => {
           this.camera.position.copy(this.rig.seat);
+          this.camera.quaternion.copy(this.preZoomOrientation);
           this.isCameraZoomed = false;
           this.activeFolder = null;
         }
       });
     } else {
       this.camera.position.copy(this.rig.seat);
+      this.camera.quaternion.copy(this.preZoomOrientation);
       this.isCameraZoomed = false;
       this.activeFolder = null;
     }
@@ -1719,7 +1858,10 @@ class DeskScene {
     if (!note) return;
 
     this.isCameraZoomed = true;
-    this.seatedOrientation = this.camera.quaternion.clone();
+    this.preZoomOrientation = this.camera.quaternion.clone();
+    this.rig.targetYaw = this.rig.yaw;
+    this.rig.targetPitch = this.rig.pitch;
+    this.rig.keys.clear();
     this.isDraggingView = false;
     this.hideTooltip();
     this.activeStickyMesh = visualMesh;
@@ -1914,14 +2056,32 @@ class DeskScene {
   animate() {
     requestAnimationFrame(() => this.animate());
 
+    if (this.pendingHover) {
+      if (!this.isDraggingView && !this.isCameraZoomed) this.updateHover(this.pendingHover);
+      this.pendingHover = null;
+    }
     const seconds = performance.now() * 0.001;
     this.classroomRotors.forEach((rotor, i) => { rotor.rotation.y = seconds * (i === 2 ? 1.3 : 0.78) + i; });
     this.classroomShafts.forEach((beam, i) => { beam.position.y = 2.42 + 0.055 * Math.sin(seconds * 0.24 + i); });
     this.classroomDust.position.set(0.13 * Math.sin(seconds * 0.31), 0.12 * Math.sin(seconds * 0.21), 0.11 * Math.cos(seconds * 0.25));
 
-    if (!this.isCameraZoomed) this.rig.update();
+    const dt = Math.min(seconds - (this.lastFrameSeconds ?? seconds), 0.05);
+    this.lastFrameSeconds = seconds;
+    if (!this.isCameraZoomed) {
+      this.rig.updateKeyboardLook(dt);
+      this.rig.update();
+    }
 
     if (this.renderer && this.scene && this.camera) {
+      // Keep animated shadows while bounding their cost on slower GPUs.
+      if (seconds - this.lastShadowUpdate >= 1 / 15) {
+        this.renderer.shadowMap.needsUpdate = true;
+        this.lastShadowUpdate = seconds;
+      }
+      const covered = this.bookOverlay?.classList.contains('active') ||
+        document.getElementById('laptopErrorModal')?.classList.contains('active');
+      if (covered && seconds - this.lastSceneRender < 0.25) return;
+      this.lastSceneRender = seconds;
       this.updateFrontWall(seconds);
       this.renderer.render(this.scene, this.camera);
     }
@@ -1956,6 +2116,7 @@ class DeskScene {
       `;
       card.addEventListener('click', () => {
         if (typeof this.onFolderSelect === 'function') {
+          this.onFolderClick?.(m);
           this.onFolderSelect(m);
         }
       });
