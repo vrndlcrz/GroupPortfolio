@@ -8,6 +8,15 @@ class PortfolioPhone {
       if(event.code!=='KeyC'||event.repeat||event.ctrlKey||event.metaKey||event.altKey||event.target.closest('input,textarea,select,[contenteditable=true]'))return;
       event.preventDefault();event.stopPropagation();this.gesture ||= event.isTrusted;this.opened?this.close():this.open();
     });
+    this.offerShortcutHint();
+  }
+  offerShortcutHint() {
+    if(this.hintShown)return;
+    if(!this.canOpen()){this.hintWaitTimer=setTimeout(()=>this.offerShortcutHint(),250);return}
+    this.hintShown=true;
+    const hint=this.shortcutHint=this.element('div','phone-shortcut-hint','Use C to see Phone');
+    hint.id='phone-shortcut-hint';hint.setAttribute('role','status');hint.setAttribute('aria-live','polite');
+    document.body.append(hint);this.hintTimer=setTimeout(()=>hint.remove(),10000);
   }
   element(tag,className,text) {
     const node=document.createElement(tag);if(className)node.className=className;
@@ -41,9 +50,8 @@ class PortfolioPhone {
     root.append(status,header,this.screen,home);document.body.append(root);
     for(const type of ['pointerdown','pointerup','pointermove','mousedown','mouseup','mousemove','click','dblclick','wheel','touchstart','touchmove','touchend'])
       root.addEventListener(type,event=>event.stopPropagation(),{passive:true});
-    root.addEventListener('pointerdown',event=>{this.gesture ||= event.isTrusted;this.armAutoHide()});
-    root.addEventListener('wheel',()=>this.armAutoHide(),{passive:true});
-    root.addEventListener('keydown',event=>{this.gesture ||= event.isTrusted;this.armAutoHide();
+    root.addEventListener('pointerdown',event=>{this.gesture ||= event.isTrusted});
+    root.addEventListener('keydown',event=>{this.gesture ||= event.isTrusted;
       if(this.app==='tiktik'&&['ArrowUp','ArrowDown'].includes(event.key)){
         event.preventDefault();event.stopPropagation();const index=Math.max(0,Math.min(this.pages.length-1,this.visible+(event.key==='ArrowDown'?1:-1)));
         this.pages[index]?.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -80,16 +88,13 @@ class PortfolioPhone {
   }
   open() {
     if(this.opened||!this.canOpen())return false;
+    this.hintShown=true;clearTimeout(this.hintWaitTimer);clearTimeout(this.hintTimer);this.shortcutHint?.remove();
     this.build();this.stopNotebook();this.opened=true;this.root.hidden=false;this.root.inert=false;
     this.root.style.pointerEvents='auto';this.button.setAttribute('aria-expanded','true');this.showHome();
     if(window.gsap){gsap.killTweensOf(this.root);gsap.fromTo(this.root,{yPercent:110},{yPercent:0,duration:.5,ease:'power2.out'})}
-    this.armAutoHide();this.closeButton.focus();return true;
-  }
-  armAutoHide() {
-    clearTimeout(this.autoHideTimer);if(this.opened)this.autoHideTimer=setTimeout(()=>this.close(),10000);
+    this.closeButton.focus();return true;
   }
   close(immediate=false) {
-    clearTimeout(this.autoHideTimer);
     if(!this.root||!this.opened)return;
     const restore=this.root.contains(document.activeElement);this.opened=false;this.stopMedia();
     this.root.inert=true;this.root.style.pointerEvents='none';this.button.setAttribute('aria-expanded','false');

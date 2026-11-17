@@ -10,13 +10,13 @@ class ClassroomExperiences {
     document.addEventListener('keydown',event=>{
       if(this.dark&&event.key==='Tab'){event.preventDefault();return}
       if(event.key!=='Escape')return;
-      if(this.dark||this.darkTransition){event.preventDefault();event.stopImmediatePropagation();this.leaveDark();}
+      if(this.dark){event.preventDefault();event.stopImmediatePropagation();this.leaveDark();}
       else if(this.concertActive){event.preventDefault();event.stopImmediatePropagation();this.stopConcert();}
       else if(this.scrapOpen){event.preventDefault();event.stopImmediatePropagation();this.closeScrap();}
     },true);
     window.AudioMaster?.onChange(muted=>{if(this.audio)this.audio.muted=muted});
   }
-  get blocking(){return !!(this.dark||this.darkTransition||this.scrapOpen)}
+  get blocking(){return !!(this.dark||this.scrapOpen)}
   get speaking(){return !!(this.concertActive||this.cleaning||this.kimActive)}
   paint(color){if(!this.materials.has(color))this.materials.set(color,Theme.toon(color));return this.materials.get(color)}
   mesh(parent,shape,color,x,y,z,w,h,d,outline=true) {
@@ -70,10 +70,12 @@ class ClassroomExperiences {
     if(type==='exit-door'){this.showKim();return true}
     return false;
   }
-  paintBubble(name,line) {
+  paintBubble(name,line,hint='') {
     const strong=document.createElement('strong');strong.className='speaker-name';strong.textContent=name;
     const body=document.createElement('span');body.className='speaker-line';body.textContent=line;
-    this.s.teacherBubble.replaceChildren(strong,body);this.s.teacherBubble.style.whiteSpace='pre-line';return body;
+    this.s.teacherBubble.replaceChildren(strong,body);
+    if(hint){const prompt=document.createElement('span');prompt.className='speaker-hint';prompt.textContent=hint;this.s.teacherBubble.append(prompt)}
+    this.s.teacherBubble.style.whiteSpace='pre-line';return body;
   }
   speak(name,line,anchor) {
     const node=this.paintBubble(name,line);this.speaker={name,node,anchor};this.s.bubbleStudentId=null;this.s.bubbleAnchor=anchor;this.s.speechUntil=Infinity;this.s.hideTooltip();return node;
@@ -197,25 +199,27 @@ class ClassroomExperiences {
     this.s.rig.applyPose(this.concertCamera);this.clearSpeaker();this.s.renderer.shadowMap.needsUpdate=true;
   }
   enterDark() {
-    if(!this.s.inputEnabled||this.s.view==='gliding'||this.s.curtainAnimating||this.dark||this.darkTransition)return;
+    if(!this.s.inputEnabled||this.s.view==='gliding'||this.dark)return;
     this.stopConcert();this.stopKim();this.closeScrap();this.phone.close(true);this.book.close();this.s.whiteboardController?.close();
-    this.darkHome={pose:this.s.rig.capturePose(),view:this.s.view,input:this.s.rig.inputEnabled};this.darkTransition=true;
-    const token=this.darkToken=(this.darkToken||0)+1;
-    const center=this.point.set(11,3.55,.6),camera=this.s.camera.position;
-    this.s.glideTo({...this.s.rig.capturePose(),yaw:Math.atan2(center.x-camera.x,camera.z-center.z),pitch:Math.atan2(center.y-camera.y,Math.hypot(center.x-camera.x,center.z-camera.z))},.75,'seat');
-    this.darkTimer=setTimeout(()=>{
-      if(token!==this.darkToken)return;this.s.rig.setInputEnabled(false);if(!this.s.curtainClosed)this.s.toggleCurtain(true);
-      this.darkTimer=setTimeout(()=>{if(token!==this.darkToken)return;
-        if(!this.blackout){this.blackout=document.createElement('div');this.blackout.id='classroom-blackout';this.blackout.tabIndex=-1;this.blackout.setAttribute('role','dialog');this.blackout.setAttribute('aria-modal','true');this.blackout.setAttribute('aria-label','Dark mode. Press Escape to return.');document.body.append(this.blackout)}
-        this.dark=true;this.darkTransition=false;document.documentElement.classList.add('classroom-blackout-mode');document.getElementById('darkModeBtn').setAttribute('aria-pressed','true');this.blackout.hidden=false;this.s.rig.setInputEnabled(false);this.blackout.focus();
-      },760);
-    },800);
+    this.s.resetHoverState();this.s.hideSean();this.s.pendingHover=null;
+    this.darkHome={input:this.s.rig.inputEnabled};
+    if(!this.blackout){
+      this.blackout=document.createElement('div');this.blackout.id='classroom-blackout';this.blackout.tabIndex=-1;
+      this.blackout.setAttribute('role','dialog');this.blackout.setAttribute('aria-modal','true');
+      this.blackout.setAttribute('aria-label','Dark mode. Click anywhere or press Escape to return.');
+      this.blackout.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();this.leaveDark()});
+      for(const type of ['pointerdown','pointerup','pointermove','wheel'])this.blackout.addEventListener(type,event=>event.stopPropagation());
+      document.body.append(this.blackout);
+    }
+    this.dark=true;document.documentElement.classList.add('classroom-blackout-mode');
+    document.getElementById('darkModeBtn').setAttribute('aria-pressed','true');
+    this.blackout.hidden=false;this.s.rig.setInputEnabled(false);this.blackout.focus();
   }
   leaveDark() {
-    clearTimeout(this.darkTimer);this.darkToken++;this.s.viewTween?.kill();this.s.viewTween=null;gsap.killTweensOf(this.s);this.s.curtainAnimating=false;
-    document.documentElement.classList.remove('classroom-blackout-mode');document.getElementById('darkModeBtn').setAttribute('aria-pressed','false');this.dark=false;this.darkTransition=false;if(this.blackout)this.blackout.hidden=true;document.getElementById('darkModeBtn').focus();
-    const home=this.darkHome;this.s.view='seat';if(this.s.curtainClosed)this.s.toggleCurtain(true);
-    if(home){this.s.rig.applyPose(home.pose);this.s.rig.setInputEnabled(home.input);this.s.view=home.view;this.s.backButton.hidden=home.view!=='desk'}
+    if(!this.dark)return;
+    this.dark=false;document.documentElement.classList.remove('classroom-blackout-mode');
+    document.getElementById('darkModeBtn').setAttribute('aria-pressed','false');this.blackout.hidden=true;
+    this.s.rig.setInputEnabled(this.darkHome.input);document.getElementById('darkModeBtn').focus();
   }
   update(seconds) {
     if(this.concertActive){

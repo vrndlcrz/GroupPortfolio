@@ -2300,7 +2300,7 @@ class DeskScene {
     this.teacherBubble.style.maxWidth=''; this.teacherBubble.style.overflowWrap='';
     const lines = this.experiences?.teacherLines || (Array.isArray(this.classroom.teacherLines) && this.classroom.teacherLines.length
       ? this.classroom.teacherLines : classroomDefaults.teacherLines);
-    if(this.experiences)this.experiences.paintBubble('Sir Sean',lines[this.speechIndex % lines.length]);
+    if(this.experiences)this.experiences.paintBubble('Sir Sean',lines[this.speechIndex % lines.length],'Click Sir Sean');
     else this.teacherBubble.textContent = lines[this.speechIndex % lines.length];
     this.speechIndex = (this.speechIndex + 1) % lines.length;
     this.speechUntil = performance.now() + duration;

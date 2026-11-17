@@ -1,4 +1,5 @@
 /* Flat cartoon phone; no backdrop or camera lock. */
+.phone-shortcut-hint { position:fixed; right:20px; bottom:24px; z-index:2147482998; max-width:calc(100vw - 40px); padding:13px 18px; border:3px solid var(--ink,#3A2312); border-radius:8px; background:#FFF0C2; color:var(--ink,#3A2312); box-shadow:5px 5px 0 var(--ink,#3A2312); font:clamp(20px,2vw,26px) 'Lilita One',sans-serif; pointer-events:none; }
 .portfolio-phone { position:fixed; right:16px; bottom:16px; z-index:2147483001; width:min(300px,92vw); height:min(600px,80vh); box-sizing:border-box; display:flex; flex-direction:column; padding:9px; border:3px solid var(--ink,#3A2312); border-radius:30px; background:#E9B54D; color:var(--ink,#3A2312); box-shadow:8px 8px 0 var(--ink,#3A2312); font-family:'Lilita One','Trebuchet MS',sans-serif; }
 .portfolio-phone[hidden],.portfolio-phone [hidden] { display:none!important; }
 .portfolio-phone * { box-sizing:border-box; }

@@ -2,6 +2,7 @@
 .teacher-speech { font-size:clamp(22px,2.1vw,34px)!important; line-height:1.35!important; padding:16px 22px!important; max-width:min(18em,calc(100vw - 20px))!important; }
 .teacher-speech .speaker-name { display:block; font-family:'Lilita One',sans-serif; font-size:.78em; line-height:1.15; margin-bottom:.35em; }
 .teacher-speech .speaker-line { display:block; white-space:pre-line; overflow-wrap:anywhere; }
+.teacher-speech .speaker-hint { display:block; margin-top:.6em; padding-top:.4em; border-top:2px solid var(--ink,#3A2312); font:.68em 'Lilita One',sans-serif; }
 .book-overlay .page-text,.book-overlay .page-content-text { font-size:clamp(20px,1.65vw,26px)!important; line-height:1.5!important; }
 .book-overlay .page-body-content { overflow-y:auto; min-height:0; }
 .book-overlay :is(.page-category-tag,.folder-letterhead,.skill-funny-label,.signed-name,.book-key-hints) { font-size:clamp(16px,1.2vw,20px)!important; }
@@ -18,7 +19,7 @@
 .scrap-card h2 { margin:0 0 18px; font-family:'Lilita One',sans-serif; font-size:clamp(28px,3vw,40px); }
 .scrap-card p { white-space:pre-line; overflow-wrap:anywhere; font-family:'Patrick Hand',cursive; font-size:clamp(26px,2.3vw,36px); line-height:1.35; }
 .scrap-actions { display:flex; flex-wrap:wrap; gap:14px; margin-top:24px; }.scrap-actions button { padding:10px 20px; font:23px 'Lilita One',sans-serif; color:var(--ink,#3A2312); background:#F4BA45; border:3px solid var(--ink,#3A2312); border-radius:7px; box-shadow:4px 4px 0 var(--ink,#3A2312); cursor:pointer; }
-#classroom-blackout { position:fixed; inset:0; z-index:2147483647; background:#000; outline:0; }
+#classroom-blackout { position:fixed; inset:0; z-index:2147483647; background:#000; outline:0; cursor:pointer; }
 #classroom-blackout[hidden] { display:none; }
 @media(max-width:600px) { .teacher-speech { font-size:22px!important; padding:12px 15px!important; }.book-overlay .john-profile-details { font-size:15px!important; } }
 
