@@ -35,8 +35,8 @@
   align-items: center;
   justify-content: center;
   background: rgba(8, 12, 22, 0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: none;
+  backdrop-filter: none;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -75,8 +75,8 @@
   font-family: var(--font-title);
   font-size: 0.95rem;
   font-weight: 700;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  backdrop-filter: blur(10px);
+  box-shadow: 4px 4px 0 var(--ink);
+  backdrop-filter: none;
 }
 
 .member-color-indicator {
@@ -84,7 +84,7 @@
   height: 14px;
   border-radius: 50%;
   border: 2px solid #FFFFFF;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 .book-close-btn {
@@ -100,15 +100,15 @@
   font-size: 1.4rem;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-  backdrop-filter: blur(10px);
+  box-shadow: 4px 4px 0 var(--ink);
+  backdrop-filter: none;
 }
 
 .book-close-btn:hover {
   background: #EF4444;
   border-color: #EF4444;
   transform: rotate(90deg) scale(1.1);
-  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 /* 3D Book Container */
@@ -117,7 +117,7 @@
   width: var(--book-width);
   height: var(--book-height);
   transform-style: preserve-3d;
-  box-shadow: var(--shadow-book);
+  box-shadow: 4px 4px 0 var(--ink);
   border-radius: var(--book-radius);
   transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -134,7 +134,7 @@
   border-bottom-left-radius: var(--book-radius);
   z-index: 100;
   border-right: 2px solid rgba(0, 0, 0, 0.35);
-  box-shadow: inset 2px 0 6px rgba(255,255,255,0.4), inset -2px 0 6px rgba(0,0,0,0.5);
+  box-shadow: 4px 4px 0 var(--ink);
   pointer-events: none;
 }
 
@@ -187,7 +187,7 @@
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   background: #FFFFFF;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 .page-face.page-front {
@@ -243,7 +243,7 @@
 }
 
 .book-page.turning {
-  box-shadow: -20px 20px 45px rgba(0, 0, 0, 0.45);
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 .book-page.turning .page-bend-shadow {
@@ -302,7 +302,7 @@
   justify-content: space-between;
   padding: 42px 32px 38px calc(var(--book-spine-width) + 26px);
   color: #FFFFFF;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  text-shadow: none;
   overflow: hidden;
 }
 
@@ -313,7 +313,7 @@
 .cover-badge {
   display: inline-block;
   background: rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(6px);
+  backdrop-filter: none;
   padding: 5px 16px;
   border-radius: 999px;
   font-family: var(--font-title);
@@ -361,7 +361,7 @@
   height: 100%;
   border-radius: 50%;
   border: 5px solid #FFFFFF;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 4px 0 var(--ink);
   object-fit: cover;
   background: #FFFFFF;
 }
@@ -381,7 +381,7 @@
   opacity: 0.95;
   transition: all 0.2s;
   pointer-events: none;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 .cover-footer {
@@ -554,7 +554,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 4px 14px rgba(244, 63, 94, 0.4);
+  box-shadow: 4px 4px 0 var(--ink);
   transition: all 0.2s ease;
   margin-top: 6px;
 }
@@ -562,7 +562,7 @@
 .page-action-btn:hover {
   background: #E11D48;
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(244, 63, 94, 0.5);
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 .roast-result-box {
@@ -611,7 +611,7 @@
   padding: 18px 22px;
   width: 100%;
   max-width: 330px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: none;
 }
 
 .team-credits-card h4 {
@@ -655,14 +655,14 @@
   align-items: center;
   gap: 8px;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  backdrop-filter: none;
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 .book-nav-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.32);
   transform: translateY(-2px) scale(1.04);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 .book-nav-btn:disabled {
@@ -679,7 +679,7 @@
   padding: 8px 18px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  backdrop-filter: none;
 }
 
 .page-dot {
@@ -695,7 +695,7 @@
   width: 24px;
   border-radius: 999px;
   background: #38BDF8;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 .book-key-hints {
@@ -722,14 +722,14 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+  box-shadow: 4px 4px 0 var(--ink);
   transition: all 0.2s ease;
 }
 
 .book-guestbook-trigger:hover {
   background: linear-gradient(135deg, #059669, #047857);
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5);
+  box-shadow: 4px 4px 0 var(--ink);
 }
 
 @keyframes fadeIn {
@@ -878,7 +878,7 @@
 .theme-folder .page-inner::after, .theme-folder .page-inner::before {
   content: ''; position: absolute; z-index: 5; pointer-events: none;
   top: -7px; right: 24px; width: 11px; height: 35px; border: 2px solid #828c98;
-  border-radius: 8px; transform: rotate(9deg); box-shadow: 1px 1px 2px #0002;
+  border-radius: 8px; transform: rotate(9deg); box-shadow: 4px 4px 0 var(--ink);
 }
 .theme-folder .page-inner::after { top: 2px; right: 27px; width: 5px; height: 21px; border-top: 0; }
 .theme-folder .folder-stamp {
@@ -914,7 +914,7 @@
 }
 @keyframes pad-curl {
   0%,100% { border-radius: 2px; }
-  40%,65% { border-radius: 2px 3px 35% 10%; box-shadow: inset -5px -20px 18px -12px #9b885c88; }
+  40%,65% { border-radius: 2px 3px 35% 10%; box-shadow: 4px 4px 0 var(--ink); }
 }
 @media (prefers-reduced-motion: reduce) {
   .theme-pad .book-page.turning, .theme-pad .book-page.turning .page-front { animation-duration: 1ms; }
@@ -930,7 +930,7 @@
   transition: none;
   transform-style: flat;
   border-radius: 4px;
-  box-shadow: none;
+  box-shadow: 4px 4px 0 var(--ink);
   --edge-shadow: 1px 2px #bcb6a9, 2px 4px #eeeae1, 3px 5px #aaa599,
               4px 7px #e7e3d9, 6px 22px 40px #0007;
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.84' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath fill='%23000' opacity='.075' filter='url(%23g)' d='M0 0h128v128H0z'/%3E%3C/svg%3E");
@@ -947,9 +947,9 @@
   :is(.spiral-left, .book-page:not(.active-page)) { visibility: hidden; }
 .theme-spiral #pagesDeck::before {
   content: ''; position: absolute; inset: 0 0 0 50%;
-  border-radius: 3px; box-shadow: var(--edge-shadow); pointer-events: none;
+  border-radius: 3px; box-shadow: 4px 4px 0 var(--ink); pointer-events: none;
 }
-.theme-spiral .spiral-left { box-shadow: var(--edge-shadow); }
+.theme-spiral .spiral-left { box-shadow: 4px 4px 0 var(--ink); }
 .theme-spiral #pagesDeck { perspective: 2200px; }
 .theme-spiral .book-spine, .theme-spiral .page-bend-shadow { display: none; }
 .theme-spiral .book-page {
@@ -984,7 +984,7 @@
 }
 .theme-spiral .spiral-coil i {
   height: 8px; border: 2px solid; border-color: #f7f8f7 #707675 #434746 #b5b8b7;
-  border-radius: 65%; transform: rotate(-7deg); box-shadow: 0 2px 2px #322c244d;
+  border-radius: 65%; transform: rotate(-7deg); box-shadow: 4px 4px 0 var(--ink);
 }
 .theme-spiral .spiral-shadow {
   position: absolute; top: 0; bottom: 0; width: 36%; left: 32%; opacity: 0;
@@ -994,7 +994,7 @@
 .theme-spiral .spiral-divider .page-front { overflow: visible; }
 .theme-spiral .semester-sheet {
   position: absolute; inset: 0;
-  filter: drop-shadow(1px 2px 2px #514c413d) drop-shadow(-1px -1px 1px #453f3522);
+  filter: none;
 }
 .theme-spiral .semester-flap {
   position: absolute; inset: 0; container-type: inline-size;
@@ -1052,13 +1052,13 @@
   content: '46'; display: inline-block; text-decoration: line-through double; margin-left: .35em;
 }
 .theme-spiral [data-page-index="7"] .page-text p:first-child .ink-word:nth-child(2) {
-  background: #fff; box-shadow: 1px 1px 2px #51413044;
+  background: #fff; box-shadow: 4px 4px 0 var(--ink);
 }
 .theme-spiral .spiral-profile { gap: 8px; }
 .theme-spiral .snapshot {
   box-sizing: border-box; width: min(64%, 170px); margin: 8px 0 10px 5%;
   position: relative; padding: 7px 7px 5px; background: #fffdf8;
-  box-shadow: 0 2px 5px #42372142; transform: rotate(-4deg);
+  box-shadow: 4px 4px 0 var(--ink); transform: rotate(-4deg);
 }
 .theme-spiral .snapshot img { display: block; width: 100%; }
 .theme-spiral .snapshot figcaption { text-align: center; font: 500 1rem/1 Caveat, cursive; margin-top: 3px; color: #44413e; }
@@ -1089,7 +1089,55 @@
 
 .book-music-btn { margin-left: auto; margin-right: 8px; padding: 5px 10px; }
 .book-overlay .music-credit { color: #fff; text-align: center; }
+
+/* Hard paper edges retain each stationery theme and its supplied cover artwork. */
+.book-overlay, .book-overlay * { backdrop-filter:none!important; -webkit-backdrop-filter:none!important; text-shadow:none!important; }
+.book-overlay { background:rgba(58,35,18,.72); }
+.book-overlay .page-inner { border:3px solid var(--ink); }
+.book-overlay .page-face::after { background:none; }
+.book-overlay .page-bend-shadow { background:none; }
+.book-member-pill,.book-close-btn,.book-nav-btn,.book-guestbook-trigger {
+  background:var(--cream)!important; color:var(--ink)!important; border:3px solid var(--ink)!important;
+  border-radius:5px 8px 4px 6px; box-shadow: 4px 4px 0 var(--ink);
+}
+.book-overlay .page-text,.book-overlay .page-inner p,.book-overlay .page-inner li,
+.book-overlay .page-inner td,.book-overlay .page-inner small {
+  color:#1B2A20!important; opacity:1!important;
+}
+.book-overlay .ink-word { opacity:1!important; }
+.book-overlay .book-page { --ink-opacity:1!important; }
+.book-overlay .theme-folder .book-page * { font-family:'Patrick Hand','Trebuchet MS','Comic Sans MS',sans-serif; }
+.book-overlay .page-title { color:var(--ink); font-family:var(--font-title); }
+.book-overlay :is(.page-category-tag,.skill-funny-label,.snapshot figcaption,.signed-name,.section-callout) {
+  color:var(--ink)!important; opacity:1!important;
+}
+.book-overlay .skill-bar-fill { background:var(--teal); transition:none; }
+.book-overlay .page-action-btn {
+  color:var(--ink); background:var(--sun); border:3px solid var(--ink);
+  transition:transform .15s ease-out;
+}
+.book-overlay.theme-folder :is(.book-cover,.book-back-cover) { background:#fffefa!important; color:var(--ink); }
+.book-overlay.theme-themebook :is(.book-cover,.book-back-cover) { background:#21589b!important; color:#fff; }
+.book-overlay.theme-pad :is(.book-cover,.book-back-cover) { background:var(--cream)!important; color:var(--ink); }
+.book-overlay.theme-spiral .book-back-cover { background:var(--wood)!important; color:var(--ink); }
+.book-overlay .team-credits-card { background:var(--cream); color:var(--ink); border:3px solid var(--ink); }
+.book-overlay .page-body-content { isolation:isolate; }
+
 .book-overlay [hidden] { display: none; }
 
 .book-overlay { contain: layout paint; }
 .book-overlay:not(.active) .book-page { pointer-events: none; }
+
+/* Preserve the exact pre-golden page, ink, and supplied-cover palette. */
+.book-overlay .book-page, .book-overlay .spiral-left {
+  --leaf:#3FBF6B; --leaf-light:#8FE39B; --ink:#1B2A20; --wood:#C89B63; --wood-dark:#8E6538;
+  --card-red:#C8323C; --teal:#2E9C8F; --violet:#6B3F7E; --cream:#F1E4BF; --sun:#F2C230; --x-orange:#F08A24;
+}
+.book-overlay .book-container { outline:3px solid #3A2312; box-shadow:4px 4px 0 #3A2312; }
+.book-overlay :is(.book-member-pill,.book-close-btn,.book-nav-btn,.book-guestbook-trigger,.book-music-btn) {
+  background:var(--gold)!important; color:var(--ink)!important; border:3px solid var(--ink)!important;
+  box-shadow:4px 4px 0 var(--ink); border-radius:5px 8px 4px 6px; text-shadow:none;
+}
+.book-overlay .book-close-btn { background:var(--amber)!important; }
+
+.book-overlay .page-dot.active { background:var(--amber); }

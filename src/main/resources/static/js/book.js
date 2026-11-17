@@ -79,7 +79,7 @@ class ClearBook {
     this.memberPillName = document.getElementById('memberPillName');
     this.memberColorDot = document.getElementById('memberColorDot');
 
-    this.music = new ThemeSong(container.querySelector('.book-music-btn'), container.querySelector('.music-credit'));
+    this.music = new ThemeSong(container.querySelector('.book-music-btn'), container.querySelector('.music-credit'), this.options.notebookTheme);
     this.closeBtn.addEventListener('click', () => this.close());
     this.prevBtn.addEventListener('click', () => this.prevPage());
     this.nextBtn.addEventListener('click', () => this.nextPage());
@@ -148,11 +148,10 @@ class ClearBook {
   }
 
   open(memberData, { theme = this.options.theme || memberData.deskItem } = {}) {
-    if (memberData.themeSong && !navigator.userActivation?.hasBeenActive) {
-      this.music.stop(false);
-      this.overlayElement.addEventListener('click', this.activatePreviewMusic = () => this.music.start(memberData.themeSong), { once: true, capture: true });
-    } else if (!this.musicPrepared) this.music.start(memberData.themeSong);
-    this.musicPrepared = false;
+    // Playback was requested synchronously by the opening click, before camera animation.
+    // Programmatic opens never attempt autoplay or attach delayed playback listeners.
+    if (this.musicPrepared !== memberData.id || !this.isNotebook(memberData, theme)) this.music.stop();
+    this.musicPrepared = null;
     this.bookContainer.dataset.build = CLEARBOOK_BUILD;
     this.overlayElement.classList.toggle('theme-pad', theme === 'pad' || theme === 'intermediate-pad');
     this.overlayElement.classList.toggle('theme-folder', theme === 'folder' || theme === 'long-folder');
@@ -190,9 +189,14 @@ class ClearBook {
     this.updatePageStates();
   }
 
+  isNotebook(member, theme = member.deskItem) {
+    return member.id === 1 && (!theme || theme === 'spiral-notebook' || theme === 'spiral');
+  }
+
   prepareMusic(member) {
-    this.musicPrepared = true;
-    this.music.start(member.themeSong);
+    this.musicPrepared = member.id;
+    if (this.isNotebook(member)) this.music.start(member.themeSong);
+    else this.music.stop();
   }
 
   close() {
@@ -201,7 +205,7 @@ class ClearBook {
     this.bookContainer.style.removeProperty('--book-offset');
     this.bookContainer.style.removeProperty('--left-opacity');
     this.isDragging = false;
-    this.overlayElement.removeEventListener('click', this.activatePreviewMusic, true);
+    this.musicPrepared = null;
     clearTimeout(this.flipTimer);
     for (const leaf of this.pagesElements) {
       leaf.classList.remove('turning', 'spiral-turning');

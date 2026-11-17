@@ -13,23 +13,29 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/book.css">
   <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/intro.css">
+  <script>if (new URLSearchParams(location.search).get("intro") === "off") document.documentElement.classList.add("intro-off");</script>
 </head>
 <body>
 
-  <!-- 1. REALISTIC EYE-BLINK LOADING SCREEN (3x Blink with Curved Eye Aperture) -->
-  <div class="eye-blink-overlay" id="loadingScreen">
-    <div class="eye-vignette"></div>
-    <div class="eyelid-panel eyelid-top" id="eyelidTop">
-      <svg viewBox="0 0 1000 500" preserveAspectRatio="none" class="eyelid-svg">
-        <path d="M 0 0 L 1000 0 L 1000 500 C 750 435, 250 435, 0 500 Z" fill="#070A14" />
-        <path d="M 0 500 C 250 435, 750 435, 1000 500" stroke="#020408" stroke-width="14" fill="none" opacity="0.9" />
-      </svg>
+  <div id="intro" role="status" aria-live="polite">
+    <div class="intro-title">
+      <h1>What if Sir Sean was a highschool teacher?</h1>
+      <p class="intro-subtitle">A Group 1 production</p>
     </div>
-    <div class="eyelid-panel eyelid-bottom" id="eyelidBottom">
-      <svg viewBox="0 0 1000 500" preserveAspectRatio="none" class="eyelid-svg">
-        <path d="M 0 500 L 1000 500 L 1000 0 C 750 65, 250 65, 0 0 Z" fill="#070A14" />
-        <path d="M 0 0 C 250 65, 750 65, 1000 0" stroke="#020408" stroke-width="10" fill="none" opacity="0.8" />
+    <div class="intro-controls" aria-hidden="true">
+      <div class="intro-keyboard">
+        <span class="intro-sr">W A S D to look around</span>
+        <div class="intro-keys" aria-hidden="true"><span>W</span><span>A</span><span>S</span><span>D</span></div>
+        <p aria-hidden="true">looks around</p>
+      </div>
+      <p class="intro-or">or</p>
+      <svg class="intro-mouse" viewBox="0 0 140 100" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="49" y="27" width="42" height="64" rx="20" fill="var(--cream)"/>
+        <path d="M70 28v23m-20 0h40M20 15h100m-89-8-11 8 11 8m78-16 11 8-11 8"/>
       </svg>
+      <p class="intro-drag">Click and drag to look</p>
     </div>
   </div>
 
@@ -142,12 +148,15 @@
 
   <!-- 7. APPLICATION MODULES -->
   <script src="js/api.js"></script>
+  <script src="js/theme.js"></script>
   <script src="js/humor.js"></script>
   <script src="js/handwriting.js"></script>
   <script src="js/sketches.js"></script>
   <script src="js/themesong.js"></script>
   <script src="js/book.js"></script>
   <script src="js/scene.js"></script>
+  <script src="js/introSound.js"></script>
+  <script src="js/intro.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

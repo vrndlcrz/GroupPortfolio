@@ -5,7 +5,13 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const classroomRequest = API.getClassroom();
+  const classroomRequest = API.getClassroom().then(classroom => {
+    Theme.configure(classroom.theme);
+    return classroom;
+  });
+  const intro = window.Intro?.start(classroomRequest);
+  const themeFonts = Promise.all(['Lilita One', 'Patrick Hand'].map(family =>
+    document.fonts.load('16px "' + family + '"').catch(() => {})));
   let members = [];
   let notes = [];
   let currentVisitorCount = 0;
@@ -14,7 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let activeMemberIdForNote = 1;
 
   // UI Elements
-  const loadingScreen = document.getElementById('loadingScreen');
   const visitorCountBadge = document.getElementById('visitorCountBadge');
   const guestbookModal = document.getElementById('guestbookModal');
   const guestbookForm = document.getElementById('guestbookForm');
@@ -60,9 +65,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     PortfolioHumor.showToast('⚠️ Could not reach Spring Boot backend. Running in offline fallback mode.');
   }
 
-  // 2. Initialize ClearBook Engine
+  // 2. Initialize the optional audio once, before any desk click.
+  const classroom = await classroomRequest;
   clearBook = new ClearBook({
     containerId: 'bookOverlayRoot',
+    notebookTheme: classroom.audio?.notebookTheme,
     onClose: () => {
       if (deskScene) {
         deskScene.returnToDesk();
@@ -88,14 +95,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // 3. Initialize 3D Desk Scene
+  // Resolve the bounded HEAD check before WebGL shader compilation can delay its timeout.
+  // This awaits only availability, never audio download or decoding.
+  await Promise.all([themeFonts, clearBook.music.prepared]);
   deskScene = new DeskScene({
-    classroom: await classroomRequest,
+    classroom,
+    inputEnabled: !intro?.active,
     containerId: 'scene-container',
     members: members,
     notes: notes,
     onFolderClick: member => clearBook.prepareMusic(member),
     onFolderSelect: member => clearBook.open(member)
   });
+
+  intro?.attach(deskScene);
 
   // 4. Connect Easy Easter Eggs (Keys 'E', 'G', 'F' or Konami) to Desk Anti-Gravity
   PortfolioHumor.initEasterEggs(() => {
@@ -110,23 +123,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 6. Wire Note Viewer Modal close buttons
   setupNoteViewerModal();
 
-  // 7. Complete Eye-Blink Loading Screen after 3 blinks (2300ms)
-  setTimeout(() => {
-    finishLoading();
-  }, 2300);
-
   /* ========================================================================
      HELPER FUNCTIONS
      ======================================================================== */
-
-  function finishLoading() {
-    if (loadingScreen) {
-      loadingScreen.classList.add('done');
-      loadingScreen.style.display = 'none';
-      loadingScreen.style.pointerEvents = 'none';
-    }
-    PortfolioHumor.playSound('pop');
-  }
 
   function setupHeaderControls() {
     // 1-Click Easter Egg Zero-G Button

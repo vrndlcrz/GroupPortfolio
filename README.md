@@ -345,3 +345,12 @@ Read these 7 points during your class presentation:
 4. Show the guestbook and visitor counter working.
 5. Explain the tech stack: Three.js, GSAP and Spring Boot.
 6. Keep a backup recording in case something breaks.
+
+
+## Theme song
+
+The optional notebook song belongs to member 1 only. Put a file you have the right to use at `src/main/resources/static/assets/audio/notebook-theme.mp3`. Keep the source copy here: `mvn clean` removes `target/`, and Git clones do not include ignored MP3 files. The tracked `README.txt` keeps the audio folder documented.
+
+Spring configures the URL with `site.audio.notebook-theme` in `application.yml` and exposes `audio.notebookTheme` in `/api/site/classroom`. The browser defaults to `/assets/audio/notebook-theme.mp3` if configuration is missing. One audio element preloads at startup, plays from the notebook-opening click, and fades out over 400 ms on close or when another member opens. The existing notebook mute button remembers your choice for the browser session.
+
+The site works silently if the song is absent, invalid, or blocked by the browser. A click before the optional file check completes stays silent; reopen the notebook after loading. No song is downloaded automatically. MP3 files stay out of Git; keep your own backup when moving or cloning the project.

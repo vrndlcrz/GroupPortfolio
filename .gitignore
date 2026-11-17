@@ -1,5 +1,6 @@
 # Compiled output
 target/
+.verification/
 *.class
 
 # Project specific data files (auto-generated)
@@ -20,4 +21,5 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 
-/src/main/resources/static/assets/audio/notebook-theme.mp3
+/src/main/resources/static/assets/audio/*.mp3
+!/src/main/resources/static/assets/audio/README.txt

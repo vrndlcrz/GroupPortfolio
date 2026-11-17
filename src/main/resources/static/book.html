@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clear-Book Standalone Engine Test</title>
   <link rel="stylesheet" href="css/book.css">
+  <link rel="stylesheet" href="css/theme.css">
   <style>
     body {
       background: radial-gradient(circle at center, #1E293B 0%, #0F172A 100%);
@@ -115,6 +116,7 @@
 
     const memberCache = new Map();
     async function loadAndOpen(id) {
+      if (navigator.userActivation?.isActive) book.prepareMusic(memberCache.get(id) || { id });
       if (memberCache.has(id)) {
         book.open(memberCache.get(id));
         return;

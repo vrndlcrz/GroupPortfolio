@@ -1,4 +1,14 @@
 site:
+  intro:
+    enabled: true
+    title: "What if Sir Sean was a highschool teacher?"
+    subtitle: "A Group 1 production"
+    sound-enabled: true
+  audio:
+    notebook-theme: /assets/audio/notebook-theme.mp3
+  theme:
+    golden-intensity: 0.8
+    sky-drift: true
   classroom:
     board:
       title: "Sean Dyogi Truthers"

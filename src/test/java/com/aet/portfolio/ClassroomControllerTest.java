@@ -15,9 +15,25 @@ class ClassroomControllerTest {
     @Autowired MockMvc mvc;
 
     @Test
+    void optionalWindowPhotoNeverReturnsAnError() throws Exception {
+        mvc.perform(get("/assets/textures/window-sunset.jpg"))
+            .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
     void servesConfiguredClassroom() throws Exception {
         mvc.perform(get("/api/site/classroom"))
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$.intro.enabled").value(true))
+            .andExpect(jsonPath("$.intro.title").value("What if Sir Sean was a highschool teacher?"))
+            .andExpect(jsonPath("$.intro.subtitle").value("A Group 1 production"))
+            .andExpect(jsonPath("$.intro.soundEnabled").value(true))
+            .andExpect(jsonPath("$.audio.notebookTheme").value("/assets/audio/notebook-theme.mp3"))
+            .andExpect(jsonPath("$.theme.goldenIntensity").value(0.8))
+            .andExpect(jsonPath("$.theme.skyDrift").value(true))
+            .andExpect(jsonPath("$.theme.filterEnabled").doesNotExist())
+            .andExpect(jsonPath("$.theme.filterIntensity").doesNotExist())
+            .andExpect(jsonPath("$.theme.dateStamp").doesNotExist())
             .andExpect(jsonPath("$.board.title").value("Sean Dyogi Truthers"))
             .andExpect(jsonPath("$.whiteboardLines[0]").value("AET Group Portfolio"))
             .andExpect(jsonPath("$.tvSlides", hasSize(3)))

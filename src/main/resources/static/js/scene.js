@@ -17,6 +17,7 @@ const tabletopLayout = [
 class CameraRig {
   constructor(camera) {
     this.camera = camera;
+    this.inputEnabled = true;
     this.keys = new Set();
     this.seat = new THREE.Vector3(0, 4, 5.2);
     camera.position.copy(this.seat);
@@ -26,8 +27,15 @@ class CameraRig {
     this.applyLook();
   }
 
+  setInputEnabled(enabled) {
+    this.inputEnabled = enabled;
+    this.keys.clear();
+    this.targetYaw = this.yaw;
+    this.targetPitch = this.pitch;
+  }
+
   bindKeyboardLook(isZoomed) {
-    this.lookBlocked = () => isZoomed() || document.activeElement?.matches('input, textarea') ||
+    this.lookBlocked = () => !this.inputEnabled || isZoomed() || document.activeElement?.matches('input, textarea') ||
       document.querySelector('#bookOverlay.active');
     const controls = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ShiftLeft', 'ShiftRight', 'KeyR']);
     window.addEventListener('keydown', event => {
@@ -64,6 +72,7 @@ class CameraRig {
   }
 
   aim(yaw, pitch) {
+    if (!this.inputEnabled) return;
     this.targetYaw = yaw;
     this.targetPitch = THREE.MathUtils.clamp(pitch, -1.32, 1.22);
   }
@@ -73,6 +82,7 @@ class CameraRig {
   }
 
   update() {
+    if (!this.inputEnabled) return;
     this.yaw += (this.targetYaw - this.yaw) * 0.08;
     this.pitch += (this.targetPitch - this.pitch) * 0.08;
     this.applyLook();
@@ -81,6 +91,7 @@ class CameraRig {
 
 class DeskScene {
   constructor(options = {}) {
+    this.inputEnabled = options.inputEnabled !== false;
     this.container = document.getElementById(options.containerId || 'scene-container');
     this.onFolderClick = options.onFolderClick;
     this.onFolderSelect = options.onFolderSelect || null;
@@ -129,7 +140,8 @@ class DeskScene {
 
     // 1. Setup Three.js Scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0xbadcde);
+    this.scene.background = Theme.vivid(Theme.cream);
+    this.scene.fog = new THREE.Fog(Theme.vivid('#FFE3A3'),18,60);
 
     const width = this.container.clientWidth || window.innerWidth;
     const height = this.container.clientHeight || window.innerHeight;
@@ -148,6 +160,7 @@ class DeskScene {
     // 3. Setup Camera with default position guaranteed
     this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
     this.rig = new CameraRig(this.camera);
+    this.rig.setInputEnabled(this.inputEnabled);
     this.adjustCameraForScreen();
 
     // 4. Lighting & Ambience
@@ -161,6 +174,7 @@ class DeskScene {
     this.buildFolders();
     this.buildProps();
     this.buildStickyNotes();
+    Theme.applyScene(this);
 
     // 7. Raycasting & Events
     this.raycaster = new THREE.Raycaster();
@@ -184,19 +198,20 @@ class DeskScene {
 
   setupLighting() {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.1;
-    this.scene.add(new THREE.HemisphereLight(0xffebcd, 0xb6a995, 0.57));
-    this.scene.add(new THREE.AmbientLight(0xc1d3ef, 0.24));
-    const sun = new THREE.DirectionalLight(0xffc864, 1.6);
-    sun.position.set(18, 7.6, 5.4);
-    sun.target.position.set(-9, -2.84, -4.8);
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
-    Object.assign(sun.shadow.camera, { left: -18, right: 18, top: 13, bottom: -13, near: 0.5, far: 48 });
+    this.renderer.toneMappingExposure = 1.15;
+    const strength = Theme.config.goldenIntensity;
+    this.scene.add(new THREE.HemisphereLight('#FFE3A3','#C98A45',.9*strength));
+    const fill = new THREE.DirectionalLight('#FFD9A0',.35*strength);
+    fill.position.set(0,5,8); this.scene.add(fill);
+    const sun = new THREE.DirectionalLight('#FFC862',1.4*strength);
+    sun.position.set(18,7.6,5.4);
+    sun.target.position.set(-9,-2.84,-4.8);
+    sun.castShadow=true;
+    sun.shadow.mapSize.set(1024,1024);
+    Object.assign(sun.shadow.camera,{left:-17,right:17,top:11,bottom:-11,near:1,far:44});
     sun.shadow.camera.updateProjectionMatrix();
-    sun.shadow.normalBias = 0.018;
-    sun.shadow.bias = -0.00012;
-    this.scene.add(sun, sun.target);
+    sun.shadow.normalBias=.018;sun.shadow.bias=-.00012;
+    this.scene.add(sun,sun.target);
   }
 
   buildSurroundingRoom() {
@@ -206,8 +221,8 @@ class DeskScene {
     const floor = -2.84, ceiling = 10, front = -15, back = 9, side = 11;
     const unitBox = new THREE.BoxGeometry(1, 1, 1);
     const paint = color => new THREE.MeshStandardMaterial({ color, roughness: 0.88 });
-    const white = paint(0xfffdf6), yellow = paint(0xf0bc40), green = paint(0x347953);
-    const frame = paint(0x282e2d), silver = paint(0xbcc6c3);
+    const white = paint(Theme.cream), yellow = paint(Theme.sun), green = paint(0x69bd4c);
+    const frame = paint(Theme.ink), silver = paint(Theme.teal);
     const box = (parent, mat, x, y, z, w, h, d) => {
       const mesh = new THREE.Mesh(unitBox, mat);
       mesh.scale.set(w, h, d);
@@ -232,16 +247,16 @@ class DeskScene {
       return face;
     };
     const tile = texture(128, 128, ctx => {
-      ctx.fillStyle = '#F0EEEE'; ctx.fillRect(0, 0, 128, 128);
-      ctx.strokeStyle = '#d9d7d5'; ctx.strokeRect(0, 0, 128, 128);
+      ctx.fillStyle = '#F5D69A'; ctx.fillRect(0, 0, 128, 128);
+      ctx.strokeStyle = '#D4AE6D'; ctx.strokeRect(0, 0, 128, 128);
     });
     tile.wrapS = tile.wrapT = THREE.RepeatWrapping;
     tile.repeat.set(11, 12);
     box(room, new THREE.MeshStandardMaterial({ map: tile, roughness: 0.9 }), 0, floor - 0.08, -3, 22, 0.16, 24);
     const wallHeight = ceiling - floor;
-    box(room, paint(0xe8d59a), 0, floor + wallHeight / 2, front, 22, wallHeight, 0.18);
-    box(room, paint(0x7fb069), 0, floor + wallHeight * .05, front + .11, 22, wallHeight * .1, .08);
-    box(room, paint(0xb49c63), 0, ceiling - .25, front + .14, 22, .12, .12);
+    box(room, paint(0xffe3a3), 0, floor + wallHeight / 2, front, 22, wallHeight, 0.18);
+    box(room, paint(0x69ad42), 0, floor + wallHeight * .05, front + .11, 22, wallHeight * .1, .08);
+    box(room, paint(Theme.gold), 0, ceiling - .25, front + .14, 22, .12, .12);
     box(room, white, 0, ceiling + 0.1, -3, 22, 0.2, 24);
     for (const z of [back]) {
       box(room, white, 0, (ceiling + floor) / 2, z, 22, ceiling - floor, 0.18);
@@ -253,7 +268,7 @@ class DeskScene {
     door.userData = { type: 'door', enabled: false };
     room.add(door);
     // TODO: Register the exit-to-outside handler when the door is enabled.
-    const timber = paint(0xb19169);
+    const timber = paint(Theme.wood);
     const daylight = new THREE.MeshStandardMaterial({
       color: 0xe8f2ef, emissive: 0xfff8d7, emissiveIntensity: 1.1, roughness: 0.95
     });
@@ -278,24 +293,33 @@ class DeskScene {
     wallPiece(sill, lintel, front, start); wallPiece(sill, lintel, end, back);
     for (const y of [sill, lintel]) box(room, green, side, y, (start+end)/2, 0.32, 0.22, end-start);
     for (const z of [start, (start+end)/2, end]) box(room, green, side, (sill+lintel)/2, z, 0.32, lintel-sill, 0.2);
-    const glass = new THREE.MeshStandardMaterial({ color: 0xb3d4cb, transparent: true, opacity: 0.28, depthWrite: false, roughness: 0.22 });
+    const glass = new THREE.MeshBasicMaterial({ color: new THREE.Color('#FFD866') });
+    const slats = [];
     for (let column = 0; column < 2; column++) {
       for (let i = 0; i < 12; i++) {
         const slat = box(room, glass, side, sill + (i + 0.5) * 0.55, start + 3.3 + column * 6.6, 0.05, 0.51, 6.42);
         slat.rotation.z = -0.94;
+        slats.push(slat);
       }
     }
 
+    // One shared outline draw for all 24 existing blades, without changing their poses.
+    const slatOutlines=new THREE.InstancedMesh(unitBox,
+      new THREE.MeshBasicMaterial({color:Theme.ink,side:THREE.BackSide}),slats.length);
+    const expansion=new THREE.Matrix4().makeScale(1.045,1.045,1.045),matrix=new THREE.Matrix4();
+    slats.forEach((slat,i)=>{slat.updateMatrix();slatOutlines.setMatrixAt(i,matrix.copy(slat.matrix).multiply(expansion));});
+    slatOutlines.userData.outlineAdded=true;slatOutlines.raycast=()=>{};room.add(slatOutlines);
+    this.buildWindowView(side,sill,lintel,start,end);
+
     const boardX = 0, boardWidth = 22 * .75, boardHeight = wallHeight * .37, boardY = 3.5;
-    box(room, paint(0x4a7a3a), boardX, boardY, front + .18, boardWidth, boardHeight, .2);
+    box(room, paint(Theme.gold), boardX, boardY, front + .18, boardWidth, boardHeight, .2);
     const board = texture(2048, 560, () => {});
     const writeBoard = () => {
       const ctx = board.image.getContext('2d');
       const { title, subtitle, names } = this.classroom.board;
       ctx.fillStyle = '#F7F7F5'; ctx.fillRect(0, 0, 2048, 560);
       ctx.textAlign = 'right';
-      ctx.fillStyle = '#202021'; ctx.font = 'bold 76px "Gochi Hand", sans-serif';
-      ctx.fillText(title, 1940, 94, 1010);
+      Theme.drawTitle(ctx, title, 1940, 94, 1010);
       ctx.fillStyle = '#b3333b'; ctx.font = 'bold 56px Caveat, cursive';
       ctx.fillText(subtitle, 1935, 161, 970);
       const step = Math.min(82, 322 / Math.max(1, names.length));
@@ -314,7 +338,7 @@ class DeskScene {
       board.needsUpdate = true;
     };
     writeBoard();
-    Promise.all([document.fonts.load('76px "Gochi Hand"'), document.fonts.load('70px Caveat')]).then(writeBoard);
+    Promise.all([document.fonts.load('76px "Gochi Hand"'), document.fonts.load('70px Caveat')]).then(writeBoard).catch(() => {});
     panel(board, boardWidth - .36, boardHeight - .36, boardX, boardY, front + .29);
     const trayY = boardY - boardHeight / 2;
     box(room, silver, boardX, trayY, front + .37, boardWidth, .12, .45);
@@ -343,7 +367,7 @@ class DeskScene {
     box(tv, frame, 0, 0, 0, 4.87, 2.75, .2);
     this.tvTexture = texture(768,432,() => {});
     const screen = new THREE.Mesh(new THREE.PlaneGeometry(4.72,2.61),
-      new THREE.MeshStandardMaterial({map:this.tvTexture, emissiveMap:this.tvTexture, emissive:0xffffff, emissiveIntensity:0.35, roughness:0.65}));
+      new THREE.MeshBasicMaterial({map:this.tvTexture}));
     screen.position.z = .11; tv.add(screen);
     this.tvStart = performance.now();
     this.drawTVSlide(0);
@@ -423,37 +447,77 @@ class DeskScene {
       g.addColorStop(0,'rgba(255,222,144,.85)'); g.addColorStop(1,'rgba(255,220,140,0)');
       ctx.fillStyle=g; ctx.fillRect(0,0,128,128);
     });
-    const shaftMat = new THREE.MeshBasicMaterial({map:glow,transparent:true,opacity:0.12,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
+    const shaftMat = new THREE.MeshBasicMaterial({map:glow,color:0xffd27a,transparent:true,opacity:0.18,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
     this.classroomShafts = [];
     for (let i=0;i<3;i++) {
       const beam = new THREE.Mesh(new THREE.PlaneGeometry(15,1.7),shaftMat);
       beam.rotation.order = 'YXZ'; beam.rotation.y = -0.36; beam.rotation.z = 0.35;
       beam.position.set(4,2.42,-4+i*3); room.add(beam); this.classroomShafts.push(beam);
     }
-    const positions = new Float32Array(80*3);
-    for (let i=0;i<80;i++) {
+    const positions = new Float32Array(60*3);
+    for (let i=0;i<60;i++) {
       const x = (i*59 % 83)/6 - 3;
       positions.set([x, 0.38*x + (i*23 % 37)/18, (i*41 % 89)/9 - 4.5],i*3);
     }
     const cloud = new THREE.BufferGeometry(); cloud.setAttribute('position',new THREE.BufferAttribute(positions,3));
-    this.classroomDust = new THREE.Points(cloud,new THREE.PointsMaterial({map:glow,color:0xffe5b8,size:0.04,transparent:true,opacity:0.55,blending:THREE.AdditiveBlending,depthWrite:false}));
+    this.classroomDust = new THREE.Points(cloud,new THREE.PointsMaterial({map:glow,color:0xffd27a,size:0.055,transparent:true,opacity:0.65,blending:THREE.AdditiveBlending,depthWrite:false}));
     room.add(this.classroomDust);
   }
 
 
+  buildWindowView(side,sill,lintel,start,end) {
+    const width=(end-start)*1.2,height=(lintel-sill)*1.2;
+    // Keep the narrow sea strip above the sill; put most overscan above the opening.
+    const bottom=sill-.1, centerZ=(start+end)/2;
+    const geometry=new THREE.PlaneGeometry(1,1);
+    const make=(x,y,h,color)=>{
+      const material=new THREE.MeshBasicMaterial({color,toneMapped:false,fog:false,depthWrite:false});
+      const mesh=new THREE.Mesh(geometry,material);
+      mesh.rotation.y=-Math.PI/2;mesh.position.set(x,y,centerZ);mesh.scale.set(width,h,1);
+      mesh.raycast=()=>{};this.scene.add(mesh);return mesh;
+    };
+    const horizonHeight=height*(1-Theme.HORIZON_Y),skyHeight=height*Theme.HORIZON_Y;
+    this.windowSky=make(side+.42,bottom+horizonHeight+skyHeight/2,skyHeight,Theme.amber);
+    this.windowHorizon=make(side+.40,bottom+horizonHeight/2,horizonHeight,Theme['sun-glow']);
+    this.windowCenterZ=centerZ;
+    this.skyDriftEnabled=Theme.config.skyDrift;
+    this.skyMotionPreference=matchMedia('(prefers-reduced-motion: reduce)');
+    Theme.windowTextures().then(layers=>{
+      this.windowSky.material.map=layers.sky;this.windowHorizon.material.map=layers.horizon;
+      for(const mesh of [this.windowSky,this.windowHorizon]) {mesh.material.color.set(0xffffff);mesh.material.needsUpdate=true;}
+      this.windowSkyTexture=layers.sky;this.windowSource=layers.source;
+    }).catch(()=>{});
+    const glow=make(side-.22,(sill+lintel)/2,lintel-sill,Theme['sun-glow']);
+    glow.scale.x=end-start;glow.material.transparent=true;glow.material.opacity=.25;
+    glow.material.blending=THREE.AdditiveBlending;glow.renderOrder=1;
+  }
+
+  updateWindowView(seconds) {
+    if(!this.windowSky) return;
+    const yaw=this.rig.yaw;
+    this.windowSky.position.z=this.windowCenterZ-yaw*.04;
+    this.windowHorizon.position.z=this.windowCenterZ-yaw*.015;
+    if(this.windowSkyTexture&&this.skyDriftEnabled&&!this.skyMotionPreference.matches) {
+      // Two mirrored repeats keep wraparound continuous at the boundary.
+      this.windowSkyTexture.offset.x=(seconds*.004)%2;
+      this.windowSkyTexture.offset.y=Math.sin(seconds*.12)*.004;
+    }
+  }
+
   drawTVSlide(index) {
     this.tvIndex = index;
     const ctx = this.tvTexture.image.getContext('2d');
-    ctx.fillStyle = '#173845'; ctx.fillRect(0,0,768,432);
-    ctx.fillStyle = '#e8bc62'; ctx.fillRect(64,125,72,7);
-    ctx.fillStyle = '#fffcf2'; ctx.font = 'bold 51px sans-serif';
-    ctx.fillText(this.classroom.tvSlides[index],64,245,640);
+    ctx.fillStyle = Theme.cream; ctx.fillRect(0,0,768,432);
+    Theme.drawTitle(ctx,this.classroom.tvSlides[index],64,245,640);
+    ctx.fillStyle = Theme.sun; ctx.fillRect(64,125,120,40);
+    ctx.fillStyle = Theme.ink; ctx.font='26px "Patrick Hand", "Comic Sans MS", sans-serif';
+    ctx.fillText(this.classroom.board.subtitle,72,153,104);
     this.tvTexture.needsUpdate = true;
   }
 
   buildTeacher(room, floor, box, paint, texture) {
-    const desk = paint(0x735742), black = paint(0x202426), mint = paint(0x93d3ae);
-    const top = box(room, paint(0x5e4636), 0, floor + 3, -11.55, 22 * .36, .21, 2);
+    const desk = paint(Theme['wood-dark']), black = paint(Theme.ink), mint = paint(0x9bd36b);
+    const top = box(room, paint(Theme.wood), 0, floor + 3, -11.55, 22 * .36, .21, 2);
     top.geometry = top.geometry.clone();
     const corners = top.geometry.attributes.position;
     for (let i = 0; i < corners.count; i++) {
@@ -471,7 +535,7 @@ class DeskScene {
     person.position.set(7.72,floor,-11.6); person.rotation.y = -0.23;
     person.userData.type = 'teacher'; room.add(person); 
     const skin = paint(0xb98058), slacks = paint(0x35373d), hair = paint(0x242021);
-    this.teacherJacket = paint(0x22262d);
+    this.teacherJacket = paint(Theme.ink);
     const oval = (parent, material, x,y,z, w,h,d) => {
       const mesh = new THREE.Mesh(new THREE.SphereGeometry(1,10,8),material);
       mesh.position.set(x,y,z); mesh.scale.set(w,h,d);
@@ -554,25 +618,21 @@ class DeskScene {
 
     // Wooden tabletop
     const deskGeo = new THREE.BoxGeometry(10.5, 0.35, 6.2);
-    const deskMat = new THREE.MeshStandardMaterial({
-      color: 0x854D0E,
-      roughness: 0.65,
-      metalness: 0.08
-    });
+    const deskMat = new THREE.MeshBasicMaterial({ map: Theme.woodTexture(), toneMapped:false });
     const deskMesh = new THREE.Mesh(deskGeo, deskMat);
     deskMesh.receiveShadow = true;
     this.deskGroup.add(deskMesh);
 
     // Desk edge trim
     const trimGeo = new THREE.BoxGeometry(10.6, 0.4, 6.3);
-    const trimMat = new THREE.MeshStandardMaterial({ color: 0x713F12, roughness: 0.8 });
+    const trimMat = Theme.toon(Theme['wood-dark']);
     const trimMesh = new THREE.Mesh(trimGeo, trimMat);
     trimMesh.position.y = -0.04;
     this.deskGroup.add(trimMesh);
 
     // Desk legs
     const legGeo = new THREE.CylinderGeometry(0.12, 0.1, 2.65, 12);
-    const legMat = new THREE.MeshStandardMaterial({ color: 0x1E293B, metalness: 0.8, roughness: 0.3 });
+    const legMat = Theme.toon(Theme.ink);
     const legPositions = [
       [-4.8, -1.515, -2.6],
       [4.8, -1.515, -2.6],
@@ -588,7 +648,7 @@ class DeskScene {
 
     // Desk mat
     const matGeo = new THREE.BoxGeometry(9.2, 0.02, 4.6);
-    const matMaterial = new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.9 });
+    const matMaterial = new THREE.MeshBasicMaterial({ map: Theme.woodTexture(), toneMapped:false });
     const mat = new THREE.Mesh(matGeo, matMaterial);
     mat.position.set(0, 0.18, 0.2);
     mat.receiveShadow = true;
@@ -784,7 +844,7 @@ class DeskScene {
     }
     art.onload = draw;
     art.src = 'assets/textures/pad-cover.png';
-    document.fonts.load('43px "Patrick Hand"').then(draw);
+    document.fonts.load('43px "Patrick Hand"').then(draw).catch(() => {});
     draw();
     const face = new THREE.Mesh(new THREE.PlaneGeometry(1, 1.25),
       new THREE.MeshStandardMaterial({ map, roughness: 0.91 }));
@@ -845,7 +905,7 @@ class DeskScene {
     border.onload = draw;
     border.src = 'assets/borders/wavy-pink.svg';
     draw();
-    document.fonts.load('600 48px "Plus Jakarta Sans"').then(draw);
+    document.fonts.load('600 48px "Plus Jakarta Sans"').then(draw).catch(() => {});
     const face = new THREE.Mesh(new THREE.PlaneGeometry(1, 1.53),
       new THREE.MeshStandardMaterial({ map, roughness: 0.96 }));
     face.rotation.x = -Math.PI / 2;
@@ -896,7 +956,7 @@ class DeskScene {
     cover.onload = draw;
     cover.src = 'assets/textures/themebook-cover.png';
     draw();
-    document.fonts.load('600 35px "Dancing Script"').then(draw);
+    document.fonts.load('600 35px "Dancing Script"').then(draw).catch(() => {});
     const face = new THREE.Mesh(new THREE.PlaneGeometry(1.10, 1.54),
       new THREE.MeshStandardMaterial({ map: texture, roughness: 0.24 }));
     face.rotation.x = -Math.PI / 2;
@@ -1291,6 +1351,14 @@ class DeskScene {
     this.interactiveObjects.push(noteHitBox);
   }
 
+  setInputEnabled(enabled) {
+    this.inputEnabled = enabled;
+    this.rig?.setInputEnabled(enabled);
+    this.isDraggingView = false;
+    this.pendingHover = null;
+    this.hideTooltip();
+  }
+
   bindEvents() {
     this.rig.bindKeyboardLook(() => this.isCameraZoomed);
     window.addEventListener('resize', () => this.onWindowResize());
@@ -1343,6 +1411,7 @@ class DeskScene {
   }
 
   onMouseDown(e) {
+    if (!this.inputEnabled) return;
     if (this.isCameraZoomed) return;
     // Don't drag if clicking buttons, modals, or clear-book overlay
     if (e.target.closest('button') || e.target.closest('.guestbook-modal-overlay') || e.target.closest('#bookOverlay') || e.target.closest('.error-modal-overlay')) return;
@@ -1359,6 +1428,7 @@ class DeskScene {
   }
 
   onTouchStart(e) {
+    if (!this.inputEnabled) return;
     if (this.isCameraZoomed || !e.touches || e.touches.length === 0) return;
     this.isDraggingView = true;
     this.dragStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -1368,6 +1438,7 @@ class DeskScene {
   }
 
   onTouchMove(e) {
+    if (!this.inputEnabled) return;
     if (!this.isDraggingView || this.isCameraZoomed || !e.touches || e.touches.length === 0) return;
     const dx = e.touches[0].clientX - this.dragStartPos.x;
     const dy = e.touches[0].clientY - this.dragStartPos.y;
@@ -1385,6 +1456,7 @@ class DeskScene {
   }
 
   onMouseMove(e) {
+    if (!this.inputEnabled) return;
     if (this.isCameraZoomed) {
       this.hideTooltip();
       return;
@@ -1412,6 +1484,7 @@ class DeskScene {
   }
 
   updateHover(e) {
+    if (!this.inputEnabled) return;
     // Raycast hovered props & folders
     const rect = this.renderer.domElement.getBoundingClientRect();
     this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -1456,10 +1529,10 @@ class DeskScene {
     document.body.style.cursor = 'pointer';
 
     if (obj.userData.type === 'placard') {
-      obj.material.emissive.setHex(0x39331b);
+      obj.material.color.set(Theme['sun-glow']);
       this.showTooltip('Click to read placard', e);
     } else if (obj.userData.type === 'teacher') {
-      this.teacherJacket.emissive.setHex(0x594626);
+      this.teacherJacket.color.set(Theme.teal);
       this.showTooltip('Sean Dyogi · Click to talk', e);
     } else if (obj.userData.type === 'folder') {
       const folder = obj.userData.folderMesh || obj;
@@ -1491,8 +1564,8 @@ class DeskScene {
   }
 
   resetHoverState() {
-    if (this.hoveredObject?.userData.type === 'placard') this.hoveredObject.material.emissive.setHex(0);
-    if (this.hoveredObject?.userData.type === 'teacher') this.teacherJacket.emissive.setHex(0);
+    if (this.hoveredObject?.userData.type === 'placard') this.hoveredObject.material.color.set(0xffffff);
+    if (this.hoveredObject?.userData.type === 'teacher') this.teacherJacket.color.set(Theme.ink);
     if (this.hoveredObject) {
       if (this.hoveredObject.userData.type === 'folder' && !this.isCameraZoomed) {
         const folder = this.hoveredObject.userData.folderMesh || this.hoveredObject;
@@ -1535,6 +1608,7 @@ class DeskScene {
   }
 
   onClick(e) {
+    if (!this.inputEnabled) return;
     if (this.isCameraZoomed) {
       return;
     }
@@ -1584,6 +1658,7 @@ class DeskScene {
   }
 
   handleObjectClick(obj) {
+    if (!this.inputEnabled) return;
     const type = obj.userData.type;
 
     if (type === 'placard') {
@@ -2072,9 +2147,11 @@ class DeskScene {
       this.rig.update();
     }
 
+    this.updateWindowView(seconds);
+
     if (this.renderer && this.scene && this.camera) {
-      // Keep animated shadows while bounding their cost on slower GPUs.
-      if (seconds - this.lastShadowUpdate >= 1 / 15) {
+      // Rotating fan blades and active prop tweens are the moving shadow casters.
+      if ((this.classroomRotors.length || this.isFloating || this.isCameraZoomed || this.hoveredObject) && seconds - this.lastShadowUpdate >= 1 / 15) {
         this.renderer.shadowMap.needsUpdate = true;
         this.lastShadowUpdate = seconds;
       }

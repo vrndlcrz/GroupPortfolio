@@ -1,0 +1,47 @@
+@font-face { font-family: 'Lilita One'; src: url('../fonts/LilitaOne.woff2') format('woff2'); font-display: swap; }
+@font-face { font-family: 'Patrick Hand'; src: url('../fonts/PatrickHand.woff2') format('woff2'); font-display: swap; }
+:root {
+  --gold:#F2B632; --amber:#E8892B; --orange:#D9622B; --sun-glow:#FFD866;
+  --cream:#FFF1C9; --ink:#3A2312; --wood:#D49A4F; --wood-dark:#9A6428;
+  --card-red:#D8402F; --teal:#2E9C8F; --leaf:#3FBF6B;
+  --sun:var(--gold); --x-orange:var(--orange);
+  --font-title:'Lilita One','Trebuchet MS','Comic Sans MS',sans-serif;
+  --font-text:'Patrick Hand','Trebuchet MS','Comic Sans MS',sans-serif;
+  --shadow-book:4px 4px 0 var(--ink);
+  --book-radius:3px;
+  --font-display:var(--font-title); --font-body:var(--font-text);
+  --bg-primary:var(--cream); --bg-secondary:var(--wood); --text-primary:var(--ink);
+  --text-secondary:var(--ink); --text-muted:var(--ink); --accent-cyan:var(--teal);
+  --accent-orange:var(--x-orange); --accent-purple:var(--amber); --accent-rose:var(--card-red);
+}
+body { font-family:var(--font-text); color:var(--ink); background:var(--cream); }
+::selection { background:var(--sun); color:var(--ink); }
+:focus-visible { outline:3px dashed var(--ink); outline-offset:5px; }
+.top-navbar-inner { background:transparent!important; border:0!important; box-shadow:none!important; backdrop-filter:none!important; }
+.hud-btn, .hud-btn.primary, .hud-btn.easter-egg-btn,
+.guestbook-submit-btn, .book-close-btn, .book-nav-btn, .book-guestbook-btn {
+  background:var(--gold)!important; color:var(--ink)!important; border:3px solid var(--ink)!important;
+  border-radius:5px 8px 3px 7px!important; box-shadow:4px 4px 0 var(--ink)!important;
+  font-family:var(--font-title); backdrop-filter:none!important; text-shadow:none!important;
+  transform:rotate(-1deg); transition:transform .15s ease-out!important;
+}
+.hud-btn:nth-child(even) { background:var(--amber)!important; transform:rotate(1.2deg); }
+.hud-btn:hover { transform:rotate(0) scale(1.04,.96)!important; }
+.hud-btn:active { transform:translate(3px,3px) scale(.96,1.04)!important; }
+.hud-btn:disabled { opacity:.55; cursor:default; }
+.humor-toast,.teacher-speech,.desk-tooltip,.floating-look-guide,.guestbook-card,.terms-window,.retro-error-window {
+  background:var(--cream)!important; color:var(--ink)!important; border:3px solid var(--ink)!important;
+  border-radius:4px 9px 5px 7px!important; box-shadow:4px 4px 0 var(--ink)!important;
+  backdrop-filter:none!important; text-shadow:none!important; font-family:var(--font-text);
+}
+.desk-tooltip * { color:var(--ink)!important; }
+.floating-look-guide { bottom:20px; }
+.scene-waking-blur { filter:none!important; }
+.guestbook-modal-overlay,.note-view-modal-overlay { backdrop-filter:none!important; }
+@media(prefers-reduced-motion:reduce) { .hud-btn { transition:none!important; } }
+
+/* Flat golden chrome; stationery page artwork has its own protected palette. */
+.guestbook-modal-overlay,.note-view-modal-overlay,.error-modal-overlay { background:rgba(58,35,18,.72)!important; }
+.guestbook-input,.guestbook-textarea,.guestbook-submit-btn,.note-view-return-btn,.book-music-btn {
+  background:var(--cream); color:var(--ink); border:3px solid var(--ink); box-shadow:4px 4px 0 var(--ink); text-shadow:none; border-radius:5px;
+}

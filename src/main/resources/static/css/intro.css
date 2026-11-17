@@ -1,0 +1,16 @@
+/* Intro stays above the toolbar and scene. */
+#intro { position:fixed; inset:0; z-index:100000; background:#1F1206; color:var(--cream); display:grid; place-items:center; touch-action:none; }
+.intro-off #intro { display:none; }
+.intro-title,.intro-controls { grid-area:1 / 1; width:90vw; max-width:1000px; text-align:center; opacity:0; will-change:opacity; }
+.intro-title h1 { margin:0; font:clamp(28px,5vw,64px)/1.15 'Lilita One','Trebuchet MS',sans-serif; color:var(--leaf,#3FBF6B); -webkit-text-stroke:3px var(--ink,#3A2312); paint-order:stroke fill; text-shadow:4px 4px 0 var(--ink); transform:rotate(-1.5deg); }
+.intro-subtitle { margin:24px 0 0; opacity:0; font:clamp(16px,2.2vw,28px)/1.25 'Patrick Hand','Trebuchet MS',sans-serif; color:var(--sun,#F2C230); transform:rotate(1deg); }
+.intro-controls { font:clamp(20px,3vw,30px)/1.2 'Patrick Hand','Trebuchet MS',sans-serif; }
+.intro-controls p { margin:14px 0; }
+.intro-keys { display:grid; grid-template-columns:repeat(3,clamp(44px,7vw,64px)); gap:8px; justify-content:center; }
+.intro-keys span { display:grid; place-items:center; height:clamp(44px,7vw,64px); background:var(--cream); color:var(--ink); border:3px solid var(--ink); border-radius:5px 8px 4px 6px; box-shadow:4px 4px 0 var(--ink); font-family:'Lilita One','Trebuchet MS',sans-serif; }
+.intro-keys span:first-child { grid-column:2; }
+.intro-keys span:nth-child(2) { grid-column:1; }
+.intro-mouse { width:140px; height:100px; color:var(--sun); }
+.intro-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+#intro.intro-touch .intro-keyboard,#intro.intro-touch .intro-or { display:none; }
+@media(max-height:450px) { .intro-controls p { margin:5px 0; } .intro-mouse { height:65px; } }
