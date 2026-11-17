@@ -30,7 +30,7 @@ class ThemeSong {
 
   async prepare() {
     try {
-      const response = await fetch(this.src, { method: 'HEAD', signal: AbortSignal.timeout(2000) });
+      const response = await fetch(this.src, { method: 'HEAD' });
       if (!response.ok || response.status === 204 || response.headers.get('content-length') === '0') {
         this.disable();
         return;
@@ -73,7 +73,7 @@ class ThemeSong {
         this.credit.hidden = !song?.credit;
       }).catch(() => {
         // Closing/reopening can abort an older play request; do not disable a new one.
-        if (generation === this.generation) this.disable();
+        if (generation === this.generation) this.stop(false);
       });
     } catch { this.disable(); }
   }

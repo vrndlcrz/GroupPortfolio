@@ -4,6 +4,26 @@
  * REST API client, and humor features into a seamless user journey.
  */
 
+window.AudioMaster = (() => {
+  let muted = false;
+  const listeners = new Set();
+  try { muted = sessionStorage.getItem('gp.muted') === 'true'; } catch {}
+  return {
+    get muted() { return muted; },
+    toggle() {
+      muted = !muted;
+      try { sessionStorage.setItem('gp.muted', String(muted)); } catch {}
+      listeners.forEach(cb => { try { cb(muted); } catch {} });
+      return muted;
+    },
+    onChange(cb) {
+      listeners.add(cb);
+      try { cb(muted); } catch {}
+      return () => listeners.delete(cb);
+    }
+  };
+})();
+
 document.addEventListener('DOMContentLoaded', async () => {
   const classroomRequest = API.getClassroom().then(classroom => {
     Theme.configure(classroom.theme);
@@ -141,8 +161,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Mute Button
     const muteBtn = document.getElementById('muteToggleBtn');
     if (muteBtn) {
-      muteBtn.addEventListener('click', () => {
-        PortfolioHumor.toggleMute();
+      muteBtn.addEventListener('click', () => window.AudioMaster.toggle());
+      window.AudioMaster.onChange(muted => {
+        muteBtn.setAttribute('aria-pressed', String(muted));
+        muteBtn.title = muted ? 'Unmute sound' : 'Mute sound';
+        muteBtn.innerHTML = '<svg class="uicon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4Z"/>' +
+          (muted ? '<path d="m15 5 7 14"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>') +
+          '</svg><span class="hud-label">Sound</span>';
       });
     }
 

@@ -42,6 +42,8 @@
   <!-- 3. THREE.JS 3D SCENE CONTAINER -->
   <main id="scene-container" class="scene-waking-blur" aria-label="Interactive 3D Student Desk with 360 Degree Look Around"></main>
 
+  <button id="deskBackBtn" class="hud-btn" type="button" hidden aria-label="Back to seat">Back</button>
+
   <!-- 2. TOP NAVBAR (Floating on top of scene container with guaranteed clickability) -->
   <header class="top-navbar-dock" id="topNavbar">
     <div class="top-navbar-inner">
@@ -53,7 +55,7 @@
         <svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
         <span class="hud-label">Zero-G</span>
       </button>
-      <button class="hud-btn" id="muteToggleBtn" title="Mute/Unmute sound effects">
+      <button class="hud-btn" id="muteToggleBtn" type="button" aria-label="Sound" aria-pressed="false" title="Mute sound">
         <svg class="uicon sound-icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
         <span class="hud-label">Sound</span>
       </button>

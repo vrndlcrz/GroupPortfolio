@@ -155,7 +155,7 @@ window.Theme = (() => {
     const canvas = document.createElement('canvas');
     let source = 'photo';
     try {
-      const response = await fetch('/assets/textures/window-sunset.jpg', {signal:AbortSignal.timeout(3000)});
+      const response = await fetch('/assets/textures/window-sunset.jpg');
       if (!response.ok) throw new Error('Optional sunset unavailable');
       const photo = await createImageBitmap(await response.blob());
       const scale = Math.min(1,1024 / Math.max(photo.width,photo.height));

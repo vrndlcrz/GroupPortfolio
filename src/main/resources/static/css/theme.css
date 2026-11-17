@@ -45,3 +45,11 @@ body { font-family:var(--font-text); color:var(--ink); background:var(--cream); 
 .guestbook-input,.guestbook-textarea,.guestbook-submit-btn,.note-view-return-btn,.book-music-btn {
   background:var(--cream); color:var(--ink); border:3px solid var(--ink); box-shadow:4px 4px 0 var(--ink); text-shadow:none; border-radius:5px;
 }
+
+/* Keep the master in the toolbar, above the intro and book stacking contexts. */
+#topNavbar { z-index:2147483000!important; opacity:1!important; visibility:visible!important; pointer-events:none; }
+#topNavbar #muteToggleBtn { pointer-events:auto; visibility:visible!important; opacity:1!important; background:var(--gold)!important; border:3px solid var(--ink)!important; box-shadow:4px 4px 0 var(--ink)!important; }
+#muteToggleBtn:focus-visible { outline:3px dashed var(--ink); outline-offset:5px; }
+
+#deskBackBtn { position:fixed; top:20px; left:20px; z-index:2147482999; background:var(--gold)!important; color:var(--ink)!important; border:3px solid var(--ink)!important; box-shadow:4px 4px 0 var(--ink)!important; }
+#deskBackBtn[hidden] { display:none!important; }

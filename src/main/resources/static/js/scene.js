@@ -5,25 +5,40 @@ const INVERT_Y = false;
 const MOUSE_YAW_RANGE = Math.PI * 1.15;
 const PITCH_RANGE = 1.5;
 const KEY_LOOK_VIEWPORTS_PER_SECOND = 0.5;
-const DEFAULT_PITCH = -Math.atan2(2.2, 6);
 const tabletopLayout = [
-  { item: 'spiral-notebook', x: -2.9, z: 1.05, yaw: 0.14 },
-  { item: 'long-folder', x: -0.95, z: 0.55, yaw: -0.11 },
-  { item: 'laptop', x: 0, z: -1.55, yaw: 0 },
-  { item: 'theme-book', x: 1.05, z: 0.85, yaw: 0.08 },
-  { item: 'intermediate-pad', x: 2.95, z: 0.65, yaw: -0.14 }
+  { item: 'spiral-notebook', x: -4.4, z: -.04, yaw: 0.14 },
+  { item: 'long-folder', x: -2.35, z: -.04, yaw: -0.11 },
+  { item: 'laptop', x: 0, z: 0, yaw: 0 },
+  { item: 'theme-book', x: 2.35, z: -.04, yaw: 0.08 },
+  { item: 'intermediate-pad', x: 4.35, z: -.04, yaw: -0.14 }
 ];
 
 class CameraRig {
+  static SEAT_POSE = Object.freeze({ x: -8.2, y: 4, z: 3.7, yaw: .493, pitch: -.10, fov: 50 });
+  static DESK_POSE = Object.freeze({ x: 0, y: 8, z: -11.55, yaw: Math.PI, pitch: -Math.PI * 85 / 180 });
+
+  capturePose() {
+    const p = this.camera.position;
+    return { x: p.x, y: p.y, z: p.z, yaw: this.yaw, pitch: this.pitch };
+  }
+
+  applyPose(pose) {
+    this.camera.position.set(pose.x, pose.y, pose.z);
+    this.yaw = this.targetYaw = pose.yaw;
+    this.pitch = this.targetPitch = pose.pitch;
+    this.applyLook();
+  }
+
   constructor(camera) {
     this.camera = camera;
     this.inputEnabled = true;
     this.keys = new Set();
-    this.seat = new THREE.Vector3(0, 4, 5.2);
+    const pose = CameraRig.SEAT_POSE;
+    this.seat = new THREE.Vector3(pose.x, pose.y, pose.z);
     camera.position.copy(this.seat);
     camera.rotation.order = 'YXZ';
-    this.yaw = this.targetYaw = 0;
-    this.pitch = this.targetPitch = DEFAULT_PITCH;
+    this.yaw = this.targetYaw = pose.yaw;
+    this.pitch = this.targetPitch = pose.pitch;
     this.applyLook();
   }
 
@@ -43,8 +58,8 @@ class CameraRig {
           event.altKey || this.lookBlocked()) return;
       if (event.code === 'KeyR') {
         this.keys.clear();
-        this.yaw = this.targetYaw = 0;
-        this.pitch = this.targetPitch = DEFAULT_PITCH;
+        this.yaw = this.targetYaw = CameraRig.SEAT_POSE.yaw;
+        this.pitch = this.targetPitch = CameraRig.SEAT_POSE.pitch;
         this.applyLook();
       } else {
         this.keys.add(event.code);
@@ -92,6 +107,7 @@ class CameraRig {
 class DeskScene {
   constructor(options = {}) {
     this.inputEnabled = options.inputEnabled !== false;
+    this.view = 'seat';
     this.container = document.getElementById(options.containerId || 'scene-container');
     this.onFolderClick = options.onFolderClick;
     this.onFolderSelect = options.onFolderSelect || null;
@@ -158,7 +174,7 @@ class DeskScene {
     this.container.appendChild(this.renderer.domElement);
 
     // 3. Setup Camera with default position guaranteed
-    this.camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
+    this.camera = new THREE.PerspectiveCamera(CameraRig.SEAT_POSE.fov, width / height, 0.1, 100);
     this.rig = new CameraRig(this.camera);
     this.rig.setInputEnabled(this.inputEnabled);
     this.adjustCameraForScreen();
@@ -171,10 +187,14 @@ class DeskScene {
 
     // 6. Build Desk & Props
     this.buildDesk();
+    const roomObjects = new Set(this.scene.children);
     this.buildFolders();
     this.buildProps();
     this.buildStickyNotes();
     Theme.applyScene(this);
+    this.moveTableContents(roomObjects);
+    this.installWindowShadowFade();
+    this.renderer.shadowMap.needsUpdate = true;
 
     // 7. Raycasting & Events
     this.raycaster = new THREE.Raycaster();
@@ -212,6 +232,8 @@ class DeskScene {
     sun.shadow.camera.updateProjectionMatrix();
     sun.shadow.normalBias=.018;sun.shadow.bias=-.00012;
     this.scene.add(sun,sun.target);
+    this.windowSun = sun; this.windowSunIntensity = sun.intensity;
+    this.windowLight = 1;
   }
 
   buildSurroundingRoom() {
@@ -293,7 +315,7 @@ class DeskScene {
     wallPiece(sill, lintel, front, start); wallPiece(sill, lintel, end, back);
     for (const y of [sill, lintel]) box(room, green, side, y, (start+end)/2, 0.32, 0.22, end-start);
     for (const z of [start, (start+end)/2, end]) box(room, green, side, (sill+lintel)/2, z, 0.32, lintel-sill, 0.2);
-    const glass = new THREE.MeshBasicMaterial({ color: new THREE.Color('#FFD866') });
+    const glass = new THREE.MeshBasicMaterial({ color: new THREE.Color('#FFD866'), transparent: true, opacity: .18, depthWrite: false });
     const slats = [];
     for (let column = 0; column < 2; column++) {
       for (let i = 0; i < 12; i++) {
@@ -305,11 +327,12 @@ class DeskScene {
 
     // One shared outline draw for all 24 existing blades, without changing their poses.
     const slatOutlines=new THREE.InstancedMesh(unitBox,
-      new THREE.MeshBasicMaterial({color:Theme.ink,side:THREE.BackSide}),slats.length);
+      new THREE.MeshBasicMaterial({color:Theme.ink,side:THREE.BackSide,transparent:true,opacity:.13,depthWrite:false}),slats.length);
     const expansion=new THREE.Matrix4().makeScale(1.045,1.045,1.045),matrix=new THREE.Matrix4();
     slats.forEach((slat,i)=>{slat.updateMatrix();slatOutlines.setMatrixAt(i,matrix.copy(slat.matrix).multiply(expansion));});
     slatOutlines.userData.outlineAdded=true;slatOutlines.raycast=()=>{};room.add(slatOutlines);
     this.buildWindowView(side,sill,lintel,start,end);
+    this.buildCurtain(room, box, texture, side, sill, lintel, start, end);
 
     const boardX = 0, boardWidth = 22 * .75, boardHeight = wallHeight * .37, boardY = 3.5;
     box(room, paint(Theme.gold), boardX, boardY, front + .18, boardWidth, boardHeight, .2);
@@ -425,7 +448,7 @@ class DeskScene {
       for (const x of [-8.2,-4.2,4.2,8.2]) {
         if (z === -12 && (x > 0 || x === -4.2)) continue;
         if (z >= 0 && Math.abs(x) < 6) continue;
-        seats.push([x,z]);
+        if (x !== CameraRig.SEAT_POSE.x || z !== CameraRig.SEAT_POSE.z) seats.push([x,z]);
       }
     }
     const chairBatch = (material, parts) => {
@@ -441,6 +464,18 @@ class DeskScene {
     const supports = [[0.77,2.13,-0.36,0.1,1.04,0.1],[0,1.54,0,1.62,0.12,1.46]];
     for (const x of [-0.69,0.69]) for (const z of [-0.58,0.58]) supports.push([x,0.83,z,0.11,1.66,0.11]);
     chairBatch(frame,supports);
+    // One plain monoblock for the viewer; all tablet-arm classroom chairs stay unchanged.
+    const viewerChair = this.viewerChair = new THREE.Group(); room.add(viewerChair);
+    viewerChair.position.set(CameraRig.SEAT_POSE.x,0,CameraRig.SEAT_POSE.z);
+    const plastic = Theme.toon(0x8fb3c9);
+    box(viewerChair,plastic,0,floor+1.73,0,1.67,.14,1.55);
+    const backShape = new THREE.Shape();
+    backShape.moveTo(-.82,-.65); backShape.lineTo(.82,-.65);
+    backShape.lineTo(.78,.45); backShape.quadraticCurveTo(.76,.78,0,.78);
+    backShape.quadraticCurveTo(-.76,.78,-.78,.45); backShape.closePath();
+    const plasticBack = new THREE.Mesh(new THREE.ExtrudeGeometry(backShape,{depth:.09,bevelEnabled:false}),plastic);
+    plasticBack.position.set(0,floor+2.42,.68); plasticBack.rotation.x=.12; viewerChair.add(plasticBack);
+    for (const x of [-.69,.69]) for (const z of [-.58,.58]) box(viewerChair,plastic,x,floor+.83,z,.11,1.66,.11);
 
     const glow = texture(128,128,ctx => {
       const g = ctx.createRadialGradient(64,64,0,64,64,64);
@@ -465,6 +500,90 @@ class DeskScene {
   }
 
 
+  buildCurtain(room, box, texture, side, sill, lintel, start, end) {
+    const map = texture(256, 256, ctx => {
+      ctx.fillStyle = '#FFE3A3'; ctx.fillRect(0, 0, 256, 256);
+      for (let x = 0; x < 256; x += 32) {
+        ctx.fillStyle = '#E8B650'; ctx.fillRect(x + 20, 0, 12, 256);
+        ctx.fillStyle = '#FFF1C9'; ctx.fillRect(x + 3, 0, 7, 256);
+      }
+      ctx.strokeStyle = Theme.ink; ctx.lineWidth = 8; ctx.strokeRect(4, 4, 248, 248);
+    });
+    const fabric = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide });
+    const ink = new THREE.MeshBasicMaterial({ color: Theme.ink });
+    const tieMaterial = new THREE.MeshBasicMaterial({ color: Theme.gold, transparent: true });
+    const geometry = new THREE.PlaneGeometry(1, 1), width = (end - start) / 2;
+    this.curtainPanels = []; this.curtainTies = [];
+    for (let i = 0; i < 2; i++) {
+      const panel = new THREE.Mesh(geometry, fabric);
+      panel.rotation.y = -Math.PI / 2;
+      panel.position.set(side - .55, (sill + lintel) / 2, i ? end - .55 : start + .55);
+      panel.scale.set(1.1, lintel - sill, 1);
+      panel.userData.openZ = panel.position.z;
+      panel.userData.closedZ = start + width * (i + .5);
+      room.add(panel); this.curtainPanels.push(panel);
+      const tie = box(room, tieMaterial, side - .59, sill + 2.1, panel.position.z, .08, .22, 1.16);
+      tie.castShadow = tie.receiveShadow = false; this.curtainTies.push(tie);
+    }
+    box(room, ink, side - .55, lintel + .25, (start + end) / 2, .16, .16, end - start + .8);
+    const hit = box(room, new THREE.MeshBasicMaterial({ visible: false }), side - .7,
+      (sill + lintel) / 2, (start + end) / 2, .15, lintel - sill, end - start);
+    hit.castShadow = hit.receiveShadow = false;
+    hit.userData = { type: 'curtain' }; this.interactiveObjects.push(hit);
+    this.curtainWidth = width; this.curtainClosed = false;
+  }
+
+  installWindowShadowFade() {
+    // Real louvre shadows share the sunlight's opacity; keep existing material programs.
+    this.windowShadowFade = { value: 1 };
+    const seen = new Set();
+    this.scene.traverse(obj => {
+      if (!obj.receiveShadow) return;
+      for (const mat of (Array.isArray(obj.material) ? obj.material : [obj.material])) {
+        if (!mat || seen.has(mat) || mat.isMeshBasicMaterial) continue;
+        seen.add(mat);
+        const previous = mat.onBeforeCompile;
+        mat.onBeforeCompile = (shader, renderer) => {
+          previous.call(mat, shader, renderer);
+          shader.uniforms.gpWindowLight = this.windowShadowFade;
+          shader.fragmentShader = shader.fragmentShader.replace('#include <common>',
+            '#include <common>\nuniform float gpWindowLight;').replace('#include <lights_fragment_begin>',
+            THREE.ShaderChunk.lights_fragment_begin.replace(/getShadow\( directionalShadowMap\[ i \],[^;]*?\)/g,
+              match => 'mix(1.0, ' + match + ', gpWindowLight)'));
+        };
+        mat.needsUpdate = true;
+      }
+    });
+  }
+
+  toggleCurtain() {
+    if (this.view !== 'seat' || this.curtainAnimating || this.interactionBlocked()) return;
+    this.curtainAnimating = true;
+    this.curtainClosed = !this.curtainClosed;
+    gsap.to(this, {
+      windowLight: this.curtainClosed ? .25 : 1, duration: .7, ease: 'power2.inOut',
+      onUpdate: () => {
+        const light = this.windowLight, closed = (1 - light) / .75;
+        this.curtainPanels.forEach(panel => {
+          panel.position.z = THREE.MathUtils.lerp(panel.userData.openZ, panel.userData.closedZ, closed);
+          panel.scale.x = THREE.MathUtils.lerp(1.1, this.curtainWidth, closed);
+        });
+        this.curtainTies[0].material.opacity = 1 - closed;
+        this.windowSun.intensity = this.windowSunIntensity * light;
+        this.classroomShafts[0].material.opacity = .18 * light;
+        this.windowGlow.material.opacity = .25 * light;
+        this.classroomDust.material.opacity = .65 * light;
+        this.windowShadowFade.value = light;
+        this.windowSky.material.color.setScalar(light);
+        this.windowHorizon.material.color.setScalar(light);
+      },
+      onComplete: () => {
+        this.curtainAnimating = false;
+        this.renderer.shadowMap.needsUpdate = true;
+      }
+    });
+  }
+
   buildWindowView(side,sill,lintel,start,end) {
     const width=(end-start)*1.2,height=(lintel-sill)*1.2;
     // Keep the narrow sea strip above the sill; put most overscan above the opening.
@@ -484,12 +603,13 @@ class DeskScene {
     this.skyMotionPreference=matchMedia('(prefers-reduced-motion: reduce)');
     Theme.windowTextures().then(layers=>{
       this.windowSky.material.map=layers.sky;this.windowHorizon.material.map=layers.horizon;
-      for(const mesh of [this.windowSky,this.windowHorizon]) {mesh.material.color.set(0xffffff);mesh.material.needsUpdate=true;}
+      for(const mesh of [this.windowSky,this.windowHorizon]) {mesh.material.color.setScalar(this.windowLight);mesh.material.needsUpdate=true;}
       this.windowSkyTexture=layers.sky;this.windowSource=layers.source;
     }).catch(()=>{});
     const glow=make(side-.22,(sill+lintel)/2,lintel-sill,Theme['sun-glow']);
     glow.scale.x=end-start;glow.material.transparent=true;glow.material.opacity=.25;
     glow.material.blending=THREE.AdditiveBlending;glow.renderOrder=1;
+    this.windowGlow = glow;
   }
 
   updateWindowView(seconds) {
@@ -517,22 +637,17 @@ class DeskScene {
 
   buildTeacher(room, floor, box, paint, texture) {
     const desk = paint(Theme['wood-dark']), black = paint(Theme.ink), mint = paint(0x9bd36b);
-    const top = box(room, paint(Theme.wood), 0, floor + 3, -11.55, 22 * .36, .21, 2);
-    top.geometry = top.geometry.clone();
-    const corners = top.geometry.attributes.position;
-    for (let i = 0; i < corners.count; i++) {
-      if (corners.getZ(i) < 0) corners.setX(i, corners.getX(i) * .93);
-    }
-    top.geometry.computeVertexNormals();
-    box(room, desk, 0, floor + 2.54, -10.68, 7.4, .75, .14);
-    for (const x of [-3.5,3.5]) for (const z of [-12.37,-10.75]) box(room,desk,x,floor+1.47,z,.23,2.94,.23);
-    box(room,mint,0,floor+1.74,-13.44,1.82,.18,1.65);
-    box(room,mint,0,floor+3.05,-14.15,1.82,2.4,.16);
-    for (const x of [-.48,-.24,0,.24,.48]) box(room,paint(0xfffdf6),x,floor+3.35,-14.05,.09,1.28,.02);
-    for (const x of [-.7,.7]) for (const z of [-14.04,-12.84]) box(room,mint,x,floor+.86,z,.15,1.72,.15);
+    const teacherChair = this.teacherChair = new THREE.Group(); room.add(teacherChair);
+    teacherChair.position.set(0,0,-.68);
+    box(teacherChair,mint,0,floor+1.74,-13.44,1.82,.18,1.4);
+    box(teacherChair,mint,0,floor+3.05,-14.02,1.82,2.4,.16);
+    const chairStripe = paint(0xfffdf6);
+    for (const x of [-.48,-.24,0,.24,.48]) box(teacherChair,chairStripe,x,floor+3.35,-13.92,.09,1.28,.02);
+    for (const x of [-.7,.7]) for (const z of [-14,-12.9]) box(teacherChair,mint,x,floor+.86,z,.15,1.72,.15);
 
     const person = new THREE.Group();
-    person.position.set(7.72,floor,-11.6); person.rotation.y = -0.23;
+    person.position.set(0,floor - 1.5,-14.22); person.rotation.y = 0;
+    this.teacher = person;
     person.userData.type = 'teacher'; room.add(person); 
     const skin = paint(0xb98058), slacks = paint(0x35373d), hair = paint(0x242021);
     this.teacherJacket = paint(Theme.ink);
@@ -546,16 +661,24 @@ class DeskScene {
       mesh.position.set(x,y,z); parent.add(mesh); mesh.castShadow = true; return mesh;
     };
     for (const x of [-0.43,0.43]) {
-      box(person,black,x,0.24,0.14,0.69,0.48,1.08);
-      limb(person,slacks,x,1.84,0,0.45,0.31,2.98);
+      box(person,black,x,1.64,1.55,0.69,0.48,1.08);
+      const thigh = limb(person,slacks,x,3.12,.72,.45,.31,2.98);
+      thigh.scale.y = .5; thigh.rotation.x = Math.PI / 2;
+      const shin = new THREE.Mesh(thigh.geometry, slacks);
+      shin.position.set(x,2.34,1.45); shin.scale.y = .5;
+      shin.castShadow = true; person.add(shin);
     }
     const torso = this.teacherTorso = new THREE.Group(); torso.position.y=3.15; person.add(torso);
     limb(torso,this.teacherJacket,0,1.08,0,1.02,0.84,2.2).scale.z=0.64;
     box(torso,paint(0xece7db),0,1.12,0.57,0.65,1.95,0.09);
     for (const side of [-1,1]) {
-      const arm = new THREE.Group(); arm.position.set(side*0.94,1.94,0); torso.add(arm);
-      limb(arm,this.teacherJacket,side*0.08,-0.72,0,0.32,0.23,1.45);
-      oval(arm,skin,side*0.08,-1.59,0.05,0.23,0.32,0.21);
+      const arm = new THREE.Group(); arm.position.set(side === 1 ? .58 : -.94,1.94,0); torso.add(arm);
+      const upper = limb(arm,this.teacherJacket,side*.08,-.15,.33,.32,.23,1.45);
+      upper.scale.y = .5; upper.rotation.x = -1.16;
+      const forearm = new THREE.Mesh(upper.geometry, this.teacherJacket);
+      forearm.scale.set(.8,.45,.8); forearm.rotation.x = Math.PI / 2;
+      forearm.position.set(side*.08,-.24,.98); forearm.castShadow = true; arm.add(forearm);
+      oval(arm,skin,side*.08,-.24,1.36,.23,.21,.32);
       if (side === -1) this.teacherArm = arm;
       box(torso,black,side*0.16,1.5,0.66,0.045,0.98,0.035).rotation.z=-side*0.32;
     }
@@ -578,7 +701,7 @@ class DeskScene {
     }
     box(head,black,0,0.14,0.60,0.14,0.04,0.05);
     // Four scene units per metre. Reuse the unit cube from the room builder.
-    const hitbox = box(person, new THREE.MeshBasicMaterial({ visible: false }), 0, 3.8, 0, 3.2, 7.6, 2);
+    const hitbox = box(person, new THREE.MeshBasicMaterial({ visible: false }), 0, 4.45, .6, 3.2, 5.2, 2.4);
     this.interactiveObjects.push(hitbox);
     hitbox.castShadow = hitbox.receiveShadow = false;
     person.traverse(child => {
@@ -597,9 +720,10 @@ class DeskScene {
     if (index !== this.tvIndex) this.drawTVSlide(index);
     this.teacherTorso.scale.y=1+0.005*Math.sin(seconds*2);
     this.teacherHead.rotation.z=0.026*Math.sin(seconds*0.8);
-    this.teacherArm.rotation.x=-0.13-0.44*Math.pow(Math.max(0,Math.sin(seconds*0.86)),3);
+    // Seated forearms remain resting on the desk.
     const blink=Math.abs((seconds%4.8)-2.4);
     for (const eye of this.teacherEyes) eye.scale.y=0.073*Math.min(1,blink/0.085);
+    if (this.view !== 'seat' || this.interactionBlocked()) { this.hideSean(); return; }
     if (!this.speechUntil) return;
     if (seconds*1000 >= this.speechUntil) {
       this.teacherBubble.classList.remove('visible'); this.speechUntil=0; return;
@@ -611,6 +735,75 @@ class DeskScene {
     this.teacherBubble.style.left = THREE.MathUtils.clamp(rect.left + (p.x + 1) * rect.width / 2, half, window.innerWidth - half) + 'px';
     this.teacherBubble.style.top = THREE.MathUtils.clamp(rect.top + (1 - p.y) * rect.height / 2, this.teacherBubble.offsetHeight + 8, window.innerHeight - 8) + 'px';
     this.teacherBubble.classList.toggle('visible', Math.abs(p.z)<1 && !this.isCameraZoomed);
+  }
+
+  moveTableContents(roomObjects) {
+    // Includes Theme's name tags, dashed trail/X and existing table graffiti decals.
+    for (const obj of [...this.scene.children]) {
+      if (roomObjects.has(obj)) continue;
+      if (obj.position.y === .215) { obj.position.z = .87; obj.position.y = .38; }
+      this.deskGroup.add(obj);
+    }
+    this.deskGroup.position.set(0,0,-11.55);
+    this.deskGroup.rotation.y = Math.PI;
+    const hit = new THREE.Mesh(this.deskGroup.children[0].geometry, new THREE.MeshBasicMaterial({ visible:false }));
+    hit.scale.set(1,.5,.99); hit.position.y = .08;
+    hit.userData.type = 'front-desk';
+    this.deskGroup.add(hit);
+    this.deskHit = hit; this.interactiveObjects.push(hit);
+    this.deskGroup.updateMatrixWorld(true);
+  }
+
+  tabletopObject(obj) {
+    for (let node = obj; node; node = node.parent) if (node === this.deskGroup) return true;
+    return false;
+  }
+
+  pickInteraction(intersects) {
+    const first = intersects[0];
+    if (!first) return null;
+    if (this.view === 'seat') {
+      // A visible item occludes the desk below it, but cannot open from the seat.
+      const sean = intersects.find(hit => hit.object.userData.type === 'teacher');
+      if (sean) return sean;
+      if (this.tabletopObject(first.object)) return { object: this.deskHit };
+      return first;
+    }
+    return intersects.find(hit => hit.object.userData.type === 'folder') || intersects.find(hit => hit.object.userData.type !== "front-desk" && this.tabletopObject(hit.object)) || null;
+  }
+
+  enterDeskView() {
+    if (this.view !== 'seat' || this.interactionBlocked()) return;
+    this.storedSeatPose = this.rig.capturePose();
+    const pose = CameraRig.DESK_POSE;
+    const height = 6.3 / (this.camera.aspect * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)));
+    this.glideTo({ ...pose, y: Math.max(4.7,height) + .3 }, 1.2, 'desk');
+  }
+
+  backToSeat() {
+    if (this.view !== 'desk' || this.interactionBlocked()) return;
+    this.glideTo(this.storedSeatPose, 1, 'seat');
+  }
+
+  glideTo(pose, duration, view) {
+    this.viewTween?.kill();
+    this.view = 'gliding'; this.backButton.hidden = true;
+    this.rig.setInputEnabled(false);
+    this.isDraggingView = false; this.hasDraggedMeaningfully = false;
+    this.pendingHover = null; this.resetHoverState(); this.hideSean();
+    const state = this.rig.capturePose();
+    const yaw = state.yaw + Math.atan2(Math.sin(pose.yaw-state.yaw), Math.cos(pose.yaw-state.yaw));
+    this.viewTween = gsap.to(state, {
+      x: pose.x, y: pose.y, z: pose.z, yaw, pitch: pose.pitch,
+      duration, ease: 'power2.inOut', onUpdate: () => this.rig.applyPose(state),
+      onComplete: () => {
+        this.viewTween.kill(); this.viewTween = null;
+        this.rig.applyPose(pose); this.view = view;
+        this.rig.setInputEnabled(view === 'seat' && this.inputEnabled);
+        this.backButton.hidden = view !== 'desk';
+        this.renderer.shadowMap.needsUpdate = true;
+      }
+    });
   }
 
   buildDesk() {
@@ -1017,6 +1210,7 @@ class DeskScene {
         default: folderMesh = this.createFolderMesh(member);
       }
       const posY = 0.22 + i * 0.01;
+      folderMesh.scale.multiplyScalar(1.25);
       folderMesh.position.set(layout.x, posY, layout.z);
       folderMesh.rotation.set(0, layout.yaw, 0);
       folderMesh.castShadow = true;
@@ -1121,6 +1315,7 @@ class DeskScene {
     laptopGroup.add(laptopHitBox);
 
     const layout = tabletopLayout.find(entry => entry.item === 'laptop');
+    laptopGroup.scale.multiplyScalar(1.25);
     laptopGroup.position.set(layout.x, 0.22, layout.z);
     laptopGroup.rotation.y = layout.yaw;
 
@@ -1168,7 +1363,7 @@ class DeskScene {
     coffeeHitBox.userData = { type: 'coffee' };
     cupGroup.add(coffeeHitBox);
 
-    cupGroup.position.set(4.0, 0.18, -1.2);
+    cupGroup.position.set(5.45, .2, .15);
     cupGroup.userData = { type: 'coffee' };
     this.scene.add(cupGroup);
 
@@ -1188,7 +1383,7 @@ class DeskScene {
     });
     this.puddle = new THREE.Mesh(puddleGeo, puddleMat);
     this.puddle.rotation.x = -Math.PI / 2;
-    this.puddle.position.set(4.1, 0.19, -1.0);
+    this.puddle.position.set(5.15,.2,0);
     this.puddle.scale.set(0, 0, 0);
     this.puddle.userData = { type: 'coffee' };
     this.scene.add(this.puddle);
@@ -1220,7 +1415,7 @@ class DeskScene {
     const stickyNote = new THREE.Mesh(stickyGeo, stickyMat);
     stickyNote.rotation.x = -Math.PI / 2;
     stickyNote.rotation.z = -0.15;
-    stickyNote.position.set(0.1, 0.21, 2.3);
+    stickyNote.scale.setScalar(.5); stickyNote.position.set(-4.7,.21,-2.15);
     stickyNote.userData = { type: 'dont-touch-note' };
 
     // Elevated Layer 1 hitbox for dont-touch-note
@@ -1272,7 +1467,7 @@ class DeskScene {
     const calendar = new THREE.Mesh(calGeo, calMat);
     calendar.rotation.x = -Math.PI / 2;
     calendar.rotation.z = 0.25;
-    calendar.position.set(-4.22, 0.21, -1.17);
+    calendar.scale.setScalar(.65); calendar.position.set(-4.7,.21,1.95);
     this.scene.add(calendar);
   }
 
@@ -1323,8 +1518,8 @@ class DeskScene {
     const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 });
     const mesh = new THREE.Mesh(geo, mat);
 
-    const xPos = [-3.35, -2.55, -1.75, 1.65, 2.45, 3.25][slotIndex % 6];
-    const zPos = -1.34;
+    const xPos = [-4.35, -3.55, -2.75, 2.75, 3.55, 4.35][slotIndex % 6];
+    const zPos = -1.7;
     const rot = (Math.random() - 0.5) * 0.4;
 
     mesh.rotation.x = -Math.PI / 2;
@@ -1346,25 +1541,37 @@ class DeskScene {
     noteHitBox.userData = { type: 'sticky-note', note: note, originalY: 0.205 };
     mesh.add(noteHitBox);
 
-    this.scene.add(mesh);
+    this.deskGroup.add(mesh);
 
     this.interactiveObjects.push(noteHitBox);
   }
 
   setInputEnabled(enabled) {
     this.inputEnabled = enabled;
-    this.rig?.setInputEnabled(enabled);
+    this.rig?.setInputEnabled(enabled && this.view === 'seat');
+    if (!enabled) { this.resetHoverState(); this.hideSean(); }
     this.isDraggingView = false;
     this.pendingHover = null;
     this.hideTooltip();
   }
 
   bindEvents() {
-    this.rig.bindKeyboardLook(() => this.isCameraZoomed);
+    this.rig.bindKeyboardLook(() => this.isCameraZoomed || this.view !== 'seat');
+    this.backButton = document.getElementById('deskBackBtn');
+    this.backButton.addEventListener('click', () => this.backToSeat());
+    window.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && this.view === 'desk' && !this.interactionBlocked()) {
+        event.preventDefault(); event.stopImmediatePropagation(); this.backToSeat();
+      }
+    }, true);
     window.addEventListener('resize', () => this.onWindowResize());
 
     // Seated Look Around Event Listeners
     const dom = this.renderer.domElement;
+    dom.addEventListener('mouseleave', () => this.resetHoverState());
+    document.addEventListener('pointerdown', () => {
+      if (matchMedia('(pointer: coarse)').matches) this.hideSean();
+    });
 
     // Mouse Drag to Look Around
     dom.addEventListener('mousedown', (e) => this.onMouseDown(e));
@@ -1373,7 +1580,7 @@ class DeskScene {
 
     // Mouse Wheel to Tilt POV Up / Down smoothly
     dom.addEventListener('wheel', (e) => {
-      if (this.isCameraZoomed) return;
+      if (this.view !== 'seat' || this.isCameraZoomed) return;
       this.rig.aim(this.rig.targetYaw, this.rig.targetPitch - e.deltaY * 0.0018);
     }, { passive: true });
 
@@ -1398,8 +1605,7 @@ class DeskScene {
     const portrait = aspect < 0.75;
     const compact = aspect < 1.15;
     this.camera.fov = portrait ? 68 : compact ? 58 : 50;
-    this.rig.seat.set(0, portrait ? 4.3 : compact ? 4.2 : 4, portrait ? 7.2 : compact ? 6.2 : 5.2);
-    if (!this.isCameraZoomed) this.camera.position.copy(this.rig.seat);
+    if (this.view === 'seat' && !this.isCameraZoomed) this.camera.position.copy(this.rig.seat);
     this.camera.updateProjectionMatrix();
     if (this.renderer) {
       this.renderer.setSize(width, height);
@@ -1411,7 +1617,10 @@ class DeskScene {
   }
 
   onMouseDown(e) {
-    if (!this.inputEnabled) return;
+    if (!this.inputEnabled || this.view === 'gliding') return;
+    this.dragStartPos = { x: e.clientX, y: e.clientY };
+    this.hasDraggedMeaningfully = false;
+    if (this.view !== 'seat') return;
     if (this.isCameraZoomed) return;
     // Don't drag if clicking buttons, modals, or clear-book overlay
     if (e.target.closest('button') || e.target.closest('.guestbook-modal-overlay') || e.target.closest('#bookOverlay') || e.target.closest('.error-modal-overlay')) return;
@@ -1430,6 +1639,9 @@ class DeskScene {
   onTouchStart(e) {
     if (!this.inputEnabled) return;
     if (this.isCameraZoomed || !e.touches || e.touches.length === 0) return;
+    this.dragStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    this.hasDraggedMeaningfully = false;
+    if (this.view !== 'seat') return;
     this.isDraggingView = true;
     this.dragStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     this.dragStartAngles = { yaw: this.rig.targetYaw, pitch: this.rig.targetPitch };
@@ -1484,7 +1696,7 @@ class DeskScene {
   }
 
   updateHover(e) {
-    if (!this.inputEnabled) return;
+    if (this.interactionBlocked()) { this.resetHoverState(); this.hideSean(); return; }
     // Raycast hovered props & folders
     const rect = this.renderer.domElement.getBoundingClientRect();
     this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -1493,9 +1705,10 @@ class DeskScene {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.interactiveObjects, false);
 
-    if (intersects.length > 0) {
-      // NOTE TOP PRIORITY: If any sticky note or dont-touch-note is intersected, prioritize it over folders
-      let chosenIntersect = intersects[0];
+    const selected = this.pickInteraction(intersects);
+    if (selected) {
+      // Keep note priority only among interactive items in desk view.
+      let chosenIntersect = selected;
       const noteIntersect = intersects.find(it => {
         let cur = it.object;
         while (cur.parent && cur.parent !== this.scene && !cur.userData.type) {
@@ -1504,7 +1717,7 @@ class DeskScene {
         return cur.userData && (cur.userData.type === 'sticky-note' || cur.userData.type === 'dont-touch-note');
       });
 
-      if (noteIntersect && chosenIntersect.object.userData.type !== 'teacher') {
+      if (this.view === 'desk' && noteIntersect && chosenIntersect.object.userData.type !== 'folder') {
         chosenIntersect = noteIntersect;
       }
 
@@ -1532,16 +1745,13 @@ class DeskScene {
       obj.material.color.set(Theme['sun-glow']);
       this.showTooltip('Click to read placard', e);
     } else if (obj.userData.type === 'teacher') {
-      this.teacherJacket.color.set(Theme.teal);
-      this.showTooltip('Sean Dyogi · Click to talk', e);
+      if (!matchMedia('(pointer: coarse)').matches) this.showSean();
+    } else if (obj.userData.type === 'front-desk') {
+      this.showTooltip('Click to view the front desk', e);
+    } else if (obj.userData.type === 'curtain') {
+      this.hideTooltip();
     } else if (obj.userData.type === 'folder') {
       const folder = obj.userData.folderMesh || obj;
-      if (typeof gsap !== 'undefined') {
-        gsap.to(folder.position, { y: folder.userData.originalPos.y + 0.35, duration: 0.25, ease: 'power2.out' });
-        gsap.to(folder.rotation, { x: -0.12, duration: 0.25 });
-      } else {
-        folder.position.y = folder.userData.originalPos.y + 0.35;
-      }
       const member = folder.userData.member;
       this.showTooltip(`<strong>${member.deskItem === 'spiral-notebook' ? 'Spiral notebook' : member.deskItem === 'theme-book' ? 'Theme book' : member.deskItem === 'intermediate-pad' ? 'Intermediate pad' : 'Long folder'}: ${member.name}</strong><br><em>“${member.tagline}”</em><br><small style="color:#38BDF8">Click anywhere to open portfolio</small>`, e);
     } else if (obj.userData.type === 'coffee') {
@@ -1565,7 +1775,10 @@ class DeskScene {
 
   resetHoverState() {
     if (this.hoveredObject?.userData.type === 'placard') this.hoveredObject.material.color.set(0xffffff);
-    if (this.hoveredObject?.userData.type === 'teacher') this.teacherJacket.color.set(Theme.ink);
+    if (this.hoveredObject?.userData.type === 'teacher') {
+      clearTimeout(this.seanHideTimer);
+      this.seanHideTimer = setTimeout(() => this.hideSean(), 600);
+    }
     if (this.hoveredObject) {
       if (this.hoveredObject.userData.type === 'folder' && !this.isCameraZoomed) {
         const folder = this.hoveredObject.userData.folderMesh || this.hoveredObject;
@@ -1608,7 +1821,8 @@ class DeskScene {
   }
 
   onClick(e) {
-    if (!this.inputEnabled) return;
+    if (this.interactionBlocked()) return;
+    if (matchMedia('(pointer: coarse)').matches) this.hideSean();
     if (this.isCameraZoomed) {
       return;
     }
@@ -1632,9 +1846,10 @@ class DeskScene {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.interactiveObjects, false);
 
-    if (intersects.length > 0) {
-      // NOTE TOP PRIORITY: If any sticky note or dont-touch-note is intersected, prioritize it over folders
-      let chosenIntersect = intersects[0];
+    const selected = this.pickInteraction(intersects);
+    if (selected) {
+      // Keep note priority only among interactive items in desk view.
+      let chosenIntersect = selected;
       const noteIntersect = intersects.find(it => {
         let cur = it.object;
         while (cur.parent && cur.parent !== this.scene && !cur.userData.type) {
@@ -1643,7 +1858,7 @@ class DeskScene {
         return cur.userData && (cur.userData.type === 'sticky-note' || cur.userData.type === 'dont-touch-note');
       });
 
-      if (noteIntersect && chosenIntersect.object.userData.type !== 'teacher') {
+      if (this.view === 'desk' && noteIntersect && chosenIntersect.object.userData.type !== 'folder') {
         chosenIntersect = noteIntersect;
       }
 
@@ -1657,22 +1872,49 @@ class DeskScene {
     }
   }
 
-  handleObjectClick(obj) {
-    if (!this.inputEnabled) return;
-    const type = obj.userData.type;
+  interactionBlocked() {
+    return !this.inputEnabled || this.view === 'gliding' || this.isCameraZoomed || !!document.querySelector(
+      '#bookOverlay.active, .error-modal-overlay.active, .guestbook-modal-overlay.active, .note-view-modal-overlay.active, #termsModal.active');
+  }
 
-    if (type === 'placard') {
+  hideSean() {
+    clearTimeout(this.seanHideTimer);
+    this.speechUntil = 0;
+    this.teacherBubble?.classList.remove('visible');
+  }
+
+  showSean(duration = Infinity) {
+    if (this.view !== 'seat' || this.interactionBlocked()) return;
+    clearTimeout(this.seanHideTimer);
+    const lines = Array.isArray(this.classroom.teacherLines) && this.classroom.teacherLines.length
+      ? this.classroom.teacherLines : classroomDefaults.teacherLines;
+    this.teacherBubble.textContent = lines[this.speechIndex % lines.length];
+    this.speechIndex = (this.speechIndex + 1) % lines.length;
+    this.speechUntil = performance.now() + duration;
+    if (Number.isFinite(duration)) this.seanHideTimer = setTimeout(() => this.hideSean(), duration);
+    this.hideTooltip();
+  }
+
+  onSeanClick() {
+    // TODO: later feature
+  }
+
+  handleObjectClick(obj) {
+    if (this.interactionBlocked()) return;
+    const type = obj.userData.type;
+    const tabletop = this.tabletopObject(obj);
+    if (this.view === 'seat' && tabletop && type !== 'front-desk') return;
+    if (this.view === 'desk' && !tabletop) return;
+
+    if (type === 'front-desk') {
+      this.enterDeskView();
+    } else if (type === 'placard') {
       this.openPlacard(obj);
     } else if (type === 'teacher') {
-      let lines = this.classroom.teacherLines;
-      if (!Array.isArray(lines) || !lines.length) {
-        console.warn('[Sean] Empty teacher lines; using classroom defaults.');
-        lines = classroomDefaults.teacherLines;
-      }
-      this.teacherBubble.textContent=lines[this.speechIndex];
-      this.speechIndex=(this.speechIndex+1)%lines.length;
-      this.speechUntil=performance.now()+4000;
-      this.hideTooltip();
+      if (matchMedia('(pointer: coarse)').matches) this.showSean(3000);
+      this.onSeanClick();
+    } else if (type === 'curtain') {
+      this.toggleCurtain();
     } else if (type === 'folder') {
       const folderMesh = obj.userData.folderMesh || obj;
       this.selectFolder(folderMesh);
@@ -1707,6 +1949,7 @@ class DeskScene {
     this.rig.targetYaw = this.rig.yaw;
     this.rig.targetPitch = this.rig.pitch;
     this.preZoomOrientation = this.camera.quaternion.clone();
+    this.preZoomPosition = this.camera.position.clone();
     this.isCameraZoomed = true;
     const target = face.getWorldPosition(new THREE.Vector3());
     this.camera.position.copy(target);
@@ -1751,54 +1994,23 @@ class DeskScene {
   }
 
   selectFolder(obj) {
+    if (this.view !== 'desk' || this.interactionBlocked()) return;
     const folderMesh = obj.userData.folderMesh || obj;
     const member = folderMesh.userData.member;
     this.onFolderClick?.(member);
-    this.activeFolder = folderMesh;
+    this.bookOpen = true;
     this.isCameraZoomed = true;
-    this.preZoomOrientation = this.camera.quaternion.clone();
-    this.rig.targetYaw = this.rig.yaw;
-    this.rig.targetPitch = this.rig.pitch;
-    this.rig.keys.clear();
-    this.isDraggingView = false;
     this.hideTooltip();
-
-    if (window.PortfolioHumor) {
-      window.PortfolioHumor.playSound('pageFlip');
-    }
-
-    const hinge = folderMesh.getObjectByName('long-folder-hinge');
-    if (typeof gsap !== 'undefined') {
-      if (hinge) gsap.to(hinge.rotation, { z: Math.PI * 0.92, duration: 0.85, ease: 'power2.inOut' });
-      gsap.to(this.camera.position, {
-        x: folderMesh.position.x,
-        y: folderMesh.position.y + 2.8,
-        z: folderMesh.position.z + 1.8,
-        overwrite: true,
-        onUpdate: () => this.camera.lookAt(folderMesh.position),
-        duration: 0.8,
-        ease: 'power3.inOut'
-      });
-
-      gsap.to(folderMesh.position, {
-        y: folderMesh.userData.originalPos.y + 0.8,
-        duration: hinge ? 0.9 : 0.6,
-        ease: 'back.out(1.5)',
-        onComplete: () => {
-          if (typeof this.onFolderSelect === 'function') {
-            this.onFolderSelect(member);
-          }
-        }
-      });
-    } else {
-      if (hinge) hinge.rotation.z = Math.PI * 0.92;
-      if (typeof this.onFolderSelect === 'function') {
-        this.onFolderSelect(member);
-      }
-    }
+    window.PortfolioHumor?.playSound('pageFlip');
+    this.onFolderSelect?.(member);
   }
 
   returnToDesk() {
+    if (this.bookOpen) {
+      this.bookOpen = false;
+      this.isCameraZoomed = false;
+      return;
+    }
     if (!this.isCameraZoomed) return;
     const hinge = this.activeFolder?.getObjectByName('long-folder-hinge');
     if (hinge && typeof gsap !== 'undefined') {
@@ -1832,20 +2044,20 @@ class DeskScene {
       });
       gsap.to(this.camera.position, {
         overwrite: true,
-        x: this.rig.seat.x,
-        y: this.rig.seat.y,
-        z: this.rig.seat.z,
+        x: this.preZoomPosition.x,
+        y: this.preZoomPosition.y,
+        z: this.preZoomPosition.z,
         duration: 0.8,
         ease: 'power3.inOut',
         onComplete: () => {
-          this.camera.position.copy(this.rig.seat);
+          this.camera.position.copy(this.preZoomPosition);
           this.camera.quaternion.copy(this.preZoomOrientation);
           this.isCameraZoomed = false;
           this.activeFolder = null;
         }
       });
     } else {
-      this.camera.position.copy(this.rig.seat);
+      this.camera.position.copy(this.preZoomPosition);
       this.camera.quaternion.copy(this.preZoomOrientation);
       this.isCameraZoomed = false;
       this.activeFolder = null;
@@ -1934,6 +2146,7 @@ class DeskScene {
 
     this.isCameraZoomed = true;
     this.preZoomOrientation = this.camera.quaternion.clone();
+    this.preZoomPosition = this.camera.position.clone();
     this.rig.targetYaw = this.rig.yaw;
     this.rig.targetPitch = this.rig.pitch;
     this.rig.keys.clear();

@@ -2,14 +2,18 @@
 window.IntroSound = (() => {
   let ctx, enabled = false; // Wait for configuration before allowing a gesture to synthesize sound.
   function muted() {
-    try { return sessionStorage.getItem('notebook.music.muted') === 'true' || sessionStorage.getItem('sound.muted') === 'true'; }
-    catch { return false; }
+    return window.AudioMaster?.muted === true;
   }
   function resume() {
     try {
       if (!enabled || muted()) return;
       const Audio = window.AudioContext || window.webkitAudioContext;
-      if (!ctx && Audio) ctx = new Audio();
+      if (!ctx && Audio) {
+        ctx = new Audio();
+        window.AudioMaster?.onChange(muted => {
+          try { (muted ? ctx.suspend() : ctx.resume())?.catch(() => {}); } catch {}
+        });
+      }
       ctx?.resume().catch(() => {});
     } catch { /* Autoplay and unavailable audio are intentionally silent. */ }
   }

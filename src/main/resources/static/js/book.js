@@ -47,7 +47,6 @@ class ClearBook {
             <span class="member-color-indicator" id="memberColorDot"></span>
             <span id="memberPillName">Member Portfolio</span>
           </div>
-          <button type="button" hidden class="book-nav-btn book-music-btn">Mute</button>
           <button class="book-close-btn" id="bookCloseBtn" title="Close Portfolio (Esc)" aria-label="Close">✕</button>
         </div>
 
@@ -79,7 +78,16 @@ class ClearBook {
     this.memberPillName = document.getElementById('memberPillName');
     this.memberColorDot = document.getElementById('memberColorDot');
 
-    this.music = new ThemeSong(container.querySelector('.book-music-btn'), container.querySelector('.music-credit'), this.options.notebookTheme);
+    // ThemeSong keeps its existing audio and private control; the toolbar is the only DOM sound control.
+    this.music = new ThemeSong(document.createElement('button'), container.querySelector('.music-credit'), this.options.notebookTheme);
+    const music = this.music;
+    window.AudioMaster?.onChange(muted => {
+      music.muted = muted;
+      music.audio.muted = muted;
+      if (!music.active || music.disabled) return;
+      if (muted) music.audio.pause();
+      else music.audio.play().catch(() => {});
+    });
     this.closeBtn.addEventListener('click', () => this.close());
     this.prevBtn.addEventListener('click', () => this.prevPage());
     this.nextBtn.addEventListener('click', () => this.nextPage());
@@ -186,6 +194,7 @@ class ClearBook {
     this.dotsElements = pages.dotsElements;
     this.totalPages = pages.totalPages;
     this.overlayElement.classList.add('active');
+    document.getElementById('deskBackBtn')?.setAttribute('aria-hidden', 'true');
     this.updatePageStates();
   }
 
@@ -214,6 +223,7 @@ class ClearBook {
     this.deckElement.querySelector('.spiral-shadow')?.removeAttribute('style');
     this.music.stop();
     this.overlayElement.classList.remove('active');
+    document.getElementById('deskBackBtn')?.removeAttribute('aria-hidden');
     if (typeof this.options.onClose === 'function') {
       this.options.onClose();
     }

@@ -1141,3 +1141,5 @@
 .book-overlay .book-close-btn { background:var(--amber)!important; }
 
 .book-overlay .page-dot.active { background:var(--amber); }
+
+#deskBackBtn[aria-hidden="true"] { visibility: hidden; }
