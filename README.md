@@ -245,17 +245,55 @@ Use the same keys for all 4 members. Validate the file at jsonlint.com before ev
 
 ## 6. How to Run
 
-**Requirements:** Java 17 or newer, Maven (or the included `mvnw` wrapper), Git, and an IDE such as IntelliJ IDEA or VS Code.
+**Requirements:** Git and a Java 17 JDK (recommended for everyone). Check `git --version` and `java -version` in your terminal. The included Maven wrapper downloads Maven and dependencies on the first run, so an internet connection is needed. No Node.js installation or database is required.
 
-```bash
-git clone <your-repo-url>
-cd group-portfolio
-./mvnw spring-boot:run        # Windows: mvnw.cmd spring-boot:run
+### Teammates: clone and run
+
+The latest classroom work is on `feature/four-member-desk`. The maintainer must push this branch before teammates clone it. If the repository is private, the owner must first grant each teammate access on GitHub.
+
+Windows PowerShell:
+
+```powershell
+git clone --branch feature/four-member-desk https://github.com/riamjs/GroupPortfolio.git
+cd GroupPortfolio
+.\mvnw.cmd clean spring-boot:run
 ```
 
-Then open **http://localhost:8080**.
+macOS / Linux:
 
-If port 8080 is busy, add `server.port=8081` to `application.properties`.
+```bash
+git clone --branch feature/four-member-desk https://github.com/riamjs/GroupPortfolio.git
+cd GroupPortfolio
+chmod +x mvnw
+./mvnw clean spring-boot:run
+```
+
+Wait for Spring Boot to report that the application started, then open [http://localhost:8080](http://localhost:8080). Run from the project root containing `pom.xml`; the Spring Boot server supplies both the frontend and the API. Opening `index.html` directly or using VS Code Live Server does not run the backend.
+
+If port 8080 is already occupied, use a separate port without editing configuration:
+
+```powershell
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.arguments=--server.port=8082"
+```
+
+Then open [http://localhost:8082](http://localhost:8082). On macOS/Linux, replace `.\mvnw.cmd` with `./mvnw`. Stop the app with **Ctrl+C** in its terminal before restarting it.
+
+If the Maven wrapper cannot start Maven, install Maven 3.6.3 or newer, verify `mvn -version` uses Java 17, and run `mvn clean spring-boot:run` instead. Ensure the JDK is configured in `JAVA_HOME` if the launcher cannot find Java.
+
+### Tests and getting later updates
+
+Run `.\mvnw.cmd test` on Windows, or `./mvnw test` on macOS/Linux. With installed Maven, use `mvn test`.
+
+For a teammate's clean checkout, stop the server and update the shared branch:
+
+```bash
+git switch feature/four-member-desk
+git pull --ff-only origin feature/four-member-desk
+```
+
+Restart the app after pulling and hard-refresh the browser (**Ctrl+Shift+R**, or **Cmd+Shift+R** on macOS). Commit or stash local work before switching or pulling. Each laptop runs its own server and keeps its own visitor notes and counter; cloning does not synchronize runtime data. Optional MP3 files are not included in Git; see the Theme song section below.
+
+If the page looks outdated, check the terminal's project folder (`Get-Location` in PowerShell), branch (`git branch --show-current`), and startup port. Multiple project copies can serve different revisions on different ports.
 
 ---
 
@@ -314,6 +352,31 @@ Read these 7 points during your class presentation:
 ---
 
 ## 10. Git Workflow
+
+### Maintainer: commit and push these changes
+
+Open a terminal in the copy you edited:
+
+```powershell
+cd "C:\workspace\GroupPortfolio"
+git switch feature/four-member-desk
+git status --short
+git diff --stat
+git add src README.md
+git diff --cached --stat
+git commit -m "Update classroom experience and team setup instructions"
+git push -u origin feature/four-member-desk
+```
+
+The staging command includes all pending source changes and this README, including the earlier classroom updates. Review the staged changes before committing. To stage selected changes within an already modified file, use `git add -p` instead. Do not stage generated `target/` files, local verification output, or runtime notes/counters.
+
+`origin` should point to `https://github.com/riamjs/GroupPortfolio.git`; check it with `git remote -v`. Authenticate using your GitHub account when Git prompts. Pushing publishes the branch; it does not merge it into `main`. Open a pull request from `feature/four-member-desk` into `main` for team review when ready. This guide does not commit or push automatically.
+
+If Git rejects the push because the remote branch has newer commits, first commit your local work as above, then run `git pull --no-rebase origin feature/four-member-desk` to merge the shared updates. If Git reports conflicts, resolve the marked files, stage them, and finish the merge with `git commit` before pushing again. Do not force-push over teammates' work.
+
+### Teammates: contribute on a separate branch
+
+After cloning and updating the shared branch, create your own branch, for example `git switch -c feature/your-name-task`. Commit your changes, run the tests, push with `git push -u origin feature/your-name-task`, and open a pull request into the team's agreed integration branch (`feature/four-member-desk` while this work is in progress).
 
 - `main` holds only working code.
 - Each member works on their own branch, such as `feature/desk-scene` or `feature/book-engine`.

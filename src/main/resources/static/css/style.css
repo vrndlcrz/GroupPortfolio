@@ -1086,15 +1086,16 @@ html, body {
 .teacher-speech {
   position: fixed;
   z-index: 55;
-  max-width: min(240px, 75vw);
+  max-width: min(18em, calc(100vw - 16px));
+  overflow-wrap: anywhere;
   transform: translate(-50%, -100%);
-  padding: 9px 14px;
+  padding: 13px 20px;
   background: #fffbea;
   color: #26382f;
   border: 1px solid #aaac95;
   border-radius: 12px 12px 12px 3px;
   box-shadow: 0 3px 10px #0003;
-  font: 600 14px/1.4 'Plus Jakarta Sans', sans-serif;
+  font: 600 clamp(18px, 2vw, 28px)/1.35 'Plus Jakarta Sans', sans-serif;
   pointer-events: none;
   opacity: 0;
   transition: opacity .25s;

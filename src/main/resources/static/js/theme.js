@@ -5,7 +5,7 @@ window.Theme = (() => {
     'card-red':'#D8402F', teal:'#2E9C8F', leaf:'#3FBF6B',
     sun:'#F2B632', 'x-orange':'#D9622B' });
   const defaults = Object.freeze({ goldenIntensity:0.8, skyDrift:true });
-  let config = { ...defaults }, ramp, outlineMaterial, wood, cards, trail, windowLayers;
+  let config = { ...defaults }, ramp, outlineMaterial, wood, trail, windowLayers;
   const materials = new Map();
   function random(seed = 1741) { return () => { seed = (Math.imul(1664525, seed) + 1013904223) >>> 0; return seed / 4294967296; }; }
   function vivid(hex, amt = 0.15 * config.goldenIntensity) {
@@ -68,23 +68,6 @@ window.Theme = (() => {
     ctx.fillStyle = palette.gold; ctx.fillText(text,x,y,maxWidth);
   }
   function decorate(scene) {
-    const geo = new THREE.PlaneGeometry(0.42, 0.61);
-    cards ||= canvasTexture(128, 192, ctx => {
-      ctx.fillStyle = palette['card-red']; ctx.fillRect(0,0,128,192);
-      ctx.strokeStyle = palette.ink; ctx.lineWidth = 7; ctx.strokeRect(4,4,120,184);
-      ctx.beginPath();
-      for(let y=18;y<180;y+=16) { ctx.moveTo(14,y); ctx.lineTo(27,y+8); ctx.lineTo(14,y+16); ctx.moveTo(114,y); ctx.lineTo(101,y+8); ctx.lineTo(114,y+16); }
-      ctx.strokeStyle=palette.cream; ctx.lineWidth=4; ctx.stroke();
-      ctx.fillStyle=palette.sun; ctx.beginPath(); ctx.moveTo(64,42); ctx.lineTo(90,96); ctx.lineTo(64,150); ctx.lineTo(38,96); ctx.closePath(); ctx.fill(); ctx.strokeStyle=palette.ink; ctx.stroke();
-      ctx.fillStyle=palette.ink; ctx.fillRect(52,88,7,7); ctx.fillRect(70,88,7,7); ctx.fillRect(57,112,17,4);
-    });
-    const material = new THREE.MeshBasicMaterial({ map: cards, side: THREE.DoubleSide, toneMapped:false });
-    const rand = random(74);
-    for (let i=0;i<8;i++) {
-      const card = new THREE.Mesh(geo,material); card.rotation.set(-Math.PI/2,0,(rand()-.5)*.052);
-      card.position.set(-4.6+i*1.3, .204, 2.57+(i%2)*.12); card.scale.setScalar(.97+rand()*.06);
-      card.raycast=()=>{}; scene.add(card);
-    }
     trail ||= canvasTexture(1024, 640, ctx => {
       const point = (x,z) => [(x+5.25)/10.5*1024,(z+3.1)/6.2*640];
       ctx.strokeStyle=palette.ink; ctx.lineWidth=4; ctx.setLineDash([12,9]); ctx.lineCap='round';
@@ -96,15 +79,129 @@ window.Theme = (() => {
       const [x,y]=point(0,-.55); ctx.beginPath(); ctx.moveTo(x-16,y-16);ctx.lineTo(x+16,y+16);ctx.moveTo(x+16,y-16);ctx.lineTo(x-16,y+16);ctx.stroke();
     });
     const decal = new THREE.Mesh(new THREE.PlaneGeometry(10.5,6.2), new THREE.MeshBasicMaterial({ map:trail,toneMapped:false,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2 }));
-    decal.rotation.x=-Math.PI/2; decal.position.y=.203; decal.raycast=()=>{}; scene.add(decal);
+    decal.name='treasure-trail';decal.rotation.x=-Math.PI/2; decal.position.y=.203; decal.raycast=()=>{}; scene.add(decal);
+    const tagGeometry = new THREE.PlaneGeometry(0.42, 0.61);
     for (const folder of scene.userData.folders || []) {
       const tag = canvasTexture(512,128,ctx=>{
         ctx.fillStyle=palette.cream;ctx.fillRect(0,0,512,128);ctx.strokeStyle=palette.ink;ctx.lineWidth=12;ctx.strokeRect(6,6,500,116);
         ctx.fillStyle=palette.ink;ctx.font='38px "Patrick Hand", "Comic Sans MS", sans-serif';ctx.textAlign='center';ctx.fillText(folder.member.name,256,78,470);
       });
-      const label=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({map:tag}));label.scale.set(2.5,.5,1);
+      const label=new THREE.Mesh(tagGeometry,new THREE.MeshBasicMaterial({map:tag}));label.scale.set(2.5,.5,1);label.name='member-name-tag';
       label.rotation.x=-Math.PI/2;label.position.set(folder.mesh.position.x,.215,folder.mesh.position.z+1.12);label.raycast=()=>{};scene.add(label);
     }
+  }
+  function addVandalism(desk, seatSlot) {
+    if (desk.vandalismReady) return desk.vandalismReady;
+    // Capture Sean's resting footprint before his breathing/blink animation starts.
+    const teacherBounds=desk.teacher?new THREE.Box3().setFromObject(desk.teacher):null;
+    desk.vandalismReady=new Promise(resolve=>{
+      const create=()=>{
+        const rand=random(9147),pen='#2B4C9B',pencil='#6B6B6B';
+        const roots=new Set(),inverse=desk.deskGroup.matrixWorld.clone().invert();
+        for (const hit of desk.interactiveObjects) {
+          if (hit.userData.type==='front-desk' || !desk.tabletopObject(hit)) continue;
+          let root=hit;while(root.parent && root.parent!==desk.deskGroup) root=root.parent;roots.add(root);
+        }
+        for (const root of desk.deskGroup.children) if(root.name==='member-name-tag') roots.add(root);
+        const obstacles=[];
+        const boxes=[...roots].map(root=>{
+          if(root.userData.type==='sticky-note' && root.geometry) {
+            // Existing visitor notes have random tilts. Reserve their full rotation envelope
+            // without changing them, so the seeded doodles stay identical after a reload.
+            root.geometry.computeBoundingSphere();
+            const r=root.geometry.boundingSphere.radius*Math.max(Math.abs(root.scale.x),Math.abs(root.scale.y),Math.abs(root.scale.z))+.08;
+            return {local:true,bounds:new THREE.Box3(new THREE.Vector3(root.position.x-r,0,root.position.z-r),new THREE.Vector3(root.position.x+r,0,root.position.z+r))};
+          }
+          return {local:false,bounds:new THREE.Box3().setFromObject(root)};
+        });
+        if(teacherBounds)boxes.push({local:false,bounds:teacherBounds});
+        for (const {bounds,local} of boxes) {
+          const b=local?bounds:bounds.clone().applyMatrix4(inverse);
+          obstacles.push({x:(b.min.x+5.25)/10.5*1024-8,y:(b.min.z+3.1)/6.2*512-8,
+            w:(b.max.x-b.min.x)/10.5*1024+16,h:(b.max.z-b.min.z)/6.2*512+16});
+        }
+        desk.vandalismFootprints=obstacles;
+        const overlaps=(a,b)=>a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y;
+        const placed=[];
+        const locate=(w,h)=>{
+          const candidates=[];
+          for(let y=8;y+h<=504;y+=12) for(let x=8;x+w<=1016;x+=12) {
+            const rect={x,y,w,h};if(obstacles.some(b=>overlaps(rect,b)) || placed.some(b=>overlaps(rect,b))) continue;
+            candidates.push({...rect,score:Math.min(y,512-y-h)+rand()*10});
+          }
+          candidates.sort((a,b)=>a.score-b.score);const rect=candidates[0];if(rect) placed.push(rect);return rect;
+        };
+        const frontMap=canvasTexture(1024,512,ctx=>{
+          ctx.lineCap='round';ctx.lineJoin='round';
+          const shaky=(points,close=false)=>{
+            ctx.beginPath();points.forEach(([x,y],i)=>ctx[i?'lineTo':'moveTo'](x+(rand()-.5)*1.5,y+(rand()-.5)*1.5));if(close)ctx.closePath();ctx.stroke();
+          };
+          const blocks=[
+            [280,60,()=>{ctx.fillStyle=pencil;ctx.font='44px "Patrick Hand", cursive';ctx.fillText('09XX-XXX-XXXX',3,44,274);}],
+            [246,90,()=>{
+              ctx.strokeStyle=pen;ctx.fillStyle=pen;shaky([[4,8],[166,7],[168,77],[3,78]],true);
+              ctx.font='40px "Patrick Hand", cursive';ctx.fillText('BSIT 3-1',15,57,142);
+              ctx.beginPath();ctx.arc(210,43,27,0,Math.PI*2);ctx.stroke();ctx.fillRect(187,32,20,12);ctx.fillRect(212,32,20,12);
+              shaky([[207,36],[212,36]]);ctx.beginPath();ctx.arc(210,50,12,.15,Math.PI-.15);ctx.stroke();
+            }],
+            [105,100,()=>{
+              ctx.strokeStyle=pen;ctx.fillStyle=pen;ctx.beginPath();ctx.moveTo(52,89);ctx.bezierCurveTo(-17,49,1,-9,52,24);ctx.bezierCurveTo(102,-9,121,49,52,89);ctx.stroke();
+              ctx.font='30px "Patrick Hand", cursive';ctx.fillText('A + B',22,55,66);
+            }],
+            [76,84,()=>{
+              ctx.strokeStyle=pencil;const points=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?15:35;points.push([38+Math.cos(a)*r,42+Math.sin(a)*r]);}shaky(points,true);
+            }],
+            [65,96,()=>{
+              ctx.strokeStyle=pencil;ctx.beginPath();ctx.arc(32,16,11,0,Math.PI*2);ctx.stroke();shaky([[32,27],[32,62]]);shaky([[8,47],[32,35],[58,47]]);shaky([[12,91],[32,62],[52,91]]);
+            }],
+            [96,65,()=>{
+              ctx.strokeStyle=pencil;for(let x=13;x<=73;x+=20)shaky([[x,7],[x-2,56]]);shaky([[4,50],[85,15]]);
+            }]
+          ];
+          // Plan the whole set before painting so an early large doodle cannot crowd out a later one.
+          let plan=[];
+          for(const scale of [1,.85,.7,.55,.45]) {
+            placed.length=0;plan=[];
+            for(const [w,h,draw] of blocks) {
+              const pad=Math.ceil(Math.max(w,h)*scale*.075)+3,rect=locate(w*scale+pad*2,h*scale+pad*2);
+              if(!rect){plan=[];break;}plan.push({w,h,draw,rect,scale});
+            }
+            if(plan.length===blocks.length)break;
+          }
+          for(const {w,h,draw,rect,scale} of plan) {
+            const angle=(rand()-.5)*16*Math.PI/180;rect.angle=angle;rect.scale=scale;
+            ctx.save();ctx.translate(rect.x+rect.w/2,rect.y+rect.h/2);ctx.rotate(angle);ctx.scale(scale,scale);ctx.translate(-w/2,-h/2);ctx.lineWidth=2.6;draw();ctx.restore();
+          }
+          // Leave every prop/name-tag footprint and the existing treasure trail untouched.
+          ctx.globalCompositeOperation='destination-out';ctx.fillStyle='#000';
+          obstacles.forEach(r=>ctx.fillRect(r.x,r.y,r.w,r.h));ctx.drawImage(trail.image,0,0,1024,512);ctx.globalCompositeOperation='source-over';
+        });
+        frontMap.colorSpace=THREE.SRGBColorSpace;
+        const makePlane=(map,name)=>{
+          const material=new THREE.MeshBasicMaterial({map,transparent:true,opacity:.85,depthWrite:false,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+          const mesh=new THREE.Mesh(desk.deskGroup.getObjectByName('treasure-trail').geometry,material);mesh.name=name;mesh.rotation.x=-Math.PI/2;mesh.raycast=()=>{};return mesh;
+        };
+        const front=desk.tableVandalism=makePlane(frontMap,'front-table-vandalism');front.position.y=.207;desk.deskGroup.add(front);
+        desk.vandalismPlacements=placed;
+        if(seatSlot) {
+          const seatMap=canvasTexture(512,256,ctx=>{
+            // Keep the ink on the exposed outer strip, beyond the student's hands and head silhouette.
+            // Compensate for the narrow plane so the handwriting and heart retain their proportions.
+            ctx.scale(5.2,1);ctx.strokeStyle=pen;ctx.fillStyle=pen;ctx.lineWidth=1.5;ctx.lineCap='round';ctx.font='600 27px "Patrick Hand", cursive';ctx.fillText('Crush kita',5,62,88);
+            for(const y of [72,81]){ctx.beginPath();ctx.moveTo(5,y);ctx.quadraticCurveTo(48,y+2,93,y-1);ctx.stroke();}
+            ctx.beginPath();ctx.moveTo(49,168);ctx.bezierCurveTo(8,145,22,117,49,135);ctx.bezierCurveTo(76,117,91,145,49,168);ctx.stroke();
+            ctx.fillStyle=pencil;ctx.font='20px "Patrick Hand", cursive';ctx.fillText('secret',15,220,75);
+            for(const y of [207,217,228]){ctx.beginPath();ctx.moveTo(10,y);ctx.lineTo(91,y+4);ctx.stroke();}
+          });
+          seatMap.colorSpace=THREE.SRGBColorSpace;
+          const seat=desk.seatVandalism=makePlane(seatMap,'seat-tablet-vandalism');seat.scale.set(.4/10.5,1.04/6.2,1);
+          seat.position.set(seatSlot.x+.86,-2.84+2.768,seatSlot.z-.48);desk.roomGroup.add(seat);desk.seatDecalSlot=seatSlot;
+        }
+        resolve();
+      };
+      if(window.requestIdleCallback)window.requestIdleCallback(create,{timeout:800});else setTimeout(create,0);
+    });
+    return desk.vandalismReady;
   }
   function applyScene(desk) {
     const meshes=[]; desk.scene.traverse(obj=>{ if(obj.isMesh) meshes.push(obj); });
@@ -221,7 +318,7 @@ window.Theme = (() => {
     };
     return config;
   }
-  return { ...palette, palette, defaults, configure, vivid, toon, addOutline, woodTexture, drawTitle, applyScene,
+  return { ...palette, palette, defaults, configure, vivid, toon, addOutline, woodTexture, drawTitle, applyScene, addVandalism,
     windowTextures, HORIZON_Y, get config(){return {...config};} };
 })();
 window.addOutline = window.Theme.addOutline;

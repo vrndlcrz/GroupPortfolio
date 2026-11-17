@@ -1,4 +1,42 @@
 site:
+  students:
+    - id: s1
+      name: "Dinorobong Tubo"
+      line: ""
+      row: 1
+      col: 1
+      dance: true
+      look: {skin: "#C68A5E", hair-style: curly, hair-color: "#3B2A1E", outfit-color: "#D8402F", accessory: none}
+    - id: s2
+      name: "Diwata Pares"
+      line: "I love pares"
+      row: 1
+      col: 4
+      look: {skin: "#E0AC82", hair-style: bob, hair-color: "#1E1A18", outfit-color: "#2E9C8F", accessory: hairclip}
+    - id: s3
+      name: "Bea Borres"
+      line: "My baby daddy Meray, Hopea, I'm dinadaan-daanan lang"
+      row: 2
+      col: 2
+      look: {skin: "#F0C9A0", hair-style: twin buns, hair-color: "#4A2C2A", outfit-color: "#9A7BC8", accessory: none}
+    - id: s4
+      name: "Lans"
+      line: "THIS IS LANS!!!"
+      row: 2
+      col: 3
+      look: {skin: "#B97A52", hair-style: ponytail, hair-color: "#231815", outfit-color: "#F2B632", accessory: headband}
+    - id: s5
+      name: "Buseng"
+      line: "Sir, walang kanin, sir?"
+      row: 3
+      col: 1
+      look: {skin: "#D69A6B", hair-style: crew cut, hair-color: "#1B1B1B", outfit-color: "#E8892B", accessory: spoon}
+    - id: s6
+      name: "Mosh"
+      line: "Miss you mosh"
+      row: 3
+      col: 2
+      look: {skin: "#E6B88C", hair-style: side part, hair-color: "#3A2312", outfit-color: "#7A1F3A", accessory: none}
   intro:
     enabled: true
     title: "What if Sir Sean was a highschool teacher?"
@@ -10,6 +48,7 @@ site:
     golden-intensity: 0.8
     sky-drift: true
   classroom:
+    absent-name: "Mara Dimaculangan"
     board:
       title: "Sean Dyogi Truthers"
       subtitle: "Group 1"

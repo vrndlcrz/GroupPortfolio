@@ -5,6 +5,24 @@ const INVERT_Y = false;
 const MOUSE_YAW_RANGE = Math.PI * 1.15;
 const PITCH_RANGE = 1.5;
 const KEY_LOOK_VIEWPORTS_PER_SECOND = 0.5;
+// Sixteen seats in four even rows; keep the front row clear of the fixed table.
+const SEAT_SLOTS = Object.freeze([
+  [1,1,-8.2,-6.65],[1,2,-4.2,-6.65],[1,3,4.2,-6.65],[1,4,8.2,-6.65],
+  [2,1,-8.2,-3.2],[2,2,-4.2,-3.2],[2,3,4.2,-3.2],[2,4,8.2,-3.2],
+  [3,1,-8.2,.25],[3,2,-4.2,.25],[3,3,4.2,.25],[3,4,8.2,.25],
+  [4,1,-8.2,3.7],[4,2,-4.2,3.7],[4,3,4.2,3.7],[4,4,8.2,3.7]
+].map(([row,col,x,z]) => Object.freeze({row,col,x,z,yaw:0})));
+const VIEWER_SLOT = SEAT_SLOTS.find(slot => slot.row===4 && slot.col===2);
+const ABSENT_SLOT = SEAT_SLOTS.find(slot => slot.row===4 && slot.col===1);
+const studentDefaults = [
+  ['s1','Dinorobong Tubo','',1,1,true,'#C68A5E','curly','#3B2A1E','#D8402F','none'],
+  ['s2','Diwata Pares','I love pares',1,4,false,'#E0AC82','bob','#1E1A18','#2E9C8F','hairclip'],
+  ['s3','Bea Borres',"My baby daddy Meray, Hopea, I'm dinadaan-daanan lang",2,2,false,'#F0C9A0','twin buns','#4A2C2A','#9A7BC8','none'],
+  ['s4','Lans','THIS IS LANS!!!',2,3,false,'#B97A52','ponytail','#231815','#F2B632','headband'],
+  ['s5','Buseng','Sir, walang kanin, sir?',3,1,false,'#D69A6B','crew cut','#1B1B1B','#E8892B','spoon'],
+  ['s6','Mosh','Miss you mosh',3,2,false,'#E6B88C','side part','#3A2312','#7A1F3A','none']
+].map(([id,name,line,row,col,dance,skin,hairStyle,hairColor,outfitColor,accessory]) =>
+  ({id,name,line,row,col,dance,look:{skin,hairStyle,hairColor,outfitColor,accessory}}));
 const tabletopLayout = [
   { item: 'spiral-notebook', x: -4.4, z: -.04, yaw: 0.14 },
   { item: 'long-folder', x: -2.35, z: -.04, yaw: -0.11 },
@@ -14,7 +32,7 @@ const tabletopLayout = [
 ];
 
 class CameraRig {
-  static SEAT_POSE = Object.freeze({ x: -8.2, y: 4, z: 3.7, yaw: .493, pitch: -.10, fov: 50 });
+  static SEAT_POSE = Object.freeze({ x: VIEWER_SLOT.x, y: 4, z: VIEWER_SLOT.z, yaw: Math.atan2(-VIEWER_SLOT.x,VIEWER_SLOT.z+11.55), pitch: -.10, fov: 50 });
   static DESK_POSE = Object.freeze({ x: 0, y: 8, z: -11.55, yaw: Math.PI, pitch: -Math.PI * 85 / 180 });
 
   capturePose() {
@@ -191,8 +209,11 @@ class DeskScene {
     this.buildFolders();
     this.buildProps();
     this.buildStickyNotes();
+    this.buildExtras(this.roomGroup, -2.84);
     Theme.applyScene(this);
     this.moveTableContents(roomObjects);
+    const ahead=SEAT_SLOTS.filter(slot=>slot.col===VIEWER_SLOT.col && slot.row<VIEWER_SLOT.row).sort((a,b)=>b.row-a.row)[0];
+    Theme.addVandalism(this,ahead);
     this.installWindowShadowFade();
     this.renderer.shadowMap.needsUpdate = true;
 
@@ -243,6 +264,14 @@ class DeskScene {
     const floor = -2.84, ceiling = 10, front = -15, back = 9, side = 11;
     const unitBox = new THREE.BoxGeometry(1, 1, 1);
     const paint = color => new THREE.MeshStandardMaterial({ color, roughness: 0.88 });
+    const paints = new Map();
+    this.studentPaint = color => {
+      const key = new THREE.Color(color).getHex();
+      if (!paints.has(key)) paints.set(key, paint(color));
+      return paints.get(key);
+    };
+    this.studentGeometry = { box: unitBox, sphere: new THREE.SphereGeometry(1, 10, 8) };
+    this.studentHitMaterial = new THREE.MeshBasicMaterial({visible:false});
     const white = paint(Theme.cream), yellow = paint(Theme.sun), green = paint(0x69bd4c);
     const frame = paint(Theme.ink), silver = paint(Theme.teal);
     const box = (parent, mat, x, y, z, w, h, d) => {
@@ -259,6 +288,16 @@ class DeskScene {
       draw(canvas.getContext('2d'));
       return new THREE.CanvasTexture(canvas);
     };
+    // One subtle, shared grain map; chair color comes from the three cached toon materials.
+    const grain = texture(128,128,ctx => {
+      ctx.fillStyle='#ffffff';ctx.fillRect(0,0,128,128);ctx.strokeStyle='rgba(90,58,30,.12)';ctx.lineWidth=1;
+      for (let y=5;y<128;y+=11) {ctx.beginPath();ctx.moveTo(0,y);ctx.bezierCurveTo(38,y-3,82,y+3,128,y-1);ctx.stroke();}
+    });
+    grain.wrapS=grain.wrapT=THREE.RepeatWrapping;grain.repeat.set(2,2);
+    const wood = color => {const material=Theme.toon(color).clone();material.color.set(color);material.map=grain;return material;};
+    this.chairMaterials={plank:wood('#A8743F'),tablet:wood('#B98650'),legs:wood('#5A3A1E')};
+    this.chairGrain=grain;
+    this.roomTexture=texture;
     const panel = (map, w, h, x, y, z, yaw = 0) => {
       const face = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
         new THREE.MeshStandardMaterial({ map, roughness: 0.9 }));
@@ -362,7 +401,11 @@ class DeskScene {
     };
     writeBoard();
     Promise.all([document.fonts.load('76px "Gochi Hand"'), document.fonts.load('70px Caveat')]).then(writeBoard).catch(() => {});
-    panel(board, boardWidth - .36, boardHeight - .36, boardX, boardY, front + .29);
+    this.whiteboardFace=panel(board, boardWidth - .36, boardHeight - .36, boardX, boardY, front + .29);
+    this.whiteboardBaseCanvas=board.image;
+    const boardHit=this.whiteboardHitbox=new THREE.Mesh(unitBox,this.studentHitMaterial);
+    boardHit.position.set(boardX,boardY,front+.45);boardHit.scale.set(boardWidth*1.15,boardHeight*1.15,.18);boardHit.layers.set(1);
+    boardHit.userData.type='whiteboard';room.add(boardHit);this.interactiveObjects.push(boardHit);
     const trayY = boardY - boardHeight / 2;
     box(room, silver, boardX, trayY, front + .37, boardWidth, .12, .45);
     [0x205587,0xc14741,0x242628].forEach((color,i) => {
@@ -443,31 +486,26 @@ class DeskScene {
     fan(0,9.24,-9,false); fan(0,9.24,1,false); fan(-10.48,6.3,2,true);
 
     // Each tablet-arm chair uses the same local parts; one instanced draw per material.
-    const seats = [];
-    for (const z of [-12,-8.9,-5.8,0.1,3.7]) {
-      for (const x of [-8.2,-4.2,4.2,8.2]) {
-        if (z === -12 && (x > 0 || x === -4.2)) continue;
-        if (z >= 0 && Math.abs(x) < 6) continue;
-        if (x !== CameraRig.SEAT_POSE.x || z !== CameraRig.SEAT_POSE.z) seats.push([x,z]);
-      }
-    }
-    const chairBatch = (material, parts) => {
+    const seats = SEAT_SLOTS.filter(slot => slot !== VIEWER_SLOT);
+    const chairBatch = (material, parts, castShadow=true) => {
       const mesh = new THREE.InstancedMesh(unitBox, material, seats.length * parts.length);
       const pose = new THREE.Object3D(); let i = 0;
-      for (const [x,z] of seats) for (const [dx,dy,dz,w,h,d,tilt=0] of parts) {
+      for (const {x,z,yaw} of seats) for (const [dx,dy,dz,w,h,d,tilt=0] of parts) {
         pose.position.set(x+dx,floor+dy,z+dz); pose.scale.set(w,h,d);
-        pose.rotation.x = tilt; pose.updateMatrix(); mesh.setMatrixAt(i++,pose.matrix);
+        pose.rotation.set(tilt,yaw,0); pose.updateMatrix(); mesh.setMatrixAt(i++,pose.matrix);
       }
-      mesh.castShadow = mesh.receiveShadow = true; room.add(mesh);
+      mesh.castShadow = castShadow; mesh.receiveShadow = true; mesh.name='wooden-student-chairs';room.add(mesh);
     };
-    chairBatch(green, [[0,1.73,0,1.67,0.14,1.55],[0,2.56,0.68,1.62,1.24,0.13,0.1],[0.48,2.7,-0.48,1.22,0.12,1.28]]);
+    chairBatch(this.chairMaterials.plank, [[0,1.73,0,1.67,0.14,1.55],[0,2.56,0.68,1.62,1.24,0.13,0.1]]);
+    chairBatch(this.chairMaterials.tablet, [[0.48,2.7,-0.48,1.22,0.12,1.28]]);
     const supports = [[0.77,2.13,-0.36,0.1,1.04,0.1],[0,1.54,0,1.62,0.12,1.46]];
     for (const x of [-0.69,0.69]) for (const z of [-0.58,0.58]) supports.push([x,0.83,z,0.11,1.66,0.11]);
-    chairBatch(frame,supports);
-    // One plain monoblock for the viewer; all tablet-arm classroom chairs stay unchanged.
+    chairBatch(this.chairMaterials.legs,supports,false);
+    // One plain monoblock for the viewer, on the restored back-row slot.
     const viewerChair = this.viewerChair = new THREE.Group(); room.add(viewerChair);
     viewerChair.position.set(CameraRig.SEAT_POSE.x,0,CameraRig.SEAT_POSE.z);
-    const plastic = Theme.toon(0x8fb3c9);
+    viewerChair.rotation.y=VIEWER_SLOT.yaw;
+    const plastic = this.viewerPlasticMaterial=Theme.toon('#8FB3C9').clone();plastic.color.set('#8FB3C9');
     box(viewerChair,plastic,0,floor+1.73,0,1.67,.14,1.55);
     const backShape = new THREE.Shape();
     backShape.moveTo(-.82,-.65); backShape.lineTo(.82,-.65);
@@ -476,6 +514,9 @@ class DeskScene {
     const plasticBack = new THREE.Mesh(new THREE.ExtrudeGeometry(backShape,{depth:.09,bevelEnabled:false}),plastic);
     plasticBack.position.set(0,floor+2.42,.68); plasticBack.rotation.x=.12; viewerChair.add(plasticBack);
     for (const x of [-.69,.69]) for (const z of [-.58,.58]) box(viewerChair,plastic,x,floor+.83,z,.11,1.66,.11);
+
+    this.buildStudents(room, floor);
+    this.buildAbsentSeat(room, floor);
 
     const glow = texture(128,128,ctx => {
       const g = ctx.createRadialGradient(64,64,0,64,64,64);
@@ -584,6 +625,182 @@ class DeskScene {
     });
   }
 
+  buildStudent(look, bottoms='#35373D') {
+    const person = new THREE.Group(), torso = new THREE.Group(), head = new THREE.Group();
+    const paint = this.studentPaint, geometry = this.studentGeometry;
+    // Batch repeated primitives by color within each moving part. All six share geometry/materials.
+    const part = (parent, shape, color, poses) => {
+      const mesh = new THREE.InstancedMesh(geometry[shape], paint(color), poses.length);
+      const pose = new THREE.Object3D();
+      for (let i=0; i<poses.length; i++) {
+        const [x,y,z,w,h,d] = poses[i];
+        pose.position.set(x,y,z); pose.scale.set(w,h,d); pose.updateMatrix(); mesh.setMatrixAt(i,pose.matrix);
+      }
+      mesh.receiveShadow=true; mesh.castShadow=false; parent.add(mesh); return mesh;
+    };
+    part(person,'box',bottoms,[
+      [-.29,1.96,-.36,.38,.3,.92],[.29,1.96,-.36,.38,.3,.92],
+      [-.29,1.1,-.74,.34,1.42,.32],[.29,1.1,-.74,.34,1.42,.32],
+      [-.29,.34,-.9,.43,.28,.64],[.29,.34,-.9,.43,.28,.64]]);
+    torso.position.set(0,2.05,0); person.add(torso);
+    part(torso,'box',look.outfitColor,[[0,.43,.08,.93,.9,.56]]);
+    head.position.set(0,1.48,.03); torso.add(head);
+    part(head,'sphere',look.skin,[[0,0,0,.43,.53,.4]]);
+    // Generic dot eyes and a small mouth, one shared primitive and one ink material.
+    part(head,'sphere',Theme.ink,[[-.16,.06,-.38,.043,.046,.025],[.16,.06,-.38,.043,.046,.025],[0,-.19,-.379,.09,.025,.02]]);
+    const hair = [[0,.34,.06,.45,.23,.4]];
+    switch (look.hairStyle) {
+      case 'curly': hair.splice(0,1,[-.28,.34,0,.25,.26,.35],[.27,.36,0,.25,.26,.35],[0,.48,.06,.27,.25,.36]); break;
+      case 'bob': hair[0]=[0,.16,.17,.48,.48,.35]; break;
+      case 'twin buns': hair.push([-.4,.44,.1,.21,.21,.21],[.4,.44,.1,.21,.21,.21]); break;
+      case 'ponytail': hair.push([0,.18,.5,.18,.4,.22]); break;
+      case 'crew cut': hair[0]=[0,.43,.04,.43,.13,.37]; break;
+      case 'side part': hair.push([-.16,.44,-.13,.29,.12,.27]); break;
+    }
+    part(head,'sphere',look.hairColor,hair);
+    if (look.hairStyle==='curly') part(torso,'sphere',look.outfitColor,[[0,1.13,.28,.48,.38,.23]]);
+    if (look.hairStyle==='bob') part(torso,'box','#FFF3D6',[[0,.74,-.211,.32,.06,.025]]);
+    if (look.hairStyle==='twin buns') part(torso,'box','#FFF3D6',[[0,.43,-.211,.05,.86,.025]]);
+    if (look.hairStyle==='crew cut') part(torso,'box','#FFF3D6',[[-.14,.8,-.22,.18,.12,.03],[.14,.8,-.22,.18,.12,.03]]);
+    const arms=[];
+    for (const side of [-1,1]) {
+      const arm=new THREE.Group(); arm.position.set(side*.46,.72,-.02); torso.add(arm); arms.push(arm);
+      part(arm,'box',look.outfitColor,[[side<0 ? .22 : .04,.17,-.17,side<0 ? .58 : .24,.32,.55]]);
+      part(arm,'sphere',look.skin,[[side<0 ? .62 : .04,.12,-.66,.14,.1,.22]]);
+    }
+    if (look.accessory==='hairclip') part(head,'box','#F2B632',[[.35,.27,-.25,.16,.06,.06]]);
+    if (look.accessory==='headband') part(head,'box','#FFF3D6',[[0,.34,-.32,.79,.085,.055]]);
+    if (look.accessory==='spoon') {
+      part(arms[1],'box','#BEC9CF',[[.04,.08,-.91,.045,.045,.36]]);
+      part(arms[1],'sphere','#BEC9CF',[[.04,.08,-1.12,.1,.035,.14]]);
+    }
+    person.userData.parts={torso,head,arms};
+    return person;
+  }
+
+  buildStudents(room, floor) {
+    this.students=[];
+    this.studentMotionPreference=matchMedia('(prefers-reduced-motion: reduce)');
+    const data=Array.isArray(this.classroom.students) ? this.classroom.students : studentDefaults;
+    const occupied=this.occupiedStudentSeats=new Set([VIEWER_SLOT,ABSENT_SLOT].map(slot=>slot.row+':'+slot.col));
+    for (const student of data) {
+      const key=student.row+':'+student.col;
+      const slot=SEAT_SLOTS.find(seat => seat.row===student.row && seat.col===student.col);
+      if (!student.look || !slot || slot.row===4 || occupied.has(key)) continue;
+      occupied.add(key);
+      const person=this.buildStudent(student.look);
+      person.position.set(slot.x,floor,slot.z);person.rotation.y=slot.yaw;
+      person.name=student.id; room.add(person);
+      const parts=person.userData.parts;
+      // Stable id hash supplies a fixed +/-3 degree head tilt without per-frame randomness.
+      let seed=17; for (const char of student.id) seed=(seed*31+char.charCodeAt(0))>>>0;
+      parts.head.rotation.z=((seed%601)/600-.5)*Math.PI/30;
+      const anchor=new THREE.Object3D(); anchor.position.set(0,.8,0); parts.head.add(anchor);
+      const hitbox=new THREE.Mesh(this.studentGeometry.box,this.studentHitMaterial);
+      hitbox.position.set(0,2.5,0);hitbox.scale.set(1.6,3,1.5);hitbox.layers.set(1);
+      hitbox.userData={type:'student',student,anchor};person.add(hitbox);this.interactiveObjects.push(hitbox);
+      this.students.push({student,person,...parts,anchor,hitbox});
+    }
+  }
+
+  buildExtras(room, floor) {
+    this.extras=[];this.extraSightlineSkips=[];this.extraBatches=[];
+    const targets=[],point=new THREE.Vector3(),origin=new THREE.Vector3(CameraRig.SEAT_POSE.x,CameraRig.SEAT_POSE.y,CameraRig.SEAT_POSE.z);
+    const frontDesk=new THREE.Matrix4().makeRotationY(Math.PI);frontDesk.setPosition(0,0,-11.55);
+    const protectedTypes=new Set(['folder','laptop','coffee','dont-touch-note','sticky-note']);
+    this.scene.updateMatrixWorld(true);
+    for (const object of this.interactiveObjects) if (protectedTypes.has(object.userData.type)) {
+      object.getWorldPosition(point);targets.push(point.clone().applyMatrix4(frontDesk));
+    }
+    this.teacherHead.getWorldPosition(point);targets.push(point.clone());
+    const ray=new THREE.Ray(),bounds=new THREE.Box3(),intersection=new THREE.Vector3(),direction=new THREE.Vector3();
+    const skins=['#B97A52','#C68A5E','#D69A6B','#E0AC82','#E6B88C','#F0C9A0'];
+    const hairstyles=['crew cut','bob','side part','ponytail','curly','twin buns'];
+    const outfits=['#F7F1E4','#2E9C8F','#5383B5','#D8402F','#F2B632'];
+    let seed=73129,index=0;
+    const random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);
+    const batches=new Map(),instance=new THREE.Matrix4(),matrix=new THREE.Matrix4();
+    for (const slot of SEAT_SLOTS) {
+      if (this.occupiedStudentSeats.has(slot.row+':'+slot.col)) continue;
+      const look={skin:skins[Math.floor(random()*skins.length)],hairStyle:hairstyles[index%hairstyles.length],hairColor:'#231815',
+        outfitColor:outfits[index++%outfits.length],accessory:'none'};
+      bounds.min.set(slot.x-.68,floor+1.8,slot.z-.8);bounds.max.set(slot.x+.68,floor+4.2,slot.z+.8);
+      const blocks=targets.some(target=>{
+        direction.subVectors(target,origin);const distance=direction.lengthSq();ray.set(origin,direction.normalize());
+        return ray.intersectBox(bounds,intersection) && intersection.distanceToSquared(origin)<distance;
+      });
+      if (blocks) {this.extraSightlineSkips.push({row:slot.row,col:slot.col});continue;}
+      const person=this.buildStudent(look,'#22345D');person.position.set(slot.x,floor,slot.z);person.rotation.y=slot.yaw;
+      person.userData.parts.head.rotation.z=(random()-.5)*Math.PI/30;person.updateMatrixWorld(true);
+      // Extras stay still: combine all their primitive instances into shared color/geometry batches.
+      person.traverse(mesh=>{
+        if (!mesh.isInstancedMesh) return;
+        const key=mesh.geometry.uuid+':'+mesh.material.uuid;
+        if (!batches.has(key)) batches.set(key,{geometry:mesh.geometry,material:mesh.material,matrices:[]});
+        for (let i=0;i<mesh.count;i++) {
+          mesh.getMatrixAt(i,instance);matrix.multiplyMatrices(mesh.matrixWorld,instance);batches.get(key).matrices.push(matrix.clone());
+        }
+      });
+      const hitbox=new THREE.Mesh(this.studentGeometry.box,this.studentHitMaterial);
+      hitbox.position.set(slot.x,floor+2.5,slot.z);hitbox.scale.set(1.45,3.1,1.6);hitbox.layers.set(1);
+      hitbox.userData={type:'student-extra',slot};room.add(hitbox);this.interactiveObjects.push(hitbox);
+      this.extras.push({slot,look,hitbox});
+    }
+    for (const data of batches.values()) {
+      const mesh=new THREE.InstancedMesh(data.geometry,data.material,data.matrices.length);
+      data.matrices.forEach((matrix,i)=>mesh.setMatrixAt(i,matrix));mesh.receiveShadow=true;mesh.castShadow=false;
+      mesh.name='still-student-extras';room.add(mesh);this.extraBatches.push(mesh);
+    }
+  }
+
+  buildAbsentSeat(room, floor) {
+    this.absentName=this.classroom.classroom?.absentName || 'Mara Dimaculangan';
+    const map=this.roomTexture(512,256,ctx=>{
+      // textContent supplies both accessible canvas fallback text and the painted label; no HTML.
+      ctx.canvas.textContent=this.absentName+'\nAbsent';
+      const lines=ctx.canvas.textContent.split('\n');ctx.fillStyle='#FFF4DA';ctx.fillRect(0,0,512,256);
+      ctx.strokeStyle=Theme.ink;ctx.lineWidth=8;ctx.strokeRect(8,8,496,240);ctx.fillStyle=Theme.ink;ctx.textAlign='center';
+      ctx.font='600 42px "Patrick Hand", cursive';ctx.fillText(lines[0],256,102,472);
+      ctx.font='600 48px "Patrick Hand", cursive';ctx.fillText(lines[1],256,188,472);
+    });
+    const paper=new THREE.MeshBasicMaterial({map,toneMapped:false});
+    const geometry=new THREE.PlaneGeometry(1.2,.6),card=this.absentCard=new THREE.Group();
+    card.position.set(ABSENT_SLOT.x+.48,floor+3.05,ABSENT_SLOT.z-.48);card.rotation.y=-Math.PI/2;room.add(card);
+    for (const side of [-1,1]) {
+      const face=new THREE.Mesh(geometry,paper);face.position.z=side*.157;face.rotation.set(-side*.55,side>0?0:Math.PI,0);card.add(face);
+    }
+    const anchor=new THREE.Object3D();anchor.position.set(ABSENT_SLOT.x+.48,floor+3.65,ABSENT_SLOT.z-.48);room.add(anchor);
+    const hitbox=this.absentSeatHitbox=new THREE.Mesh(this.studentGeometry.box,this.studentHitMaterial);
+    hitbox.position.set(ABSENT_SLOT.x,floor+2.5,ABSENT_SLOT.z);hitbox.scale.set(1.6,3,1.5);hitbox.layers.set(1);
+    hitbox.userData={type:'absent-seat',student:{id:'absent',name:'Absent',line:''},anchor};room.add(hitbox);this.interactiveObjects.push(hitbox);
+  }
+
+  isSpeakingSeat(object) {
+    return object?.userData.type==='student' || object?.userData.type==='absent-seat';
+  }
+
+  studentInteractionBlocked() {
+    return this.view !== 'seat' || this.interactionBlocked();
+  }
+
+  showStudentBubble(obj, duration=600) {
+    if (this.studentInteractionBlocked()) return;
+    clearTimeout(this.seanHideTimer);
+    const {student,anchor}=obj.userData;
+    this.bubbleAnchor=anchor;
+    this.bubbleStudentId=student.id;
+    this.teacherBubble.textContent=student.name+(student.line ? '\n'+student.line : '');
+    this.teacherBubble.style.whiteSpace='pre-line';
+    this.teacherBubble.style.maxWidth='min(18em, calc(100vw - 16px))';
+    this.teacherBubble.style.overflowWrap='anywhere';
+    this.speechUntil=performance.now()+duration;
+    this.hideTooltip();
+  }
+
+  onStudentClick(id) {
+    // TODO: later feature
+  }
+
   buildWindowView(side,sill,lintel,start,end) {
     const width=(end-start)*1.2,height=(lintel-sill)*1.2;
     // Keep the narrow sea strip above the sill; put most overscan above the opening.
@@ -636,14 +853,14 @@ class DeskScene {
   }
 
   buildTeacher(room, floor, box, paint, texture) {
-    const desk = paint(Theme['wood-dark']), black = paint(Theme.ink), mint = paint(0x9bd36b);
+    const desk = paint(Theme['wood-dark']), black = paint(Theme.ink), mint = this.chairMaterials.plank;
     const teacherChair = this.teacherChair = new THREE.Group(); room.add(teacherChair);
     teacherChair.position.set(0,0,-.68);
     box(teacherChair,mint,0,floor+1.74,-13.44,1.82,.18,1.4);
     box(teacherChair,mint,0,floor+3.05,-14.02,1.82,2.4,.16);
-    const chairStripe = paint(0xfffdf6);
+    const chairStripe = this.chairMaterials.legs;
     for (const x of [-.48,-.24,0,.24,.48]) box(teacherChair,chairStripe,x,floor+3.35,-13.92,.09,1.28,.02);
-    for (const x of [-.7,.7]) for (const z of [-14,-12.9]) box(teacherChair,mint,x,floor+.86,z,.15,1.72,.15);
+    for (const x of [-.7,.7]) for (const z of [-14,-12.9]) box(teacherChair,this.chairMaterials.legs,x,floor+.86,z,.15,1.72,.15).castShadow=false;
 
     const person = new THREE.Group();
     person.position.set(0,floor - 1.5,-14.22); person.rotation.y = 0;
@@ -729,12 +946,22 @@ class DeskScene {
       this.teacherBubble.classList.remove('visible'); this.speechUntil=0; return;
     }
     this.camera.updateMatrixWorld();
-    this.speechAnchor.getWorldPosition(this.speechPoint).project(this.camera);
+    (this.bubbleAnchor || this.speechAnchor).getWorldPosition(this.speechPoint).project(this.camera);
     const p=this.speechPoint, rect=this.renderer.domElement.getBoundingClientRect();
     const half = this.teacherBubble.offsetWidth / 2 + 8;
     this.teacherBubble.style.left = THREE.MathUtils.clamp(rect.left + (p.x + 1) * rect.width / 2, half, window.innerWidth - half) + 'px';
     this.teacherBubble.style.top = THREE.MathUtils.clamp(rect.top + (1 - p.y) * rect.height / 2, this.teacherBubble.offsetHeight + 8, window.innerHeight - 8) + 'px';
     this.teacherBubble.classList.toggle('visible', Math.abs(p.z)<1 && !this.isCameraZoomed);
+  }
+
+  attachWhiteboardDrawing(canvas) {
+    if(this.whiteboardDrawingLayer)return this.whiteboardDrawingTexture;
+    const map=this.whiteboardDrawingTexture=new THREE.CanvasTexture(canvas);
+    map.colorSpace=THREE.SRGBColorSpace;
+    const material=new THREE.MeshBasicMaterial({map,transparent:true,depthWrite:false,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-1});
+    const layer=this.whiteboardDrawingLayer=new THREE.Mesh(this.whiteboardFace.geometry,material);
+    layer.name='whiteboard-drawing-layer';layer.position.copy(this.whiteboardFace.position);layer.position.z+=.014;layer.raycast=()=>{};
+    this.roomGroup.add(layer);return map;
   }
 
   moveTableContents(roomObjects) {
@@ -764,6 +991,7 @@ class DeskScene {
     if (!first) return null;
     if (this.view === 'seat') {
       // A visible item occludes the desk below it, but cannot open from the seat.
+      if (this.isSpeakingSeat(first.object) || first.object.userData.type==='student-extra') return first;
       const sean = intersects.find(hit => hit.object.userData.type === 'teacher');
       if (sean) return sean;
       if (this.tabletopObject(first.object)) return { object: this.deskHit };
@@ -1591,6 +1819,14 @@ class DeskScene {
 
     // Click handler for 3D props & folders
     dom.addEventListener('click', (e) => this.onClick(e));
+    dom.addEventListener('pointerup', e => {
+      if (e.pointerType !== 'touch' || this.studentInteractionBlocked() || this.hasDraggedMeaningfully) return;
+      this.updateHover(e);
+      if (this.isSpeakingSeat(this.hoveredObject)) {
+        this.showStudentBubble(this.hoveredObject,3000);
+        this.resetHoverState();
+      }
+    });
   }
 
   adjustCameraForScreen() {
@@ -1668,6 +1904,7 @@ class DeskScene {
   }
 
   onMouseMove(e) {
+    if (e.sourceCapabilities?.firesTouchEvents) return;
     if (!this.inputEnabled) return;
     if (this.isCameraZoomed) {
       this.hideTooltip();
@@ -1725,13 +1962,15 @@ class DeskScene {
       while (hitObject.parent && hitObject.parent !== this.scene && !hitObject.userData.type) {
         hitObject = hitObject.parent;
       }
+      if (hitObject.userData.type==='student-extra') {this.resetHoverState();return;}
 
       if (this.hoveredObject !== hitObject) {
         this.resetHoverState();
         this.hoveredObject = hitObject;
         this.applyHoverState(hitObject, e);
       } else if (this.hoveredObject) {
-        this.positionTooltip(e);
+        if (this.isSpeakingSeat(hitObject)) this.showStudentBubble(hitObject);
+        else this.positionTooltip(e);
       }
     } else {
       this.resetHoverState();
@@ -1741,7 +1980,11 @@ class DeskScene {
   applyHoverState(obj, e) {
     document.body.style.cursor = 'pointer';
 
-    if (obj.userData.type === 'placard') {
+    if (this.isSpeakingSeat(obj)) {
+      this.showStudentBubble(obj);
+    } else if (obj.userData.type === 'whiteboard') {
+      this.showTooltip('Click to draw on the whiteboard',e);
+    } else if (obj.userData.type === 'placard') {
       obj.material.color.set(Theme['sun-glow']);
       this.showTooltip('Click to read placard', e);
     } else if (obj.userData.type === 'teacher') {
@@ -1874,7 +2117,7 @@ class DeskScene {
 
   interactionBlocked() {
     return !this.inputEnabled || this.view === 'gliding' || this.isCameraZoomed || !!document.querySelector(
-      '#bookOverlay.active, .error-modal-overlay.active, .guestbook-modal-overlay.active, .note-view-modal-overlay.active, #termsModal.active');
+      '#bookOverlay.active, #whiteboard-overlay.active, .error-modal-overlay.active, .guestbook-modal-overlay.active, .note-view-modal-overlay.active, #termsModal.active');
   }
 
   hideSean() {
@@ -1886,6 +2129,8 @@ class DeskScene {
   showSean(duration = Infinity) {
     if (this.view !== 'seat' || this.interactionBlocked()) return;
     clearTimeout(this.seanHideTimer);
+    this.bubbleAnchor=null; this.bubbleStudentId=null;
+    this.teacherBubble.style.maxWidth=''; this.teacherBubble.style.overflowWrap='';
     const lines = Array.isArray(this.classroom.teacherLines) && this.classroom.teacherLines.length
       ? this.classroom.teacherLines : classroomDefaults.teacherLines;
     this.teacherBubble.textContent = lines[this.speechIndex % lines.length];
@@ -1902,11 +2147,16 @@ class DeskScene {
   handleObjectClick(obj) {
     if (this.interactionBlocked()) return;
     const type = obj.userData.type;
+    if (type==='student-extra' || type==='absent-seat') return;
     const tabletop = this.tabletopObject(obj);
     if (this.view === 'seat' && tabletop && type !== 'front-desk') return;
     if (this.view === 'desk' && !tabletop) return;
 
-    if (type === 'front-desk') {
+    if (type === 'whiteboard') {
+      if(this.view==='seat')this.whiteboardController?.open();
+    } else if (type === 'student') {
+      if (!this.studentInteractionBlocked()) this.onStudentClick(obj.userData.student.id);
+    } else if (type === 'front-desk') {
       this.enterDeskView();
     } else if (type === 'placard') {
       this.openPlacard(obj);
@@ -2349,6 +2599,19 @@ class DeskScene {
       this.pendingHover = null;
     }
     const seconds = performance.now() * 0.001;
+    if (this.bubbleStudentId && this.studentInteractionBlocked()) {
+      this.teacherBubble.classList.remove('visible'); this.speechUntil=0;
+    } else if (this.isSpeakingSeat(this.hoveredObject) && !this.isDraggingView) {
+      this.speechUntil=Math.max(this.speechUntil,seconds*1000+600);
+    }
+    for (const dancer of this.students) {
+      if (!dancer.student.dance || this.view !== 'seat' || this.isCameraZoomed || !this.inputEnabled || this.studentMotionPreference.matches) continue;
+      dancer.torso.rotation.z=.14*Math.sin(seconds*3.6);
+      dancer.arms[0].rotation.x=.28*(1+Math.sin(seconds*3.6));
+      dancer.arms[1].rotation.x=.28*(1-Math.sin(seconds*3.6));
+      dancer.head.position.y=1.48+.045*Math.sin(seconds*7.2);
+    }
+
     this.classroomRotors.forEach((rotor, i) => { rotor.rotation.y = seconds * (i === 2 ? 1.3 : 0.78) + i; });
     this.classroomShafts.forEach((beam, i) => { beam.position.y = 2.42 + 0.055 * Math.sin(seconds * 0.24 + i); });
     this.classroomDust.position.set(0.13 * Math.sin(seconds * 0.31), 0.12 * Math.sin(seconds * 0.21), 0.11 * Math.cos(seconds * 0.25));

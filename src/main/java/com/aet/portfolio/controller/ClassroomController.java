@@ -22,7 +22,8 @@ public class ClassroomController {
     public ClassroomResponse classroom() {
         var data = classroom.classroom();
         return new ClassroomResponse(data.whiteboardLines(), data.tvSlides(), data.teacherLines(),
-            data.board(), data.mission(), data.vision(), classroom.theme(), classroom.audio(), classroom.intro());
+            data.board(), data.mission(), data.vision(), classroom.theme(), classroom.audio(), classroom.intro(), classroom.students(),
+            java.util.Map.of("absentName", data.absentName()));
     }
 
     // Missing optional artwork is a successful empty response, avoiding browser 404 noise.
@@ -36,5 +37,6 @@ public class ClassroomController {
 
     public record ClassroomResponse(java.util.List<String> whiteboardLines, java.util.List<String> tvSlides,
         java.util.List<String> teacherLines, SiteProperties.Board board, SiteProperties.Placard mission,
-        SiteProperties.Placard vision, SiteProperties.Theme theme, SiteProperties.Audio audio, SiteProperties.Intro intro) {}
+        SiteProperties.Placard vision, SiteProperties.Theme theme, SiteProperties.Audio audio, SiteProperties.Intro intro,
+        java.util.List<SiteProperties.Student> students, java.util.Map<String, String> classroom) {}
 }
