@@ -1143,3 +1143,25 @@
 .book-overlay .page-dot.active { background:var(--amber); }
 
 #deskBackBtn[aria-hidden="true"] { visibility: hidden; }
+
+/* John only: collage cover and the first open profile spread. */
+@font-face { font-family:'Jolly Lodger'; src:url('../fonts/JollyLodger-Regular.ttf') format('truetype'); font-display:swap; }
+.theme-long-folder .john-collage-cover { background:#1F3FBF; padding:0; }
+.john-collage-cover canvas { display:block; width:100%; height:100%; object-fit:fill; }
+.theme-long-folder .book-container.john-first-spread { width:min(1040px,92vw); max-width:92vw; }
+.john-profile-spread { display:grid; grid-template-columns:1fr 1fr; height:100%; background:#fffefa; color:#3A2312; }
+.john-blank-page { background:#fffefa; border-right:2px solid #d9d0bc; }
+.john-profile-page { position:relative; display:grid; grid-template-columns:36% 1fr; grid-template-rows:30% 1fr; align-content:start; gap:4% 5%; padding:8% 6% 6%; min-width:0; background:#fffefa; }
+.john-pushpin { position:absolute; top:3%; left:3%; width:13px; height:13px; background:#9B27AF; border:2px solid #4B1FA8; border-radius:50%; box-shadow:2px 2px 0 #3A2312; }
+.john-photo { margin:0; position:relative; border:1px solid #3A2312; background:#f0ece2; overflow:hidden; display:flex; justify-content:center; align-items:end; }
+.john-photo figcaption { z-index:1; width:100%; margin:0; text-align:center; padding:4px; background:#fffefa; font-size:clamp(10px,1.1vw,16px); }
+.john-silhouette { position:absolute; width:52%; height:49%; bottom:12%; background:#b7b5b0; border-radius:50% 50% 0 0; }
+.john-silhouette::before { content:''; position:absolute; width:55%; aspect-ratio:1; border-radius:50%; background:#b7b5b0; top:-64%; left:22%; }
+.john-angular-title { grid-column:2; grid-row:1; z-index:1; align-self:start; margin:0; min-width:0; }
+.john-angular-title canvas { width:100%; height:auto; display:block; }
+.john-profile-details { grid-column:2; grid-row:1 / 3; padding-top:47%; font-size:clamp(10px,1.2vw,18px); overflow-wrap:anywhere; }
+.john-profile-details p { margin:0 0 1.1em; line-height:1.45; }
+.john-profile-details strong { font-weight:800; }
+@media(max-width:600px) { .theme-long-folder .book-container.john-first-spread { height:min(68vh,400px); } .john-profile-page { padding:10% 5% 5%; } .john-profile-details { font-size:10px; } }
+
+.john-first-spread .book-page.flipped:not(.turning) { visibility:hidden; }

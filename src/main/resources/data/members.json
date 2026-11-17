@@ -68,6 +68,9 @@
   {
     "id": 2,
     "name": "John Vernie Dela Cruz",
+    "titleText": "John Vernie",
+    "ageLine": "TODO years of existence",
+    "objective": "TODO",
     "section": "BSIT 3-1",
     "subject": "Advanced Emerging Technologies",
     "tagline": "Powered by coffee, panic, and StackOverflow",

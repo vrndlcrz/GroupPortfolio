@@ -2,7 +2,10 @@ package com.aet.portfolio.config;
 
 import java.util.List;
 import jakarta.validation.Valid;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.core.io.ClassPathResource;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.AssertTrue;
@@ -16,7 +19,30 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties("site")
 public record SiteProperties(@Valid Classroom classroom, @Valid @DefaultValue Theme theme,
                              @Valid @DefaultValue Audio audio, @Valid @DefaultValue Intro intro,
-                             List<@Valid Student> students) {
+                             List<@Valid Student> students, @Valid @DefaultValue Phone phone) {
+    @Validated
+    public record Phone(List<@Valid Playlist> playlists, List<@Valid PhoneVideo> videos) {
+        public Phone {
+            playlists = playlists == null ? List.of(
+                new Playlist("Riam Jaye Santiago", ""), new Playlist("John Vernie Dela Cruz", ""),
+                new Playlist("Charella Magalpoc", ""), new Playlist("Nicole De Guzman", "")) : List.copyOf(playlists);
+            videos = videos == null ? List.of() : List.copyOf(videos);
+        }
+    }
+    public record Playlist(@NotBlank String memberName,
+        @Pattern(regexp="^\\s*$|^https://open\\.spotify\\.com/(playlist|album)/[A-Za-z0-9]+.*$") String spotifyUrl) {}
+    public record PhoneVideo(@NotBlank String id, @NotBlank String title, @NotBlank String member,
+        @NotBlank @Pattern(regexp="^/assets/videos/(?!.*\\.\\.)[^?#\\\\]+$") String src,
+        @Pattern(regexp="^/assets/videos/(?!.*\\.\\.)[^?#\\\\]+$") String poster) {
+        // Avoid requesting absent files: browsers log a network error before media.onerror.
+        @JsonProperty("available") public boolean available() {
+            return src != null && new ClassPathResource("static" + src).exists();
+        }
+        @JsonProperty("posterAvailable") public boolean posterAvailable() {
+            return poster != null && new ClassPathResource("static" + poster).exists();
+        }
+    }
+
     public record Look(String skin, String hairStyle, String hairColor, String outfitColor, String accessory) {}
     public record Student(@NotBlank String id, @NotBlank String name, String line,
                           @Min(1) @Max(4) int row, @Min(1) @Max(4) int col,

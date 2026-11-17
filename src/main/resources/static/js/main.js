@@ -128,7 +128,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     onFolderSelect: member => clearBook.open(member)
   });
 
-  if(deskScene.whiteboardFace)new WhiteboardDrawing(deskScene);
+  const whiteboard=deskScene.whiteboardFace?new WhiteboardDrawing(deskScene):null;
+  const phone=new PortfolioPhone({
+    button:document.getElementById('phoneToggleBtn'),members,config:classroom.phone||{},
+    canOpen:()=>!intro?.active && ['seat','desk'].includes(deskScene.view),
+    stopNotebook:()=>clearBook.music.stop(true)
+  });
+  const openBook=clearBook.open.bind(clearBook);
+  clearBook.open=(...args)=>{phone.close(true);return openBook(...args)};
+  if(whiteboard){const openBoard=whiteboard.open.bind(whiteboard);whiteboard.open=(...args)=>{phone.close(true);return openBoard(...args)}}
   intro?.attach(deskScene);
 
   // 4. Connect Easy Easter Eggs (Keys 'E', 'G', 'F' or Konami) to Desk Anti-Gravity

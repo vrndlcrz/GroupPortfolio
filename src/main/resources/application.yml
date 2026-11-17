@@ -1,4 +1,11 @@
 site:
+  phone:
+    playlists:
+      - {member-name: "Riam Jaye Santiago", spotify-url: ""}
+      - {member-name: "John Vernie Dela Cruz", spotify-url: ""}
+      - {member-name: "Charella Magalpoc", spotify-url: ""}
+      - {member-name: "Nicole De Guzman", spotify-url: ""}
+    videos: []
   students:
     - id: s1
       name: "Dinorobong Tubo"

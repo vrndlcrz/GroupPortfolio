@@ -238,6 +238,37 @@ class ClearBook {
     return entry.pages;
   }
 
+  johnProfile(member) {
+    const spread=document.createElement('div');spread.className='john-profile-spread';
+    const blank=document.createElement('div');blank.className='john-blank-page';blank.setAttribute('aria-label','Blank left page');
+    const page=document.createElement('section');page.className='john-profile-page';
+    const pin=document.createElement('i');pin.className='john-pushpin';pin.setAttribute('aria-hidden','true');
+    const photo=document.createElement('figure');photo.className='john-photo';photo.setAttribute('aria-label','Photo placeholder');
+    const silhouette=document.createElement('span');silhouette.className='john-silhouette';silhouette.setAttribute('aria-hidden','true');
+    const label=document.createElement('figcaption');label.textContent='Photo';photo.append(silhouette,label);
+    const heading=document.createElement('h2');heading.className='john-angular-title';heading.textContent=member.titleText||'John Vernie';
+    const titleCanvas=document.createElement('canvas');titleCanvas.width=600;titleCanvas.height=240;titleCanvas.textContent=heading.textContent;
+    const ctx=titleCanvas.getContext('2d');
+    document.fonts.load('130px "Jolly Lodger"').catch(()=>{}).then(()=>{
+      const draw=()=>{ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='miter';ctx.miterLimit=2;
+        if(!document.fonts.check('130px "Jolly Lodger"')) {
+          const glyphs={J:[[4,0,4,5,3,6,1,6,0,5]],O:[[1,0,3,0,4,1,4,5,3,6,1,6,0,5,0,1,1,0]],H:[[0,0,0,6],[4,0,4,6],[0,3,4,3]],N:[[0,6,0,0,4,6,4,0]],V:[[0,0,2,6,4,0]],E:[[4,0,0,0,0,6,4,6],[0,3,3,3]],R:[[0,6,0,0,3,0,4,1,4,2,3,3,0,3],[2,3,4,6]],I:[[0,0,4,0],[2,0,2,6],[0,6,4,6]]};
+          ctx.beginPath();const text=titleCanvas.textContent.toUpperCase(),step=Math.min(48,540/text.length),start=(600-step*text.length)/2;
+          for(let i=0;i<text.length;i++)for(const path of glyphs[text[i]]||[]){ctx.moveTo(start+i*step+path[0]*step/5,65+path[1]*17);for(let n=2;n<path.length;n+=2)ctx.lineTo(start+i*step+path[n]*step/5,65+path[n+1]*17)}
+          ctx.strokeStyle='#4B1FA8';ctx.lineWidth=20;ctx.stroke();ctx.strokeStyle='#E4D2FF';ctx.lineWidth=13;ctx.stroke();ctx.strokeStyle='#9B6BEA';ctx.lineWidth=9;ctx.stroke();return;
+        }
+        ctx.font='130px "Jolly Lodger", monospace';ctx.strokeStyle='#4B1FA8';ctx.lineWidth=14;ctx.strokeText(titleCanvas.textContent,300,120,560);
+        ctx.strokeStyle='#E4D2FF';ctx.lineWidth=5;ctx.strokeText(titleCanvas.textContent,300,120,560);ctx.fillStyle='#9B6BEA';ctx.fillText(titleCanvas.textContent,300,120,560)};
+      if(window.requestIdleCallback)requestIdleCallback(draw,{timeout:500});else setTimeout(draw,0);
+    });
+    heading.replaceChildren(titleCanvas);heading.setAttribute('aria-label',titleCanvas.textContent);
+    const details=document.createElement('div');details.className='john-profile-details';
+    const name=document.createElement('p'),prefix=document.createElement('span'),strong=document.createElement('strong');prefix.textContent='Name: ';strong.textContent=member.name||'John Vernie Dela Cruz';name.append(prefix,strong);
+    const age=document.createElement('p');age.textContent='Age: '+(member.ageLine||'TODO years of existence');
+    const objective=document.createElement('p');objective.textContent='Objective: '+(member.objective||'TODO');
+    details.append(name,age,objective);page.append(pin,photo,heading,details);spread.append(blank,page);return spread;
+  }
+
   renderPages(member, theme) {
     const isSpiral = theme === 'spiral' || theme === 'spiral-notebook';
     const deckElement = document.createElement('div');
@@ -247,10 +278,11 @@ class ClearBook {
 
     const pageConfigs = [];
     const folderSheets = (theme === 'folder' || theme === 'long-folder');
+    const isJohn=member.id===2 && folderSheets;
     const looseSheets = folderSheets || (theme === 'pad' || theme === 'intermediate-pad');
 
     // Page 0: Cover
-    if (!looseSheets) pageConfigs.push({
+    if (!looseSheets || isJohn) pageConfigs.push({
       type: 'cover',
       title: 'Cover'
     });
@@ -272,7 +304,8 @@ class ClearBook {
         border: 'wavy-pink.svg'
       };
       pageConfigs.push({
-        type: 'inside',
+        type: isJohn && i===0 ? 'john-profile' : 'inside',
+        title: isJohn && i===0 ? 'Profile' : undefined,
         index: i + 1,
         pageData: pageData,
         skills: (i === 2) ? member.skills : null
@@ -308,7 +341,9 @@ class ClearBook {
         </div>
       `;
 
-      if (cfg.type === 'cover') {
+      if (isJohn && (cfg.type==='cover' || cfg.type==='john-profile')) {
+        frontHTML='';
+      } else if (cfg.type === 'cover') {
         frontHTML = `
           <div class="book-cover" style="background: linear-gradient(145deg, ${coverColor} 0%, ${this.adjustColorBrightness(coverColor, -35)} 100%);">
             <div class="cover-header">
@@ -524,6 +559,13 @@ class ClearBook {
         <div class="page-bend-shadow"></div>
       `;
 
+      if(isJohn && cfg.type==='cover') {
+        const front=pageEl.querySelector('.page-front');front.classList.add('john-collage-cover');
+        front.replaceChildren(JohnFolderArt.get(member).canvas);
+      } else if(cfg.type==='john-profile') {
+        pageEl.querySelector('.page-front').replaceChildren(this.johnProfile(member));
+      }
+
       pageEl.addEventListener('click', (e) => {
         if (this.isFlipping) return;
         if (e.target.closest('button') || e.target.closest('input') || e.target.closest('a') || e.target.closest('.cover-photo-wrap')) return;
@@ -542,7 +584,7 @@ class ClearBook {
 
       const dot = document.createElement('div');
       dot.className = 'page-dot';
-      dot.title = isSpiral ? (cfg.title || cfg.pageData.title) : looseSheets ? cfg.pageData.title : (idx === 0) ? 'Cover' : (idx === totalPages - 1) ? 'Back Cover' : `Page ${idx}`;
+      dot.title = isSpiral ? (cfg.title || cfg.pageData.title) : isJohn ? (cfg.title || cfg.pageData?.title || 'Profile') : looseSheets ? cfg.pageData.title : (idx === 0) ? 'Cover' : (idx === totalPages - 1) ? 'Back Cover' : `Page ${idx}`;
       dot.addEventListener('click', () => {
         if (!this.isFlipping) this.goToPage(idx);
       });
@@ -553,6 +595,7 @@ class ClearBook {
   }
 
   updatePageStates() {
+    this.bookContainer.classList.toggle('john-first-spread',this.currentMember?.id===2 && this.currentPageIndex===1 && this.overlayElement.classList.contains('theme-folder'));
     this.bookContainer.classList.toggle('is-cover', this.isSpiral && this.currentPageIndex === 0);
     this.bookContainer.classList.toggle('is-back', this.isSpiral && this.currentPageIndex === this.totalPages - 1);
     this.pagesElements.forEach((pageEl, idx) => {

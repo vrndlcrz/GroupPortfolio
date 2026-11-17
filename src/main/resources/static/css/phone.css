@@ -1,0 +1,34 @@
+/* Flat cartoon phone; no backdrop or camera lock. */
+.portfolio-phone { position:fixed; right:16px; bottom:16px; z-index:2147483001; width:min(300px,92vw); height:min(600px,80vh); box-sizing:border-box; display:flex; flex-direction:column; padding:9px; border:3px solid var(--ink,#3A2312); border-radius:30px; background:#E9B54D; color:var(--ink,#3A2312); box-shadow:8px 8px 0 var(--ink,#3A2312); font-family:'Lilita One','Trebuchet MS',sans-serif; }
+.portfolio-phone[hidden],.portfolio-phone [hidden] { display:none!important; }
+.portfolio-phone * { box-sizing:border-box; }
+.portfolio-phone button { color:inherit; font:inherit; border:3px solid var(--ink,#3A2312); background:#FFE6A1; cursor:pointer; }
+.portfolio-phone button:focus-visible,.portfolio-phone video:focus-visible,.phone-video-feed:focus-visible { outline:3px solid #2B6C85; outline-offset:2px; }
+.phone-status { display:flex; height:25px; flex:none; align-items:center; justify-content:space-between; padding:0 10px 5px; }
+.phone-notch { height:12px; width:70px; background:var(--ink,#3A2312); border-radius:0 0 12px 12px; align-self:start; }
+.phone-signal { display:flex; align-items:end; gap:2px; height:14px; }
+.phone-signal i { width:4px; height:6px; background:var(--ink,#3A2312); }.phone-signal i:nth-child(2) { height:10px; }.phone-signal i:nth-child(3) { height:14px; }
+.phone-battery { position:relative; width:21px; height:11px; border:2px solid var(--ink,#3A2312); border-radius:2px; background:#8BB66D; }.phone-battery::after { content:''; position:absolute; right:-5px; top:2px; width:3px; height:4px; background:var(--ink,#3A2312); }
+.phone-header { flex:none; display:flex; align-items:center; gap:8px; min-height:39px; padding:0 3px 7px; }
+.phone-header h2 { flex:1; margin:0; font:inherit; font-size:22px; line-height:1.1; }
+.phone-header button { width:29px; height:29px; flex:none; padding:0; border-radius:8px; font-size:25px; line-height:1; box-shadow:2px 2px 0 var(--ink,#3A2312); }
+.phone-screen { min-height:0; flex:1; overflow:hidden; border:3px solid var(--ink,#3A2312); border-radius:12px; background:#FFF2CD; }
+.phone-home-bar { flex:none; height:24px; width:100%; border:0!important; background:transparent!important; display:flex; align-items:center; justify-content:center; padding:6px; }
+.phone-home-bar span { width:85px; height:6px; background:var(--ink,#3A2312); border-radius:5px; }
+.phone-apps { display:grid; grid-template-columns:1fr 1fr; align-content:start; gap:24px 18px; padding:34px 15px; height:100%; background:#F8D677; }
+.phone-app { display:flex; flex-direction:column; align-items:center; gap:9px; border:0!important; background:transparent!important; padding:0; font-size:17px!important; }
+.phone-app svg { width:72px; height:72px; stroke:var(--ink,#3A2312); stroke-width:3px; stroke-linecap:round; stroke-linejoin:round; }
+.phone-playlists { height:100%; overflow-y:auto; padding:13px 10px; display:flex; flex-direction:column; gap:13px; }
+.phone-playlist-card { display:flex; align-items:center; width:100%; flex:none; gap:11px; padding:8px; border-radius:9px; text-align:left; box-shadow:3px 3px 0 var(--ink,#3A2312); }
+.phone-playlist-cover { display:flex; flex:none; align-items:center; justify-content:center; width:56px; height:64px; border:3px solid var(--ink,#3A2312); border-radius:5px; font-size:23px; }
+.phone-playlist-copy { display:flex; flex-direction:column; gap:5px; min-width:0; overflow-wrap:anywhere; }.phone-playlist-copy strong { font-size:15px; line-height:1.15; }.phone-playlist-copy small { font-family:'Patrick Hand',cursive; font-size:15px; }
+.phone-spotify-player { display:block; width:100%; height:100%; border:0; background:#121212; }
+.phone-placeholder { margin:0; padding:24px 14px; width:100%; height:100%; display:flex; align-items:center; justify-content:center; text-align:center; background:#FFF0C2; font-size:21px; line-height:1.3; }
+.phone-video-feed { height:100%; overflow-y:auto; scroll-snap-type:y mandatory; overscroll-behavior:contain; touch-action:pan-y; background:#FFF0C2; }
+.phone-video-page { position:relative; height:100%; min-height:100%; scroll-snap-align:start; scroll-snap-stop:always; overflow:hidden; background:#1E211F; }
+.phone-video-mount { position:absolute; inset:0; }.phone-video-mount video { display:block; width:100%; height:100%; object-fit:cover; cursor:pointer; }
+.phone-video-caption { position:absolute; left:0; bottom:0; right:0; padding:10px 58px 14px 10px; color:#FFF2CD; background:#3A2312; pointer-events:none; overflow-wrap:anywhere; }
+.phone-video-caption strong { font-size:15px; }.phone-video-caption p { margin:4px 0 0; font-family:'Patrick Hand',cursive; font-size:17px; line-height:1.15; }
+.phone-heart { position:absolute; right:8px; bottom:16px; width:41px; height:43px; padding:2px; border-radius:12px; background:#FFF0C2!important; box-shadow:2px 2px 0 var(--ink,#3A2312); }
+.phone-heart svg { width:100%; height:100%; stroke:var(--ink,#3A2312); stroke-width:4px; stroke-linejoin:round; }.phone-heart[aria-pressed=true] svg path { fill:#EC7298; }
+@media(max-width:480px) { .portfolio-phone { right:4vw; bottom:12px; } }

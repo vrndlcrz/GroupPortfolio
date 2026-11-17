@@ -22,7 +22,7 @@ public class ClassroomController {
     public ClassroomResponse classroom() {
         var data = classroom.classroom();
         return new ClassroomResponse(data.whiteboardLines(), data.tvSlides(), data.teacherLines(),
-            data.board(), data.mission(), data.vision(), classroom.theme(), classroom.audio(), classroom.intro(), classroom.students(),
+            data.board(), data.mission(), data.vision(), classroom.theme(), classroom.audio(), classroom.intro(), classroom.students(), classroom.phone(),
             java.util.Map.of("absentName", data.absentName()));
     }
 
@@ -38,5 +38,5 @@ public class ClassroomController {
     public record ClassroomResponse(java.util.List<String> whiteboardLines, java.util.List<String> tvSlides,
         java.util.List<String> teacherLines, SiteProperties.Board board, SiteProperties.Placard mission,
         SiteProperties.Placard vision, SiteProperties.Theme theme, SiteProperties.Audio audio, SiteProperties.Intro intro,
-        java.util.List<SiteProperties.Student> students, java.util.Map<String, String> classroom) {}
+        java.util.List<SiteProperties.Student> students, SiteProperties.Phone phone, java.util.Map<String, String> classroom) {}
 }
