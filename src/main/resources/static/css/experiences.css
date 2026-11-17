@@ -1,0 +1,28 @@
+/* Readable overlays and the new classroom events; preserve the existing warm ink. */
+.teacher-speech { font-size:clamp(22px,2.1vw,34px)!important; line-height:1.35!important; padding:16px 22px!important; max-width:min(18em,calc(100vw - 20px))!important; }
+.teacher-speech .speaker-name { display:block; font-family:'Lilita One',sans-serif; font-size:.78em; line-height:1.15; margin-bottom:.35em; }
+.teacher-speech .speaker-line { display:block; white-space:pre-line; overflow-wrap:anywhere; }
+.book-overlay .page-text,.book-overlay .page-content-text { font-size:clamp(20px,1.65vw,26px)!important; line-height:1.5!important; }
+.book-overlay .page-body-content { overflow-y:auto; min-height:0; }
+.book-overlay :is(.page-category-tag,.folder-letterhead,.skill-funny-label,.signed-name,.book-key-hints) { font-size:clamp(16px,1.2vw,20px)!important; }
+.book-overlay .john-profile-details { font-size:clamp(16px,1.4vw,22px)!important; }
+:is(.guestbook-modal-overlay,.note-view-modal-overlay,.error-modal-overlay) :is(p,label,input,textarea,select,button) { font-size:clamp(20px,1.7vw,26px)!important; line-height:1.4; }
+.whiteboard-toolbar button { font-size:clamp(18px,1.4vw,23px); }
+.portfolio-phone .phone-header h2 { font-size:26px; }.portfolio-phone .phone-app { font-size:22px!important; }
+.portfolio-phone .phone-playlist-copy strong { font-size:20px; line-height:1.2; }.portfolio-phone .phone-playlist-copy small { font-size:19px; }
+.portfolio-phone .phone-video-caption strong { font-size:20px; }.portfolio-phone .phone-video-caption p { font-size:21px; }
+.portfolio-phone .phone-playlist-card { min-height:100px; }.portfolio-phone .phone-placeholder { font-size:25px; }
+.scrap-overlay { position:fixed; inset:0; z-index:2147483002; display:grid; place-items:center; padding:20px; background:rgba(58,35,18,.72); }
+.scrap-overlay[hidden] { display:none; }
+.scrap-card { width:min(580px,94vw); max-height:85vh; overflow:auto; padding:clamp(20px,4vw,38px); background:#FFF0C2; color:var(--ink,#3A2312); border:3px solid var(--ink,#3A2312); border-radius:10px; box-shadow:8px 8px 0 var(--ink,#3A2312); }
+.scrap-card h2 { margin:0 0 18px; font-family:'Lilita One',sans-serif; font-size:clamp(28px,3vw,40px); }
+.scrap-card p { white-space:pre-line; overflow-wrap:anywhere; font-family:'Patrick Hand',cursive; font-size:clamp(26px,2.3vw,36px); line-height:1.35; }
+.scrap-actions { display:flex; flex-wrap:wrap; gap:14px; margin-top:24px; }.scrap-actions button { padding:10px 20px; font:23px 'Lilita One',sans-serif; color:var(--ink,#3A2312); background:#F4BA45; border:3px solid var(--ink,#3A2312); border-radius:7px; box-shadow:4px 4px 0 var(--ink,#3A2312); cursor:pointer; }
+#classroom-blackout { position:fixed; inset:0; z-index:2147483647; background:#000; outline:0; }
+#classroom-blackout[hidden] { display:none; }
+@media(max-width:600px) { .teacher-speech { font-size:22px!important; padding:12px 15px!important; }.book-overlay .john-profile-details { font-size:15px!important; } }
+
+.classroom-blackout-mode body > :not(#classroom-blackout) { visibility:hidden!important; }
+.classroom-blackout-mode::before,.classroom-blackout-mode::after,.classroom-blackout-mode body::before,.classroom-blackout-mode body::after { display:none!important; }
+
+.desk-tooltip { font-size:clamp(18px,1.5vw,24px)!important; line-height:1.4!important; max-width:min(24em,calc(100vw - 20px)); }

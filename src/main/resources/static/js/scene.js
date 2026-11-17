@@ -649,8 +649,8 @@ class DeskScene {
     });
   }
 
-  toggleCurtain() {
-    if (this.view !== 'seat' || this.curtainAnimating || this.interactionBlocked()) return;
+  toggleCurtain(force=false) {
+    if (this.view !== 'seat' || this.curtainAnimating || (!force && this.interactionBlocked())) return;
     this.curtainAnimating = true;
     this.curtainClosed = !this.curtainClosed;
     gsap.to(this, {
@@ -672,6 +672,7 @@ class DeskScene {
       },
       onComplete: () => {
         this.curtainAnimating = false;
+        if(!this.curtainClosed)this.experiences?.onCurtainOpened();
         this.renderer.shadowMap.needsUpdate = true;
       }
     });
@@ -888,7 +889,7 @@ class DeskScene {
   }
 
   studentInteractionBlocked() {
-    return this.view !== 'seat' || this.interactionBlocked();
+    return this.view !== 'seat' || !!this.experiences?.speaking || this.interactionBlocked();
   }
 
   showStudentBubble(obj, duration=600) {
@@ -953,12 +954,20 @@ class DeskScene {
     this.tvScreen=screen;this.tvFrustum=new THREE.Frustum();this.tvMatrix=new THREE.Matrix4();
     screen.updateWorldMatrix(true,false);this.tvBounds=new THREE.Box3().setFromObject(screen);
     this.tvMotion=matchMedia('(prefers-reduced-motion: reduce)');this.tvLastCheck=-Infinity;this.tvPrevious=0;
-    this.tvDVD={x:200,y:106,width:112.64,height:75,phaseX:200,phaseY:106,dirty:true,image:null};
+    this.tvDVD={x:166.4,y:84,width:179.2,height:120,phaseX:166.4,phaseY:84,dirty:true,image:null};
     this.tvMotion.addEventListener('change',()=>{this.tvDVD.dirty=true});
     // Loading failure keeps the canvas-drawn fallback, without throwing or logging.
     fetch('assets/textures/dvd-bounce.png').then(r=>{if(!r.ok)throw new Error();return r.blob()})
-      .then(blob=>createImageBitmap(blob)).then(image=>{
-        const d=this.tvDVD;d.image=image;d.width=Math.min(112.64,230*image.width/image.height);d.height=d.width*image.height/image.width;
+      .then(blob=>createImageBitmap(blob)).then(async image=>{
+        // Trim transparent padding once, so the visible cutout gets the requested width.
+        const scan=document.createElement('canvas'),scale=Math.min(1,768/Math.max(image.width,image.height));
+        scan.width=Math.ceil(image.width*scale);scan.height=Math.ceil(image.height*scale);
+        const ctx=scan.getContext('2d',{willReadFrequently:true});ctx.drawImage(image,0,0,scan.width,scan.height);
+        const pixels=ctx.getImageData(0,0,scan.width,scan.height).data;let left=scan.width,top=scan.height,right=-1,bottom=-1;
+        for(let y=0;y<scan.height;y++)for(let x=0;x<scan.width;x++)if(pixels[(y*scan.width+x)*4+3]>24){left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x);bottom=Math.max(bottom,y)}
+        if(right>=left){const sx=Math.max(0,Math.floor(left/scale)-1),sy=Math.max(0,Math.floor(top/scale)-1);
+          const cropped=await createImageBitmap(image,sx,sy,Math.min(image.width-sx,Math.ceil((right-left+1)/scale)+2),Math.min(image.height-sy,Math.ceil((bottom-top+1)/scale)+2));image.close();image=cropped}
+        const d=this.tvDVD;d.image=image;d.width=Math.min(512*.35,272*image.width/image.height);d.height=d.width*image.height/image.width;
         d.phaseX=(512-d.width)/2;d.phaseY=(288-d.height)/2;d.dirty=true;
       }).catch(()=>{});
   }
@@ -1063,8 +1072,8 @@ class DeskScene {
 
   updateFrontWall(seconds) {
     this.updateDVD(seconds);
-    this.teacherTorso.scale.y=1+0.005*Math.sin(seconds*2);
-    this.teacherHead.rotation.z=0.026*Math.sin(seconds*0.8);
+    if(!this.experiences?.concertActive){this.teacherTorso.scale.y=1+0.005*Math.sin(seconds*2);
+    this.teacherHead.rotation.z=0.026*Math.sin(seconds*0.8);}
     // Seated forearms remain resting on the desk.
     const blink=Math.abs((seconds%4.8)-2.4);
     for (const eye of this.teacherEyes) eye.scale.y=0.073*Math.min(1,blink/0.085);
@@ -1078,7 +1087,7 @@ class DeskScene {
     const p=this.speechPoint, rect=this.renderer.domElement.getBoundingClientRect();
     const half = this.teacherBubble.offsetWidth / 2 + 8;
     this.teacherBubble.style.left = THREE.MathUtils.clamp(rect.left + (p.x + 1) * rect.width / 2, half, window.innerWidth - half) + 'px';
-    this.teacherBubble.style.top = THREE.MathUtils.clamp(rect.top + (1 - p.y) * rect.height / 2, this.teacherBubble.offsetHeight + 8, window.innerHeight - 8) + 'px';
+    this.teacherBubble.style.top = THREE.MathUtils.clamp(rect.top + (1 - p.y) * rect.height / 2, this.teacherBubble.offsetHeight + (document.getElementById('topNavbar')?.offsetHeight || 52) + 32, window.innerHeight - 8) + 'px';
     this.teacherBubble.classList.toggle('visible', Math.abs(p.z)<1 && !this.isCameraZoomed);
   }
 
@@ -1119,7 +1128,7 @@ class DeskScene {
     if (!first) return null;
     if (this.view === 'seat') {
       // A visible item occludes the desk below it, but cannot open from the seat.
-      if (this.isSpeakingSeat(first.object) || first.object.userData.type==='student-extra') return first;
+      if (this.isSpeakingSeat(first.object) || first.object.userData.type==='student-extra' || first.object.userData.type==='floor-scrap' || first.object.userData.type==='exit-door') return first;
       const sean = intersects.find(hit => hit.object.userData.type === 'teacher');
       if (sean) return sean;
       if (this.tabletopObject(first.object)) return { object: this.deskHit };
@@ -2144,6 +2153,10 @@ class DeskScene {
       if (!matchMedia('(pointer: coarse)').matches) this.showSean();
     } else if (obj.userData.type === 'front-desk') {
       this.showTooltip('Click to view the front desk', e);
+    } else if (obj.userData.type==='floor-scrap') {
+      if(this.experiences?.speaking)this.hideTooltip();else this.showTooltip('Click to read the wrapper',e);
+    } else if (obj.userData.type==='exit-door') {
+      if(this.experiences?.speaking)this.hideTooltip();else this.showTooltip('Try to leave the classroom',e);
     } else if (obj.userData.type === 'curtain') {
       this.hideTooltip();
     } else if (obj.userData.type === 'folder') {
@@ -2269,7 +2282,7 @@ class DeskScene {
   }
 
   interactionBlocked() {
-    return !this.inputEnabled || this.view === 'gliding' || this.isCameraZoomed || !!document.querySelector(
+    return !!this.experiences?.blocking || !this.inputEnabled || this.view === 'gliding' || this.isCameraZoomed || !!document.querySelector(
       '#bookOverlay.active, #whiteboard-overlay.active, .error-modal-overlay.active, .guestbook-modal-overlay.active, .note-view-modal-overlay.active, #termsModal.active');
   }
 
@@ -2280,13 +2293,15 @@ class DeskScene {
   }
 
   showSean(duration = Infinity) {
+    if(this.experiences?.speaking)return;
     if (this.view !== 'seat' || this.interactionBlocked()) return;
     clearTimeout(this.seanHideTimer);
     this.bubbleAnchor=null; this.bubbleStudentId=null;
     this.teacherBubble.style.maxWidth=''; this.teacherBubble.style.overflowWrap='';
-    const lines = Array.isArray(this.classroom.teacherLines) && this.classroom.teacherLines.length
-      ? this.classroom.teacherLines : classroomDefaults.teacherLines;
-    this.teacherBubble.textContent = lines[this.speechIndex % lines.length];
+    const lines = this.experiences?.teacherLines || (Array.isArray(this.classroom.teacherLines) && this.classroom.teacherLines.length
+      ? this.classroom.teacherLines : classroomDefaults.teacherLines);
+    if(this.experiences)this.experiences.paintBubble('Sir Sean',lines[this.speechIndex % lines.length]);
+    else this.teacherBubble.textContent = lines[this.speechIndex % lines.length];
     this.speechIndex = (this.speechIndex + 1) % lines.length;
     this.speechUntil = performance.now() + duration;
     if (Number.isFinite(duration)) this.seanHideTimer = setTimeout(() => this.hideSean(), duration);
@@ -2294,11 +2309,12 @@ class DeskScene {
   }
 
   onSeanClick() {
-    // TODO: later feature
+    this.experiences?.startConcert();
   }
 
   handleObjectClick(obj) {
     if (this.interactionBlocked()) return;
+    if(this.experiences?.handleClick(obj))return;
     const type = obj.userData.type;
     if (type==='student-extra' || type==='absent-seat') return;
     const tabletop = this.tabletopObject(obj);
@@ -2762,6 +2778,7 @@ class DeskScene {
 
   animate() {
     requestAnimationFrame(() => this.animate());
+    if(this.experiences?.dark)return;
 
     if (this.pendingHover) {
       if (!this.isDraggingView && !this.isCameraZoomed) this.updateHover(this.pendingHover);
@@ -2804,6 +2821,7 @@ class DeskScene {
         document.getElementById('laptopErrorModal')?.classList.contains('active');
       if (covered && seconds - this.lastSceneRender < 0.25) return;
       this.lastSceneRender = seconds;
+      this.experiences?.update(seconds);
       this.updateFrontWall(seconds);
       this.renderer.render(this.scene, this.camera);
     }

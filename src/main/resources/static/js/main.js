@@ -131,17 +131,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   const whiteboard=deskScene.whiteboardFace?new WhiteboardDrawing(deskScene):null;
   const phone=new PortfolioPhone({
     button:document.getElementById('phoneToggleBtn'),members,config:classroom.phone||{},
-    canOpen:()=>!intro?.active && ['seat','desk'].includes(deskScene.view),
-    stopNotebook:()=>clearBook.music.stop(true)
+    canOpen:()=>!intro?.active && !deskScene.experiences?.blocking && ['seat','desk'].includes(deskScene.view),
+    stopNotebook:()=>{clearBook.music.stop(true);deskScene.experiences?.stopConcert()}
   });
+  new ClassroomExperiences(deskScene,{phone,book:clearBook});
   const openBook=clearBook.open.bind(clearBook);
-  clearBook.open=(...args)=>{phone.close(true);return openBook(...args)};
-  if(whiteboard){const openBoard=whiteboard.open.bind(whiteboard);whiteboard.open=(...args)=>{phone.close(true);return openBoard(...args)}}
+  clearBook.open=(...args)=>{phone.close(true);deskScene.experiences?.stopConcert();return openBook(...args)};
+  if(whiteboard){const openBoard=whiteboard.open.bind(whiteboard);whiteboard.open=(...args)=>{phone.close(true);deskScene.experiences?.stopConcert();return openBoard(...args)}}
   intro?.attach(deskScene);
 
   // 4. Connect Easy Easter Eggs (Keys 'E', 'G', 'F' or Konami) to Desk Anti-Gravity
   PortfolioHumor.initEasterEggs(() => {
     if (deskScene && typeof deskScene.toggleAntiGravity === 'function') {
+      deskScene.experiences?.stopConcert();
       deskScene.toggleAntiGravity();
     }
   });
@@ -162,6 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (easterEggBtn) {
       easterEggBtn.addEventListener('click', () => {
         if (deskScene) {
+          deskScene.experiences?.stopConcert();
           deskScene.toggleAntiGravity();
         }
       });
@@ -180,13 +183,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // Terms & Conditions button
-    const termsBtn = document.getElementById('termsBtn');
-    if (termsBtn) {
-      termsBtn.addEventListener('click', () => {
-        PortfolioHumor.showTermsJokeModal();
-      });
-    }
+    const darkModeBtn=document.getElementById('darkModeBtn');
+    darkModeBtn?.addEventListener('click',()=>deskScene?.experiences?.enterDark());
 
     // Floating Dock Guestbook Button
     const openGuestbookNavBtn = document.getElementById('openGuestbookNavBtn');

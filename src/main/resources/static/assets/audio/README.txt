@@ -1,3 +1,7 @@
-Place the notebook theme song here as notebook-theme.mp3 (a file you have the right to use)
+Bundled project audio
 
-Optional: the site works silently without this file. Keep it in this source folder, not only in target/. MP3 files are excluded from Git.
+notebook-theme.mp3: the notebook player soundtrack.
+nadarang.mp3: the supplied Sean concert soundtrack, played from 01:37.06.
+nadarang.lrc: the supplied timestamped concert lyrics.
+
+Keep these files in this source folder, not only in target/. The MP3s are tracked directly in Git so clones and builds include the sounds.
