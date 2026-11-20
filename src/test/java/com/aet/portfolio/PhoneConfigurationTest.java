@@ -28,21 +28,22 @@ class PhoneConfigurationTest {
 
     @Test void classroomIncludesPhoneWithoutChangingItsExistingFields() throws Exception {
         mvc.perform(get("/api/site/classroom")).andExpect(status().isOk())
-            .andExpect(jsonPath("$.phone.playlists.length()").value(4))
-            .andExpect(jsonPath("$.phone.playlists[0].memberName").value("Riam Jaye Santiago"))
-            .andExpect(jsonPath("$.phone.playlists[0].spotifyUrl").value(""))
+            .andExpect(jsonPath("$.phone.tracks.length()").value(7))
+            .andExpect(jsonPath("$.phone.tracks[0].title").value("Hev Abi - Preso"))
+            .andExpect(jsonPath("$.phone.tracks[6].id").value("tma"))
             .andExpect(jsonPath("$.phone.videos").isArray())
             .andExpect(jsonPath("$.phone.videos").isEmpty())
             .andExpect(jsonPath("$.board.title").exists());
     }
-    @Test void nonSpotifyHostFailsBinding() {
-        binding.withPropertyValues("site.phone.playlists[0].member-name=Member",
-            "site.phone.playlists[0].spotify-url=https://example.com/playlist/abc123")
+    @Test void tracksRequireLocalMediaPaths() {
+        var track = binding.withPropertyValues("site.phone.tracks[0].id=example",
+            "site.phone.tracks[0].title=Example");
+        track.withPropertyValues("site.phone.tracks[0].audio=https://example.com/audio.mp3")
             .run(context -> assertThat(context).hasFailed());
-        binding.withPropertyValues("site.phone.playlists[0].member-name=Member",
-            "site.phone.playlists[0].spotify-url=https://open.spotify.com/playlist/abc123?si=test")
+        track.withPropertyValues("site.phone.tracks[0].audio=/assets/audio/example.mp3")
             .run(context -> assertThat(context).hasNotFailed());
     }
+
     @Test void onlyLocalGroupVideoPathsBind() {
         var video = binding.withPropertyValues("site.phone.videos[0].id=v1",
             "site.phone.videos[0].title=Our clip", "site.phone.videos[0].member=Member");

@@ -3,7 +3,7 @@
 .teacher-speech .speaker-name { display:block; font-family:'Lilita One',sans-serif; font-size:.78em; line-height:1.15; margin-bottom:.35em; }
 .teacher-speech .speaker-line { display:block; white-space:pre-line; overflow-wrap:anywhere; }
 .teacher-speech .speaker-hint { display:block; margin-top:.6em; padding-top:.4em; border-top:2px solid var(--ink,#3A2312); font:.68em 'Lilita One',sans-serif; }
-.book-overlay .page-text,.book-overlay .page-content-text { font-size:clamp(20px,1.65vw,26px)!important; line-height:1.5!important; }
+.book-overlay .page-text { font-size:clamp(20px,1.65vw,26px)!important; line-height:1.5!important; }
 .book-overlay .page-body-content { overflow-y:auto; min-height:0; }
 .book-overlay :is(.page-category-tag,.folder-letterhead,.skill-funny-label,.signed-name,.book-key-hints) { font-size:clamp(16px,1.2vw,20px)!important; }
 .book-overlay .john-profile-details { font-size:clamp(16px,1.4vw,22px)!important; }
@@ -27,3 +27,30 @@
 .classroom-blackout-mode::before,.classroom-blackout-mode::after,.classroom-blackout-mode body::before,.classroom-blackout-mode body::after { display:none!important; }
 
 .desk-tooltip { font-size:clamp(18px,1.5vw,24px)!important; line-height:1.4!important; max-width:min(24em,calc(100vw - 20px)); }
+
+.experience-focus-back { position:fixed; z-index:2147482999; left:1rem; bottom:1rem; pointer-events:auto; touch-action:manipulation; background:#ffebac; color:#392625; border:2px solid #392625; border-radius:.7rem; padding:.65rem .9rem; cursor:pointer; }
+.stadium-cheer { position:fixed; z-index:360; transform:translate(-50%,-105%); max-width:26vw; padding:.35em .58em; border:2px solid #392625; border-radius:.55em; background:#fff2c3; color:#392625; box-shadow:2px 3px #392625; text-align:center; font:clamp(.7rem,1.6vw,1.2rem) "Lilita One",sans-serif; pointer-events:none; }
+.jeo-hearts { position:fixed; inset:0; z-index:34; pointer-events:none; overflow:hidden; }
+.jeo-hearts span { position:absolute; bottom:8%; left:calc(5% + var(--heart) * 12%); color:#f476aa; text-shadow:0 2px #a74677; font-size:clamp(1.3rem,4vw,3rem); animation:jeo-heart 3s calc(var(--heart) * -0.34s) ease-out infinite; }
+@keyframes jeo-heart { from { transform:translateY(12vh) rotate(-18deg); opacity:0; } 25% { opacity:.9; } to { transform:translateY(-75vh) rotate(24deg); opacity:0; } }
+.classroom-fire { position:fixed; inset:0; z-index:2100; pointer-events:none; background:radial-gradient(ellipse at 20% 100%,#fff3a6 0, #fa923c 25%,transparent 61%),radial-gradient(ellipse at 70% 118%,#fff3a6 10%,#ff782d 40%,transparent 68%),radial-gradient(ellipse at 95% 95%,#ff713b,transparent 55%),linear-gradient(0deg,#53112c,transparent 86%); transform-origin:bottom; animation:classroom-fire 1.5s ease-in-out both; }
+@keyframes classroom-fire { 0% { transform:scaleY(.04); opacity:0; } 48% { opacity:1; transform:scaleY(1.4); } 100% { transform:scaleY(1.45); opacity:0; } }
+@media (prefers-reduced-motion:reduce) {
+  .jeo-hearts span { animation:none; opacity:.55; bottom:calc(10% + mod(var(--heart),3) * 12%); }
+  .classroom-fire { animation:classroom-fire-fade .3s linear both; }
+}
+@keyframes classroom-fire-fade { from { opacity:.35; } to { opacity:0; } }
+
+.robot-captcha { position:fixed; inset:0; margin:auto; max-height:90dvh; overflow:auto; width:min(94vw,370px); border:2px solid #362d53; border-radius:1rem; padding:1rem; background:#fff4d9; color:#322540; }
+.robot-captcha::backdrop { background:#1c162285; }
+.robot-captcha h2,.robot-captcha p { margin:.5rem 0; }
+.robot-captcha-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.25rem; }
+.robot-captcha-grid button { position:relative; aspect-ratio:1.35; background:#d5c7ec; border:1px solid #6b5a82; border-radius:.3rem; font-size:1.8rem; cursor:pointer; transition:opacity .2s; }
+.robot-captcha-grid button:nth-child(2n) { background:#aed9cc; }
+.robot-captcha-grid button.captcha-fading { opacity:0; }
+.robot-captcha-light { position:absolute; right:.3rem; bottom:.22rem; font-size:.5rem; }
+
+.classroom-fire::after { content:""; position:absolute; inset:20% 0 0; background:linear-gradient(0deg,#fff4a8 3%,#ffc65c 23%,#f97e22 65%,#d64a26); clip-path:polygon(0% 100%,0% 64%,5% 44%,8% 69%,15% 22%,17% 52%,22% 78%,28% 49%,32% 12%,34% 53%,39% 72%,44% 21%,48% 48%,52% 5%,55% 57%,59% 77%,64% 41%,68% 12%,70% 57%,75% 79%,80% 35%,84% 57%,89% 19%,92% 58%,97% 36%,100% 78%,100% 100%); opacity:.82; }
+
+.tv-stop-button { bottom:3.9rem; }
+.concert-fire { position:fixed; inset:0; width:100%; height:100%; z-index:2147482998; object-fit:cover; mix-blend-mode:screen; pointer-events:none; }

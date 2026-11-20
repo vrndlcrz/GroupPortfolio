@@ -32,7 +32,7 @@ public class MemberControllerTest {
                 .andExpect(jsonPath("$[0].themeSong.credit", is("")))
                 .andExpect(jsonPath("$[1].themeSong").doesNotHaveJsonPath())
                 .andExpect(jsonPath("$[0].coverColor", is("#FF7A00")))
-                .andExpect(jsonPath("$[0].pages", hasSize(6)))
+                .andExpect(jsonPath("$[0].pages", hasSize(7)))
                 .andExpect(jsonPath("$[0].skills", not(empty())));
     }
 

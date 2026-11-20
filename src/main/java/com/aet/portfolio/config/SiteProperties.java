@@ -21,16 +21,21 @@ public record SiteProperties(@Valid Classroom classroom, @Valid @DefaultValue Th
                              @Valid @DefaultValue Audio audio, @Valid @DefaultValue Intro intro,
                              List<@Valid Student> students, @Valid @DefaultValue Phone phone) {
     @Validated
-    public record Phone(List<@Valid Playlist> playlists, List<@Valid PhoneVideo> videos) {
+    public record Phone(List<@Valid Track> tracks, List<@Valid PhoneVideo> videos) {
         public Phone {
-            playlists = playlists == null ? List.of(
-                new Playlist("Riam Jaye Santiago", ""), new Playlist("John Vernie Dela Cruz", ""),
-                new Playlist("Charella Magalpoc", ""), new Playlist("Nicole De Guzman", "")) : List.copyOf(playlists);
+            tracks = tracks == null ? List.of() : List.copyOf(tracks);
             videos = videos == null ? List.of() : List.copyOf(videos);
         }
     }
-    public record Playlist(@NotBlank String memberName,
-        @Pattern(regexp="^\\s*$|^https://open\\.spotify\\.com/(playlist|album)/[A-Za-z0-9]+.*$") String spotifyUrl) {}
+    public record Track(@NotBlank String id, @NotBlank String title,
+                        @Pattern(regexp="^/assets/audio/[a-zA-Z0-9_-]+[.](mp3|ogg|m4a|wav)$") String audio,
+                        @Pattern(regexp="^/assets/videos/[a-zA-Z0-9_-]+[.](mp4|webm)$") String video) {
+        @JsonProperty("audioAvailable") public boolean audioAvailable() { return exists(audio); }
+        @JsonProperty("videoAvailable") public boolean videoAvailable() { return exists(video); }
+        private static boolean exists(String path) {
+            return path != null && new ClassPathResource("static" + path).exists();
+        }
+    }
     public record PhoneVideo(@NotBlank String id, @NotBlank String title, @NotBlank String member,
         @NotBlank @Pattern(regexp="^/assets/videos/(?!.*\\.\\.)[^?#\\\\]+$") String src,
         @Pattern(regexp="^/assets/videos/(?!.*\\.\\.)[^?#\\\\]+$") String poster) {
@@ -60,10 +65,18 @@ public record SiteProperties(@Valid Classroom classroom, @Valid @DefaultValue Th
     }
     @Validated
     public record Intro(@DefaultValue("true") boolean enabled,
-                        @DefaultValue("What if Sir Sean was a highschool teacher?") @NotBlank String title,
+                        @DefaultValue("What if Sir Sean was your highschool teacher?") @NotBlank String title,
                         @DefaultValue("A Group 1 production") String subtitle,
                         @DefaultValue("true") boolean soundEnabled) {}
-    public record Audio(@DefaultValue("/assets/audio/notebook-theme.mp3") String notebookTheme) {}
+    public record Audio(@DefaultValue("/assets/audio/notebook-theme.mp3") String notebookTheme) {
+        @JsonProperty("kimEntry") public String kimEntry() { return cue("kim-entry.mp3"); }
+        @JsonProperty("jeoEntry") public String jeoEntry() { return cue("jeo-entry.mp3"); }
+        @JsonProperty("rinEntry") public String rinEntry() { return cue("rin-entry.mp3"); }
+        private static String cue(String name) {
+            String path = "/assets/audio/" + name;
+            return new ClassPathResource("static" + path).exists() ? path : null;
+        }
+    }
     public record Classroom(List<String> whiteboardLines, List<String> tvSlides, List<String> teacherLines,
                             Board board, Placard mission, Placard vision,
                             @DefaultValue("Mara Dimaculangan") @NotBlank String absentName) {}

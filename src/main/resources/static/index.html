@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="A humorous 3D interactive portfolio website for Advanced Emerging Technologies featuring 5 member clear books on a messy student desk.">
+  <meta name="description" content="A humorous 3D interactive portfolio website for Application and Emerging Technologies featuring 5 member clear books on a messy student desk.">
   <meta name="author" content="AET Group 1">
   <title>Sean Dyogi Truthers | Group 1 Portfolio</title>
 
@@ -11,21 +11,21 @@
 
   <!-- Application Stylesheets -->
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="css/style.css?v=vernie-update-20261120">
-  <link rel="stylesheet" href="css/book.css?v=vernie-fix3-20261120">
+  <link rel="stylesheet" href="css/style.css?v=classroom-cleanup-v1">
+  <link rel="stylesheet" href="css/book.css?v=classroom-cleanup-v1">
   <link rel="stylesheet" href="css/fonts.css?v=vernie-update-20261120">
-  <link rel="stylesheet" href="css/theme.css?v=vernie-update-20261120">
+  <link rel="stylesheet" href="css/theme.css?v=classroom-cleanup-v1">
   <link rel="stylesheet" href="css/intro.css?v=vernie-update-20261120">
   <link rel="stylesheet" href="css/whiteboard.css?v=whiteboard-v1">
-  <link rel="stylesheet" href="css/phone.css?v=vernie-update-20261120">
-  <link rel="stylesheet" href="css/experiences.css?v=vernie-update-20261120">
+  <link rel="stylesheet" href="css/phone.css?v=classroom-cleanup-v1">
+  <link rel="stylesheet" href="css/experiences.css?v=classroom-cleanup-v1">
   <script>if (new URLSearchParams(location.search).get("intro") === "off") document.documentElement.classList.add("intro-off");</script>
 </head>
 <body>
 
   <div id="intro" role="status" aria-live="polite">
     <div class="intro-title">
-      <h1>What if Sir Sean was a highschool teacher?</h1>
+      <h1>What if Sir Sean was your highschool teacher?</h1>
       <p class="intro-subtitle">A Group 1 production</p>
     </div>
     <div class="intro-controls" aria-hidden="true">
@@ -44,7 +44,7 @@
   </div>
 
   <!-- 3. THREE.JS 3D SCENE CONTAINER -->
-  <main id="scene-container" class="scene-waking-blur" aria-label="Interactive 3D Student Desk with 360 Degree Look Around"></main>
+  <main id="scene-container" aria-label="Interactive 3D Student Desk with 360 Degree Look Around"></main>
 
   <button id="deskBackBtn" class="hud-btn" type="button" hidden aria-label="Back to seat">Back</button>
 
@@ -77,7 +77,7 @@
   <!-- Bottom Center: 360° Look Around & Control Guide (Clean, non-intrusive) -->
   <aside class="floating-look-guide" id="lookGuide">
     <svg class="uicon guide-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
-    <span><strong>Free Look POV:</strong> Drag or swipe to look up, down &amp; around • Press <span class="kbd-hint">E</span> for Zero-G • Click folders to open</span>
+    <span><strong>Free Look POV:</strong> Drag or swipe to look up, down &amp; around • <strong class="zero-g-hint">Press E</strong> for Zero-G • Click folders to open</span>
   </aside>
 
   <!-- Interactive 3D Tooltip -->
@@ -97,6 +97,7 @@
       </div>
       <div class="note-view-footer">
         <span class="note-view-hint">Pinned directly onto the 3D desk</span>
+        <button class="note-view-return-btn" id="noteViewThrowBtn" type="button">Throw note</button>
         <button class="note-view-return-btn" id="noteViewReturnBtn">
           <svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
           Return to Desk
@@ -177,19 +178,19 @@
   <script src="js/lib/gsap.min.js?v=students-grid-20261117"></script>
 
   <!-- 7. APPLICATION MODULES -->
-  <script src="js/api.js?v=vernie-update-20261120"></script>
+  <script src="js/api.js?v=subject-and-seating-v1"></script>
   <script src="js/theme.js?v=table-whiteboard-20261117"></script>
-  <script src="js/humor.js?v=vernie-update-20261120"></script>
+  <script src="js/humor.js?v=classroom-cleanup-v1"></script>
   <script src="js/handwriting.js?v=vernie-update-20261120"></script>
   <script src="js/sketches.js?v=vernie-update-20261120"></script>
   <script src="js/themesong.js?v=vernie-update-20261120"></script>
-  <script src="js/book.js?v=vernie-fix3-20261120"></script>
-  <script src="js/scene.js?v=vernie-update-20261120"></script>
+  <script src="js/book.js?v=classroom-cleanup-v1"></script>
+  <script src="js/scene.js?v=classroom-cleanup-v1"></script>
   <script src="js/whiteboard.js?v=whiteboard-v1"></script>
   <script src="js/introSound.js?v=vernie-update-20261120"></script>
-  <script src="js/intro.js?v=vernie-update-20261120"></script>
-  <script src="js/phone.js?v=vernie-update-20261120"></script>
-  <script src="js/experiences.js?v=vernie-update-20261120"></script>
-  <script src="js/main.js?v=vernie-update-20261120"></script>
+  <script src="js/intro.js?v=classroom-extras-v1"></script>
+  <script src="js/phone.js?v=classroom-cleanup-v1"></script>
+  <script src="js/experiences.js?v=classroom-cleanup-v1"></script>
+  <script src="js/main.js?v=classroom-cleanup-v1"></script>
 </body>
 </html>

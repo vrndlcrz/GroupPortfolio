@@ -29,14 +29,13 @@ body { font-family:var(--font-text); color:var(--ink); background:var(--cream); 
 .hud-btn:hover { transform:rotate(0) scale(1.04,.96)!important; }
 .hud-btn:active { transform:translate(3px,3px) scale(.96,1.04)!important; }
 .hud-btn:disabled { opacity:.55; cursor:default; }
-.humor-toast,.teacher-speech,.desk-tooltip,.floating-look-guide,.guestbook-card,.terms-window,.retro-error-window {
+.humor-toast,.teacher-speech,.desk-tooltip,.floating-look-guide,.guestbook-card,.retro-error-window {
   background:var(--cream)!important; color:var(--ink)!important; border:3px solid var(--ink)!important;
   border-radius:4px 9px 5px 7px!important; box-shadow:4px 4px 0 var(--ink)!important;
   backdrop-filter:none!important; text-shadow:none!important; font-family:var(--font-text);
 }
 .desk-tooltip * { color:var(--ink)!important; }
 .floating-look-guide { bottom:20px; }
-.scene-waking-blur { filter:none!important; }
 .guestbook-modal-overlay,.note-view-modal-overlay { backdrop-filter:none!important; }
 @media(prefers-reduced-motion:reduce) { .hud-btn { transition:none!important; } }
 

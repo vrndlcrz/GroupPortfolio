@@ -1,6 +1,6 @@
 # Sean Dyogi Truthers — Group 1 Portfolio: "The Messy Desk"
 
-**Subject:** Advanced Emerging Technologies (AET)
+**Subject:** Application and Emerging Technologies (AET)
 **Team size:** 4 members
 **Stack:** HTML, CSS, JavaScript (Three.js + GSAP) on the frontend, Java Spring Boot on the backend
 **Runs on:** `http://localhost:8080` (no database, no hosting)
@@ -55,7 +55,7 @@ Each portfolio has a **cover**, **6 inside pages** and a **back cover**. Every p
 
 | Page | Title | Content | Border style |
 |---|---|---|---|
-| Cover | "PORTFOLIO" | Member photo, name, section, subject: *Advanced Emerging Technologies*, funny tagline | Solid color with a spine strip (like the reference) |
+| Cover | "PORTFOLIO" | Member photo, name, section, subject: *Application and Emerging Technologies*, funny tagline | Solid color with a spine strip (like the reference) |
 | 1 | About Me | Short intro, age or year, course, motto | Wavy outline (pink) |
 | 2 | Hobbies | List of hobbies with small doodles or icons | Colorful blobs (orange and red) |
 | 3 | Skills | Skills with funny proficiency labels | Vines and flowers |
@@ -91,7 +91,7 @@ Each portfolio has a **cover**, **6 inside pages** and a **back cover**. Every p
 - **Hobby not found (404):** a joke page for anyone who writes "sleeping" as a hobby.
 - **Terms & Conditions page:** one page of tiny text nobody will read, with a joke hidden at the bottom.
 - **Fake loading bar** that stalls at 99%.
-- **Roast Me button:** shows a random friendly roast, such as "Has 47 tabs open and uses none of them".
+- **Roast Me button:** triggers a fire animation.
 
 ### Backend-powered jokes
 - **Visitor counter:** "You are visitor #12. Please go touch grass."
@@ -195,7 +195,7 @@ Agree on this shape as a team before coding. It connects the backend and the fro
     "id": 1,
     "name": "Joshua Deliva",
     "section": "BSIT 3-1",
-    "subject": "Advanced Emerging Technologies",
+    "subject": "Application and Emerging Technologies",
     "tagline": "Emerging technologies, emerging deadlines",
     "folderLabel": "FINAL_v7_REALLYFINAL_dontopen",
     "photo": "assets/photos/member1.jpg",
@@ -347,7 +347,7 @@ Read these 7 points during your class presentation:
 4. **Authentic Clear-Book Flip Engine:** Clicking any folder triggers a GSAP camera zoom and reveals a plastic-sheened clear-book portfolio with 3D page turns, drag/arrow navigation, and spine stitching.
 5. **Original Scalable SVG Borders:** Every single inside page features a unique, recolorable hand-drawn SVG border (wavy pink, blobs, vines, dripping paint, bows/stars, dotted frame) framing readable text.
 6. **Real-time Desk Guestbook:** Visitors can leave notes with HTML-sanitized input and 120-character limits; submitted notes immediately pin themselves as colorful 3D sticky notes on the desk without reloading.
-7. **Humor & Emerging Tech:** Packed with easter eggs, including a fake 99% stalling loader, Konami code anti-gravity desk float, synthesized Web Audio sounds, and friendly developer roasts.
+7. **Humor & Emerging Tech:** Packed with easter eggs, including Konami code anti-gravity, synthesized Web Audio sounds, and the Roast Me fire animation.
 
 ---
 

@@ -37,99 +37,6 @@ html, body {
 }
 
 /* ==========================================================================
-   1. REALISTIC EYE-BLINK LOADING SCREEN (Curved Eye Aperture & 3x Blink)
-   ========================================================================== */
-.eye-blink-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  pointer-events: all;
-  overflow: hidden;
-}
-
-/* Peripheral eye vision vignette */
-.eye-vignette {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse at center, transparent 35%, rgba(3, 5, 10, 0.65) 80%, rgba(2, 4, 8, 0.95) 100%);
-  animation: fadeVignette 2.3s ease-in-out forwards;
-}
-
-@keyframes fadeVignette {
-  0%, 75% { opacity: 1; }
-  100%    { opacity: 0; }
-}
-
-/* Curved Eyelid Panels */
-.eyelid-panel {
-  position: fixed;
-  left: 0;
-  width: 100vw;
-  height: 54vh; /* Overlapping by 8vh in center when closed for zero light gap */
-  pointer-events: none;
-}
-
-.eyelid-panel svg.eyelid-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.eyelid-top {
-  top: 0;
-  transform-origin: top center;
-  animation: blinkTop 2.3s cubic-bezier(0.45, 0.05, 0.25, 1) forwards;
-}
-
-.eyelid-bottom {
-  bottom: 0;
-  transform-origin: bottom center;
-  animation: blinkBottom 2.3s cubic-bezier(0.45, 0.05, 0.25, 1) forwards;
-}
-
-/* 3x Realistic Blink Keyframes: Peek -> Half-open -> Awake Flutter -> Reveal */
-@keyframes blinkTop {
-  0%   { transform: translateY(6%); }       /* Completely closed, curves overlapping */
-  14%  { transform: translateY(-32%); }     /* Blink 1: quick sleepy slit */
-  23%  { transform: translateY(6%); }       /* Blink 1: close */
-  38%  { transform: translateY(-62%); }     /* Blink 2: wider awake */
-  48%  { transform: translateY(6%); }       /* Blink 2: close */
-  63%  { transform: translateY(-88%); }     /* Blink 3: morning light */
-  75%  { transform: translateY(-70%); }     /* Flutter */
-  100% { transform: translateY(-114%); }    /* Fully open - awake at desk! */
-}
-
-@keyframes blinkBottom {
-  0%   { transform: translateY(-6%); }      /* Completely closed */
-  14%  { transform: translateY(30%); }      /* Blink 1 */
-  23%  { transform: translateY(-6%); }      /* Close */
-  38%  { transform: translateY(58%); }      /* Blink 2 */
-  48%  { transform: translateY(-6%); }      /* Close */
-  63%  { transform: translateY(82%); }      /* Blink 3 */
-  75%  { transform: translateY(66%); }      /* Flutter */
-  100% { transform: translateY(114%); }     /* Fully open */
-}
-
-/* Waking up blur on 3D scene (sharpens with each blink) */
-.scene-waking-blur {
-  animation: wakeUpBlur 2.3s ease-out forwards;
-}
-
-@keyframes wakeUpBlur {
-  0%   { filter: blur(10px) brightness(0.6); }
-  23%  { filter: blur(8px) brightness(0.7); }
-  48%  { filter: blur(5px) brightness(0.85); }
-  75%  { filter: blur(2px) brightness(0.95); }
-  100% { filter: blur(0px) brightness(1); }
-}
-
-.eye-blink-overlay.done {
-  display: none !important;
-  pointer-events: none !important;
-}
-
-/* ==========================================================================
    2. TOP NAVIGATION BAR & ACTION CONTROLS (Top side, sleek glassmorphism)
    ========================================================================== */
 
@@ -170,14 +77,6 @@ html, body {
   display: inline-block;
   vertical-align: middle;
   pointer-events: none; /* Children don't swallow button clicks */
-}
-
-.loading-svg-icon {
-  width: 58px;
-  height: 58px;
-  color: var(--accent-cyan);
-  display: inline-block;
-  animation: bounceSlow 2.2s infinite ease-in-out;
 }
 
 /* Action Buttons (100% whole part clickable) */
@@ -269,17 +168,6 @@ html, body {
   width: 15px;
   height: 15px;
   color: var(--accent-cyan);
-}
-
-.kbd-hint {
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #FFFFFF;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 0.72rem;
-  padding: 2px 7px;
-  border-radius: 4px;
 }
 
 /* ==========================================================================
@@ -718,29 +606,6 @@ html, body {
   background: #E5E7EB;
 }
 
-/* Terms Modal */
-.terms-window {
-  max-width: 580px;
-}
-
-.terms-body {
-  flex-direction: column;
-}
-
-.terms-scroll-box {
-  width: 100%;
-  height: 200px;
-  background: #FFFFFF;
-  border: 1px solid #9CA3AF;
-  padding: 14px;
-  overflow-y: scroll;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 /* ==========================================================================
    6. HUMOR TOAST NOTIFICATION
    ========================================================================== */
@@ -1101,3 +966,8 @@ html, body {
   transition: opacity .25s;
 }
 .teacher-speech.visible { opacity: 1; }
+
+#lookGuide .zero-g-hint { color:#000; font-weight:900; }
+#laptopErrorModal .retro-window-header { gap:.75rem; align-items:center; }
+#laptopErrorModal .laptop-close { display:grid; place-items:center; flex:0 0 1.7rem; width:1.7rem; height:1.7rem; padding:0; line-height:1; font-size:1.25rem; }
+#laptopErrorModal .laptop-close::before,#laptopErrorModal .laptop-close::after { content:none; }

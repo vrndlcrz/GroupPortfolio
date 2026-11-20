@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentVisitorCount = 0;
   let deskScene = null;
   let clearBook = null;
-  let activeMemberIdForNote = 1;
 
   // UI Elements
   const visitorCountBadge = document.getElementById('visitorCountBadge');
@@ -124,13 +123,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     containerId: 'scene-container',
     members: members,
     notes: notes,
-    onFolderClick: member => clearBook.prepareMusic(member),
+    onFolderClick: member => {
+      deskScene.experiences?.stopTrack();
+      deskScene.experiences?.stopTV();
+      clearBook.prepareMusic(member);
+    },
     onFolderSelect: member => clearBook.open(member)
   });
 
   const whiteboard=deskScene.whiteboardFace?new WhiteboardDrawing(deskScene):null;
   const phone=new PortfolioPhone({
-    button:document.getElementById('phoneToggleBtn'),members,config:classroom.phone||{},
+    button:document.getElementById('phoneToggleBtn'),config:classroom.phone||{},
     canOpen:()=>!intro?.active && !deskScene.experiences?.blocking && ['seat','desk'].includes(deskScene.view),
     stopNotebook:()=>{clearBook.music.stop(true);deskScene.experiences?.stopConcert()}
   });
@@ -198,7 +201,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   function openGuestbookModal(memberId = null) {
     if (memberId && memberSelectDropdown) {
       memberSelectDropdown.value = memberId;
-      activeMemberIdForNote = memberId;
     }
     // Show modal: set display first, then add .active next frame for CSS transition to run
     guestbookModal.style.display = 'flex';
@@ -224,6 +226,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (closeBtn) closeBtn.addEventListener('click', closeNote);
     if (returnBtn) returnBtn.addEventListener('click', closeNote);
+    document.getElementById('noteViewThrowBtn')?.addEventListener('click', () => {
+      deskScene.experiences?.throwNote(deskScene.activeStickyMesh);
+    });
 
     // Click on backdrop (outside card) closes modal
     if (modal) {

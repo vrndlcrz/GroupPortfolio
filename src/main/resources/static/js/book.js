@@ -189,6 +189,16 @@ class ClearBook {
 
     const pages = this.preparePages(memberData, theme);
     this.deckElement.replaceChildren(...pages.deck);
+    const photos = this.deckElement.querySelectorAll('[data-notebook-photo]');
+    if (photos.length && typeof API !== 'undefined') API.getClassroom().then(({ notebookPhotos = [] }) => {
+      for (const img of photos) {
+        const file = img.dataset.notebookPhoto;
+        if (!notebookPhotos.includes(file)) continue;
+        img.addEventListener('load', () => { img.closest('figure').hidden = false; }, { once: true });
+        img.src = 'assets/photos/' + file;
+        delete img.dataset.notebookPhoto;
+      }
+    });
     this.dotsContainer.replaceChildren(...pages.dotsElements);
     this.pagesElements = pages.pagesElements;
     this.dotsElements = pages.dotsElements;
@@ -238,7 +248,7 @@ class ClearBook {
     return entry.pages;
   }
 
-  johnDivider(member) {
+  johnDivider() {
     const dividerEl = document.createElement('div');
     dividerEl.className = 'john-cloud-divider';
     dividerEl.innerHTML = `
@@ -278,9 +288,10 @@ class ClearBook {
     const blank=document.createElement('div');blank.className='john-blank-page';blank.setAttribute('aria-label','Blank left page');
     const page=document.createElement('section');page.className='john-profile-page';
     const pin=document.createElement('i');pin.className='john-pushpin';pin.setAttribute('aria-hidden','true');
-    const photo=document.createElement('figure');photo.className='john-photo';photo.setAttribute('aria-label','Photo placeholder');
-    const silhouette=document.createElement('span');silhouette.className='john-silhouette';silhouette.setAttribute('aria-hidden','true');
-    const label=document.createElement('figcaption');label.textContent='Photo';photo.append(silhouette,label);
+    const photo=document.createElement('figure');photo.className='john-photo';
+    const portrait=document.createElement('img');portrait.className='john-portrait';portrait.src=member.photo;
+    portrait.alt='Portrait of '+member.name;
+    photo.append(portrait);
     const heading=document.createElement('h2');heading.className='john-angular-title';heading.textContent=member.titleText||'John Vernie';
     const titleCanvas=document.createElement('canvas');titleCanvas.width=600;titleCanvas.height=240;titleCanvas.textContent=heading.textContent;
     const ctx=titleCanvas.getContext('2d');
@@ -302,6 +313,22 @@ class ClearBook {
     const age=document.createElement('p');age.textContent='Age: '+(member.ageLine||'TODO years of existence');
     const objective=document.createElement('p');objective.textContent='Objective: '+(member.objective||'TODO');
     details.append(name,age,objective);page.append(pin,photo,heading,details);spread.append(blank,page);return spread;
+  }
+
+  notebookPhotos(files, label, arrow = false) {
+    return '<div class="notebook-photos">' + files.map((file, index) =>
+      '<figure class="notebook-print' + (arrow ? ' notebook-arrow' : '') + '" hidden>' +
+        '<img data-notebook-photo="' + file + '" alt="' + label + (arrow ? '' : ' ' + (index + 1)) + '">' +
+        (arrow ? '<figcaption>Zhang Linghe</figcaption>' : '') + '</figure>'
+    ).join('') + '</div>';
+  }
+
+  coolSDoodles() {
+    const path = 'M31 13V31L45 44V56L31 69 17 56V44L24 37M38 37L45 31V19L31 6 17 19V31L31 44V58';
+    return '<div class="cool-s-doodles" role="img" aria-label="Three hand-drawn Cool S graffiti doodles">' +
+      ['#344671', '#D85776', '#2D796D'].map(color => '<svg aria-hidden="true" viewBox="0 0 62 75"><path d="' + path +
+        '" fill="none" stroke="' + color + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>').join('') +
+      '</div>';
   }
 
   renderPages(member, theme) {
@@ -339,7 +366,9 @@ class ClearBook {
         title: 'Welcome'
       });
     }
-    for (let i = 0; i < 6; i++) {
+    const insideCount = isSpiral ? (member.pages?.length || 6) : 6;
+    const numberedPages = isSpiral ? insideCount + 1 : insideCount;
+    for (let i = 0; i < insideCount; i++) {
       const pageData = (member.pages && member.pages[i]) ? member.pages[i] : {
         title: titles[i] || `Section ${i + 1}`,
         content: `Content for ${titles[i] || 'section'} will be added soon.`,
@@ -349,7 +378,7 @@ class ClearBook {
         type: 'inside',
         index: i + 1,
         pageData: pageData,
-        skills: (i === 3) ? member.skills : null
+        skills: (!isSpiral && i === 3) ? member.skills : null
       });
     }
 
@@ -377,7 +406,7 @@ class ClearBook {
             <svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
           </span>
           <h4>Clear-Book Sleeve #${idx + 1}</h4>
-          <p>Official student submission for <em>Advanced Emerging Technologies</em>.</p>
+          <p>Official student submission for <em>Application and Emerging Technologies</em>.</p>
           <div style="font-size:0.75rem; color:#94A3B8; margin-top:8px;">Turn backward or forward with arrows</div>
         </div>
       `;
@@ -390,7 +419,7 @@ class ClearBook {
             <div class="cover-header">
               <span class="cover-badge">Student Portfolio</span>
               <h1 class="cover-title">PORTFOLIO</h1>
-              <div class="cover-subject">${member.subject || 'Advanced Emerging Technologies'}</div>
+              <div class="cover-subject">${member.subject || 'Application and Emerging Technologies'}</div>
             </div>
 
             <div class="cover-photo-wrap" id="coverPhotoWrap">
@@ -448,16 +477,21 @@ class ClearBook {
         frontHTML = '<div class="semester-sheet"><div class="semester-flap"><h2>1st Semester</h2></div></div><span class="semester-tab">1st Sem</span>';
       } else if (cfg.type === 'profile') {
         frontHTML = `<div class="page-inner"><div class="page-body-content spiral-profile">
-          <span class="page-category-tag">Page 1 of 7</span><h3 class="page-title">${write('Profile')}</h3>
+          <span class="page-category-tag">Page 1 of ${numberedPages}</span><h3 class="page-title">${write('Profile')}</h3>
           <figure class="snapshot"><img src="${member.photo}" alt="Portrait of ${member.name}"><figcaption>${member.subject}</figcaption></figure>
           <h4 class="signed-name">${write(member.name)}<svg aria-hidden="true" viewBox="0 0 150 10" preserveAspectRatio="none"><path d="M2 7Q28 3 50 5T94 4T148 3" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></h4>
           <span class="section-callout">${write(member.section)}</span>
-          <p class="page-text">${write(member.tagline)}</p></div></div>`;
+          <p class="page-text">${write(member.id === 1 ? "HUSH HUSH HUSH" : member.tagline)}</p></div></div>`;
       } else if (cfg.type === 'inside') {
         const borderFile = cfg.pageData.border || 'wavy-pink.svg';
         const borderSrc = `assets/borders/${borderFile}`;
 
         let extraHTML = '';
+        if (isSpiral && member.id === 1) {
+          if (cfg.index === 1) extraHTML = this.notebookPhotos(['zhang-linghe.jpg'], 'Zhang Linghe', true);
+          if (cfg.index === 7) extraHTML = this.notebookPhotos(
+            ['riam-album-1.jpg', 'riam-album-2.jpg', 'riam-album-3.jpg', 'riam-album-4.jpg', 'riam-album-5.jpg'], 'Riam’s notebook photo');
+        }
         if (cfg.skills?.length && isSpiral) {
           extraHTML = '<ul class="spiral-skills">' + cfg.skills.map(skill =>
             `<li><strong>${skill.name}</strong> — ${skill.funnyLabel}</li>`
@@ -491,7 +525,6 @@ class ClearBook {
                 <svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
                 Roast Me!
               </button>
-              <div class="roast-result-box" id="roastResultBox" style="display:none;"></div>
             </div>
           `;
         }
@@ -582,7 +615,7 @@ class ClearBook {
                 <h3 class="page-title">Profile</h3>
                 <figure class="snapshot">
                   <img src="${member.photo}" alt="Portrait of ${member.name}">
-                  <figcaption>${member.subject || 'Advanced Emerging Technologies'}</figcaption>
+                  <figcaption>${member.subject || 'Application and Emerging Technologies'}</figcaption>
                 </figure>
                 <h4 class="signed-name">
                   ${member.name}
@@ -601,9 +634,9 @@ class ClearBook {
               <img class="page-svg-border" src="${borderSrc}" alt="Page Border">
               <div class="page-body-content">
                 ${folderSheets ? `<header class="folder-letterhead"><span>${member.name}</span><span>${member.section}</span></header>` : ''}
-                <span class="page-category-tag">Page ${isSpiral ? cfg.index + 1 : cfg.index} of ${isSpiral ? 7 : 6}</span>
+                <span class="page-category-tag">Page ${isSpiral ? cfg.index + 1 : cfg.index} of ${numberedPages}</span>
                 <h3 class="page-title">${isSpiral ? write(cfg.pageData.title) : cfg.pageData.title}</h3>
-                <div class="page-text">${isSpiral ? cfg.pageData.content.split(/\n\s*\n/).map(paragraph => `<p>${write(paragraph)}</p>`).join('') : cfg.pageData.content}</div>
+                <div class="page-text">${isSpiral ? cfg.pageData.content.split(/\n\s*\n/).map(paragraph => `<p>${paragraph.split("\n").map(write).join("<br>")}</p>`).join('') : cfg.pageData.content}</div>
                 ${extraHTML}
                 ${folderSheets && cfg.index === 6 ? '<span class="folder-stamp">APPROVED</span>' : ''}
               </div>
@@ -613,28 +646,16 @@ class ClearBook {
 
         setTimeout(() => {
           const roastBtn = pageEl.querySelector('#roastMeBtn');
-          const roastBox = pageEl.querySelector('#roastResultBox');
-          if (roastBtn && roastBox) {
-            roastBtn.addEventListener('click', (e) => {
-              e.stopPropagation();
-              const roasts = [
-                "Has 47 browser tabs open and uses none of them.",
-                "Says 'quick 5 minute break' and returns 3 business days later.",
-                "Believes 'git push --force' is a valid problem-solving strategy.",
-                "Debugs with console.log('test 1'), console.log('here'), console.log('WHY PLEASE').",
-                "Spends 2 hours searching for a Spotify playlist before writing 1 line of HTML.",
-                "Can explain the theory of quantum computing, but forgets the semicolon on line 4.",
-                "Owns a reusable water bottle that has seen more iced coffee than water.",
-                "Reads StackOverflow answers from 2013 with blind religious faith."
-              ];
-              const randomRoast = roasts[Math.floor(Math.random() * roasts.length)];
-              roastBox.textContent = `"${randomRoast}"`;
-              roastBox.style.display = 'block';
-              if (window.PortfolioHumor && typeof window.PortfolioHumor.playSound === 'function') {
-                window.PortfolioHumor.playSound('pop');
-              }
-            });
-          }
+          roastBtn?.addEventListener('click', event => {
+            event.stopPropagation();
+            document.querySelector('.classroom-fire')?.remove();
+            const fire = document.createElement('div');
+            fire.className = 'classroom-fire';
+            fire.setAttribute('aria-hidden', 'true');
+            fire.addEventListener('animationend', () => fire.remove(), { once: true });
+            document.body.append(fire);
+            window.PortfolioHumor?.playSound('spill');
+          });
 
           const guestbookBtn = pageEl.querySelector('#openGuestbookFromBookBtn');
           if (guestbookBtn) {
@@ -659,7 +680,7 @@ class ClearBook {
 
             <div class="team-credits-card">
               <h4>AET Group Portfolio</h4>
-              <p>Subject: <strong>Advanced Emerging Technologies</strong></p>
+              <p>Subject: <strong>Application and Emerging Technologies</strong></p>
               <p>Tech: Three.js • GSAP • Spring Boot 3</p>
               <p style="margin-top: 6px; font-size: 0.75rem; opacity: 0.8;">Zero databases were harmed in the making of this portfolio.</p>
             </div>
@@ -692,6 +713,8 @@ class ClearBook {
           }
         }
       }
+      // The previous leaf's reverse is the left side of the photo spread.
+      if (isSpiral && member.id === 1 && cfg.type === 'inside' && cfg.index === 6) backHTML = this.coolSDoodles();
       if (looseSheets && !isJohn) backHTML = '<div class="folder-sheet-back"></div>';
       else if (isJohn) {
         const leftPageDoodles = (Sketches.SKETCH_LAYOUT[idx + 1] || []).map(({ name, x, y, size, rot }) =>
@@ -712,7 +735,7 @@ class ClearBook {
         front.replaceChildren(JohnFolderArt.get(member).canvas);
       } else if(cfg.type==='john-divider') {
         const front=pageEl.querySelector('.page-front');front.classList.add('john-divider-cover');
-        front.replaceChildren(this.johnDivider(member));
+        front.replaceChildren(this.johnDivider());
       } else if(cfg.type==='john-profile') {
         pageEl.querySelector('.page-front').replaceChildren(this.johnProfile(member));
       }

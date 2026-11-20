@@ -17,23 +17,23 @@ const classroomDefaults = {
   },
   "mission": {
     "title": "MISSION",
-    "text": "TODO: write our mission"
+    "text": "Buenos dias mi amor, por favor"
   },
   "vision": {
     "title": "VISION",
-    "text": "TODO: write our vision"
+    "text": "Kasi nga pag di ka inintindi, alam mo na yung magic word"
   },
   "whiteboardLines": [
     "AET Group Portfolio",
     "07:30   Filipino",
     "08:30   Mathematics",
-    "10:00   Advanced Emerging Technologies",
+    "10:00   Application and Emerging Technologies",
     "Attendance: present, even if the Wi-Fi is absent.",
     "Homework: save before you celebrate."
   ],
   "tvSlides": [
     "AET Group Portfolio",
-    "Advanced Emerging Technologies",
+    "Application and Emerging Technologies",
     "Click the laptop"
   ],
   "teacherLines": [

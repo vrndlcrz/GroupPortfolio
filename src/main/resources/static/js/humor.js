@@ -17,20 +17,6 @@ const PortfolioHumor = (function() {
   ];
   let konamiIndex = 0;
 
-  // Friendly Roasts list
-  const roasts = [
-    "Has 47 browser tabs open and uses none of them.",
-    "Says 'quick 5 minute break' and returns 3 business days later.",
-    "Believes 'git push --force' is a valid problem-solving strategy.",
-    "Debugs with console.log('test 1'), console.log('here'), console.log('WHY PLEASE').",
-    "Spends 2 hours searching for a Spotify playlist before writing 1 line of HTML.",
-    "Can explain the theory of quantum computing, but forgets the semicolon on line 4.",
-    "Owns a reusable water bottle that has seen more iced coffee than water.",
-    "Reads StackOverflow answers from 2013 with blind religious faith.",
-    "Uses dark mode so the bugs can't see them coming.",
-    "Calls a missing semicolon 'an unexpected design pause'."
-  ];
-
   const paperBuffers = new Map();
   function paperBuffer(ctx, spiral) {
     if (paperBuffers.has(spiral)) return paperBuffers.get(spiral);
@@ -204,10 +190,6 @@ const PortfolioHumor = (function() {
     }
   }
 
-  function toggleMute() {
-    return window.AudioMaster?.toggle();
-  }
-
   /**
    * Initializes both single-key ('E', 'G', 'F') and classic Konami easter eggs
    */
@@ -264,12 +246,16 @@ const PortfolioHumor = (function() {
     if (!dialog) {
       dialog = document.createElement('div');
       dialog.id = 'laptopErrorModal';
+      dialog.setAttribute('role', 'dialog');
+      dialog.setAttribute('aria-modal', 'true');
+      dialog.setAttribute('aria-label', 'Laptop system warning');
+      dialog.inert = true;
       dialog.className = 'error-modal-overlay';
       dialog.innerHTML = `
         <div class="retro-error-window">
           <div class="retro-window-header">
             <span style="display:flex; align-items:center; gap:6px;"><svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> System Warning: Motivation.exe</span>
-            <button class="retro-close-x" onclick="PortfolioHumor.closeLaptopError()">✕</button>
+            <button class="retro-close-x laptop-close" type="button" aria-label="Close laptop" onclick="PortfolioHumor.closeLaptopError()"><span aria-hidden="true">&#215;</span></button>
           </div>
           <div class="retro-window-body">
             <div class="retro-error-icon" style="display:flex;align-items:center;justify-content:center;">
@@ -284,23 +270,90 @@ const PortfolioHumor = (function() {
           <div class="retro-window-footer">
             <button class="retro-btn" onclick="PortfolioHumor.restartMotivation()">Drink Coffee &amp; Restart</button>
             <button class="retro-btn secondary" onclick="PortfolioHumor.closeLaptopError()">Ignore &amp; Cry</button>
+            <button class="retro-btn secondary" id="laptopCaptchaBtn" type="button">Verify I’m a robot</button>
           </div>
         </div>
       `;
+      dialog.querySelector('#laptopCaptchaBtn').addEventListener('click',()=>showRobotCaptcha(dialog));
       document.body.appendChild(dialog);
     }
     return dialog;
   }
 
+  function showRobotCaptcha(laptop) {
+    const game=document.createElement('dialog');
+    game.className='robot-captcha';
+    game.setAttribute('aria-labelledby','robot-captcha-title');
+    game.innerHTML = [
+      '<h2 id="robot-captcha-title">Robot verification</h2>',
+      '<label><input type="checkbox"> I am a robot</label>',
+      '<section hidden><p>Select all squares that contain a memory you deeply regret.</p>',
+      '<div class="robot-captcha-grid" role="group" aria-label="Memory tiles"></div>',
+      '<p aria-live="polite"></p></section>',
+      '<form method="dialog"><button type="submit">Close</button></form>'
+    ].join('');
+    const [intro,status]=game.querySelectorAll('section p');
+    const panel=game.querySelector('section'),grid=game.querySelector('.robot-captcha-grid');
+    const scenes=['🌧️','📱','📚','🎈','🚌','🎧','🌱','🍜','💻'];
+    let round=0,target=4;
+    const draw=()=>{
+      intro.textContent=round?'Find the tiny traffic light that got away.':'Select all squares that contain a memory you deeply regret.';
+      grid.removeAttribute('aria-busy');
+      grid.replaceChildren(...scenes.map((symbol,i)=>{
+        const tile=document.createElement('button');
+        tile.type='button';tile.setAttribute('aria-label',round&&i===target?'Tile '+(i+1)+' with a traffic light':'Tile '+(i+1));
+        tile.textContent=symbol;
+        if (round && i===target) {
+          const light=document.createElement('span');
+          light.className='robot-captcha-light';light.textContent='🚦';tile.append(light);
+        }
+        tile.onclick=()=>{
+          if (round && i!==target) {status.textContent='The traffic light is hiding in another square.';return;}
+          if (grid.getAttribute('aria-busy')==='true') return;
+          if (++round===4) {
+            grid.replaceChildren();intro.textContent='Verification complete';
+            status.textContent='Certified robot. Human feelings detected.';
+            game.querySelector('form button').focus();return;
+          }
+          target=(i+2+round)%scenes.length;
+          grid.setAttribute('aria-busy','true');tile.disabled=true;tile.classList.add('captcha-fading');status.textContent='One more scan…';
+          setTimeout(()=>{if(game.open){draw();grid.querySelectorAll('button')[i]?.focus();}},220);
+        };
+        return tile;
+      }));
+    };
+    game.querySelector('input').addEventListener('change',event=>{
+      panel.hidden=!event.target.checked;
+      if (event.target.checked) {round=0;draw();}
+    });
+    game.addEventListener('close',()=>{game.remove();laptop.querySelector('#laptopCaptchaBtn').focus();},{once:true});
+    document.body.append(game);game.showModal();
+  }
+
   function showLaptopErrorDialog() {
     playSound('error');
-    laptopDialog().classList.add('active');
+    const dialog = laptopDialog();
+    dialog.inert = false;
+    dialog.classList.add('active');
+    dialog.querySelector('.laptop-close').focus({preventScroll:true});
   }
 
   function closeLaptopError() {
     const dialog = document.getElementById('laptopErrorModal');
-    if (dialog) dialog.classList.remove('active');
+    if (dialog) {
+      dialog.classList.remove('active');
+      dialog.inert = true;
+    }
   }
+
+  window.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || !document.getElementById('laptopErrorModal')?.classList.contains('active')) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const captcha = document.querySelector('.robot-captcha[open]');
+    if (captcha) captcha.close();
+    else closeLaptopError();
+  }, true);
 
   function restartMotivation() {
     closeLaptopError();
@@ -308,57 +361,13 @@ const PortfolioHumor = (function() {
     showToast('Motivation rebooted! Coffee levels at 100%.');
   }
 
-  function showTermsJokeModal() {
-    let dialog = document.getElementById('termsModal');
-    if (!dialog) {
-      dialog = document.createElement('div');
-      dialog.id = 'termsModal';
-      dialog.className = 'error-modal-overlay';
-      dialog.innerHTML = `
-        <div class="retro-error-window terms-window">
-          <div class="retro-window-header">
-            <span style="display:flex; align-items:center; gap:6px;"><svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> Terms &amp; Conditions (Nobody Reads This)</span>
-            <button class="retro-close-x" onclick="document.getElementById('termsModal').classList.remove('active')">✕</button>
-          </div>
-          <div class="retro-window-body terms-body">
-            <p style="font-size:0.75rem; color:#64748B; margin-bottom:12px;">By looking at this website for more than 3 seconds, you agree to the following legally unenforceable clauses:</p>
-            <div class="terms-scroll-box">
-              <p>1. <strong>Clause of Universal Div Centering:</strong> The user acknowledges that centering a div in CSS is an art form comparable to classical renaissance sculpting.</p>
-              <p>2. <strong>Caffeine Conversion Rate:</strong> The developers maintain a 1:1 ratio between dark roast espresso and working REST endpoints.</p>
-              <p>3. <strong>The "It Worked On My Machine" Immunity:</strong> If any feature fails during grading, Article 42 establishes that it worked perfectly on the presenter's laptop at 10:33 PM.</p>
-              <p>4. <strong>Rubber Duck Arbitration:</strong> Any disputes regarding algorithms shall be submitted in writing to a yellow rubber duck sitting on the desk.</p>
-              <p style="background:#FEF3C7; padding:8px; border-radius:4px; color:#B45309; font-weight:bold;">
-                🎉 JOKE FOUND: You actually scrolled down here! You have been awarded 100 bonus imaginary credits. Please tell the professor our team deserves an A+!
-              </p>
-            </div>
-          </div>
-          <div class="retro-window-footer">
-            <button class="retro-btn" onclick="document.getElementById('termsModal').classList.remove('active'); PortfolioHumor.playSound('pop');">I Accept (Give Me An A+)</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(dialog);
-    }
-    dialog.classList.add('active');
-  }
-
-  function showHobbyNotFoundJoke() {
-    playSound('error');
-    showToast('⚠️ 404: Hobby Not Found! Sleeping is classified as a survival necessity, not a hobby.');
-  }
-
   return {
     playSound,
-    toggleMute,
-    initKonamiCode: initEasterEggs,
     initEasterEggs,
     showToast,
     showLaptopErrorDialog,
     closeLaptopError,
-    restartMotivation,
-    showTermsJokeModal,
-    showHobbyNotFoundJoke,
-    roasts
+    restartMotivation
   };
 })();
 
