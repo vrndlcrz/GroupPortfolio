@@ -12,7 +12,7 @@ const classroomDefaults = {
       "Riam Jaye Santiago",
       "John Vernie Dela Cruz",
       "Charella Magalpoc",
-      "Nicole De Guzman"
+      "Nicole Leigh G. De Guzman"
     ]
   },
   "mission": {

@@ -24,7 +24,7 @@ public class MemberControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[*].name", contains("Riam Jaye Santiago", "John Vernie Dela Cruz", "Charella Magalpoc", "Nicole De Guzman")))
+                .andExpect(jsonPath("$[*].name", contains("Riam Jaye Santiago", "John Vernie Dela Cruz", "Charella Magalpoc", "Nicole Leigh G. De Guzman")))
                 .andExpect(jsonPath("$[*].deskItem", contains("spiral-notebook", "long-folder", "theme-book", "intermediate-pad")))
                 .andExpect(jsonPath("$[0].themeSong.provider", is("file")))
                 .andExpect(jsonPath("$[0].themeSong.src", is("assets/audio/notebook-theme.mp3")))

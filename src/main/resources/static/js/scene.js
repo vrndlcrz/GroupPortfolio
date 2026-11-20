@@ -1568,10 +1568,10 @@ class DeskScene {
       // Student Blue Ballpen Handwriting in Patrick Hand (exact match to Image 5)
       ctx.fillStyle = '#174092';
       ctx.font = 'bold 34px "Patrick Hand", "Caveat", cursive';
-      ctx.fillText(member.name || 'Nicole De Guzman', 300, 785);
+      ctx.fillText(member.name || 'Nicole Leigh G. De Guzman', 300, 785);
 
       ctx.font = 'bold 29px "Patrick Hand", "Caveat", cursive';
-      ctx.fillText('Advanced Emerging', 300, 836);
+      ctx.fillText('Application and Emerging', 300, 836);
       ctx.fillText('Technologies', 300, 872);
 
       ctx.font = 'bold 34px "Patrick Hand", "Caveat", cursive';
@@ -1777,12 +1777,12 @@ class DeskScene {
       },
       {
         "id": 4,
-        "name": "Nicole De Guzman",
+        "name": "Nicole Leigh G. De Guzman",
         "titleText": "Nicole Leigh G. De Guzman",
         "section": "BSIT 3-1",
         "school": "Sta. John Gi Academy",
         "grade": "BSIT 3-1",
-        "subject": "Advanced Emerging Technologies",
+        "subject": "Application and Emerging Technologies",
         "teacher": "Sir Sean Dyogi",
         "deskItem": "intermediate-pad",
         "tagline": "Powered by careful planning and a fear of redoing work.",

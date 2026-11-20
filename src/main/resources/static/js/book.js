@@ -952,7 +952,7 @@ class ClearBook {
   }
 
   nicoleCoverHTML(member) {
-    const fullName = member.name || "Nicole De Guzman";
+    const fullName = member.titleText || member.name || "Nicole Leigh G. De Guzman";
     const teacherName = member.teacher || "Sir Sean Dyogi";
     return `
       <div class="nicole-page-container nicole-school-cover">
