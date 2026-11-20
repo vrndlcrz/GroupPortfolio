@@ -1170,8 +1170,79 @@ class ClearBook {
       `;
     }
 
-    // Spread 3 Left Page (Sheet 2 Verso - Stationery and Pens)
+    // Spread 3 Left Page (Sheet 2 Verso - Skincare Research)
     if (idx === 2) {
+      return `
+        <div class="nicole-verso-container nicole-stationery-page">
+          <div class="nicole-washi-strip washi-matcha">INTERESTS</div>
+          <div class="nicole-page-header">
+            <span class="nicole-page-num">NOTES</span>
+            <h2 class="nicole-section-title">Skincare Research</h2>
+          </div>
+          <div class="stationery-feature-card">
+            <div class="stationery-lead">
+              <p>Learning about skincare formulas and ingredients is a relaxing hobby away from the screen. I enjoy researching gentle routines that keep skin healthy.</p>
+            </div>
+            <div class="nib-diagram-box">
+              <div class="nib-diagram-header">
+                <div class="nib-icon-badge">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M10 2v7.31L4.69 18.5A2 2 0 0 0 6.44 21.5h11.12a2 2 0 0 0 1.75-3L14 9.31V2"/><line x1="8.5" y1="2" x2="15.5" y2="2"/><line x1="7" y1="16" x2="17" y2="16"/>
+                  </svg>
+                </div>
+                <div>
+                  <h4>Gentle Ingredients</h4>
+                  <span class="nib-sub">Hydration and Barrier Care</span>
+                </div>
+              </div>
+              <div class="nib-spec-grid">
+                <div class="nib-spec-item"><span class="spec-label">KEY ACTIVES</span><span class="spec-val">Ceramides and Peptides</span></div>
+                <div class="nib-spec-item"><span class="spec-label">HYDRATION</span><span class="spec-val">Hyaluronic Acid and Glycerin</span></div>
+                <div class="nib-spec-item"><span class="spec-label">PH BALANCE</span><span class="spec-val">Balanced and Gentle</span></div>
+                <div class="nib-spec-item"><span class="spec-label">DAILY FOCUS</span><span class="spec-val">Simple and Consistent Steps</span></div>
+              </div>
+            </div>
+            <div class="stationery-quote-tape">
+              <span class="quote-tape-pin" aria-hidden="true"></span>
+              <p>&ldquo;Good skincare is about patience and finding what works gently.&rdquo;</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Spread 4 Left Page (Sheet 3 Verso - Core Values: Replaces Career Goal)
+    if (idx === 3) {
+      return `
+        <div class="nicole-verso-container nicole-manifesto-page">
+          <div class="nicole-washi-strip washi-matcha">CORE VALUES</div>
+          <div class="nicole-page-header">
+            <span class="nicole-page-num">VALUES</span>
+            <h2 class="nicole-section-title">Quality Over Quantity</h2>
+          </div>
+          <div class="manifesto-card">
+            <div class="manifesto-quote-badge">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <span>FUN FACT &bull; WORK HABIT</span>
+            </div>
+            <blockquote class="manifesto-pullquote">
+              &ldquo;I always choose quality over quantity, and it genuinely bothers me if I leave something unfinished or slightly off.&rdquo;
+            </blockquote>
+            <p class="manifesto-body">Whether I am adjusting spacing in Figma or writing a Java class, I prefer spending extra time to make sure things look right and run without errors.</p>
+            <div class="manifesto-seal">
+              <div class="seal-ring">
+                <span class="seal-inner-text">DOING WORK PROPERLY</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Spread 5 Left Page (Sheet 4 Verso - Stationery and Pens: Pairs with Ink Swatches)
+    if (idx === 4) {
       return `
         <div class="nicole-verso-container nicole-stationery-page">
           <div class="nicole-washi-strip washi-matcha">STATIONERY</div>
@@ -1205,75 +1276,6 @@ class ClearBook {
             <div class="stationery-quote-tape">
               <span class="quote-tape-pin" aria-hidden="true"></span>
               <p>&ldquo;Good stationery keeps my notes neat and readable.&rdquo;</p>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Spread 4 Left Page (Sheet 3 Verso - Healthcare Technology)
-    if (idx === 3) {
-      return `
-        <div class="nicole-verso-container nicole-clinical-page">
-          <div class="nicole-washi-strip washi-matcha">CAREER GOAL</div>
-          <div class="nicole-page-header">
-            <span class="nicole-page-num">GOAL</span>
-            <h2 class="nicole-section-title">Healthcare Technology</h2>
-          </div>
-          <div class="clinical-pillars-card">
-            <p class="clinical-lead">Software used in clinics and hospitals needs to be simple and reliable. When patients and healthcare providers use a system, it should be clear and easy to navigate.</p>
-            <div class="pillars-list">
-              <div class="pillar-row">
-                <div class="pillar-bullet">01</div>
-                <div>
-                  <h4>Clear Information</h4>
-                  <p>Important details like patient names and dosage instructions should stand out immediately without clutter.</p>
-                </div>
-              </div>
-              <div class="pillar-row">
-                <div class="pillar-bullet">02</div>
-                <div>
-                  <h4>High Contrast Layouts</h4>
-                  <p>Readable text, high contrast, and simple layouts that are comfortable to use during long shifts.</p>
-                </div>
-              </div>
-              <div class="pillar-row">
-                <div class="pillar-bullet">03</div>
-                <div>
-                  <h4>Reliable Data Entry</h4>
-                  <p>Forms with clear labels and helpful validation so records stay accurate and easy to review.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Spread 5 Left Page (Sheet 4 Verso - Values)
-    if (idx === 4) {
-      return `
-        <div class="nicole-verso-container nicole-manifesto-page">
-          <div class="nicole-washi-strip washi-matcha">CORE VALUES</div>
-          <div class="nicole-page-header">
-            <span class="nicole-page-num">VALUES</span>
-            <h2 class="nicole-section-title">Quality Over Quantity</h2>
-          </div>
-          <div class="manifesto-card">
-            <div class="manifesto-quote-badge">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-              </svg>
-              <span>FUN FACT &bull; WORK HABIT</span>
-            </div>
-            <blockquote class="manifesto-pullquote">
-              &ldquo;I always choose quality over quantity, and it genuinely bothers me if I leave something unfinished or slightly off.&rdquo;
-            </blockquote>
-            <p class="manifesto-body">Whether I am adjusting spacing in Figma or writing a Java class, I prefer spending extra time to make sure things look right and run without errors.</p>
-            <div class="manifesto-seal">
-              <div class="seal-ring">
-                <span class="seal-inner-text">DOING WORK PROPERLY</span>
-              </div>
             </div>
           </div>
         </div>
@@ -1494,38 +1496,34 @@ class ClearBook {
       `;
     }
 
-    // Spread 4 Right Page (Sheet 4 Recto)
+    // Spread 4 Right Page (Sheet 4 Recto - Quality in Practice)
     if (idx === 4) {
       return `
         <div class="nicole-page-container nicole-vision-page">
-          <div class="nicole-washi-strip washi-cream">FUTURE PLANS</div>
+          <div class="nicole-washi-strip washi-cream">CORE VALUES</div>
           <div class="nicole-page-header">
             <span class="nicole-page-num">04 / 06</span>
-            <h2 class="nicole-section-title">Healthcare and Technology</h2>
+            <h2 class="nicole-section-title">Quality in Practice</h2>
           </div>
           <div class="nicole-vision-content">
             <div class="vision-banner">
               <div class="vision-icon-duo">
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="med-svg" aria-hidden="true">
-                  <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/>
-                </svg>
-                <span class="bridge-plus">&plus;</span>
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tech-svg" aria-hidden="true">
-                  <rect x="3" y="4" width="18" height="12" rx="2"/><line x1="2" y1="20" x2="22" y2="20"/>
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                 </svg>
               </div>
               <div class="vision-headline">
-                <h3>Dream Career</h3>
-                <p>To become a doctor, or to work in healthcare technology.</p>
+                <h3>Work Standards</h3>
+                <p>Taking the time to do things properly from the start.</p>
               </div>
             </div>
             <div class="vision-col">
-              <div class="col-ribbon">PRACTICAL SOFTWARE</div>
-              <h4>Helpful Tools for Clinics</h4>
-              <p>Good healthcare software should make everyday clinic work simpler. Clear forms, organized patient records, and readable screens help staff and patients stay on the same page.</p>
+              <div class="col-ribbon">PRACTICAL STANDARDS</div>
+              <h4>Doing Things Thoroughly</h4>
+              <p>Whether sketching layouts or organizing code, I prefer working patiently to ensure every detail is in place. Rushing often creates mistakes that take longer to fix later.</p>
             </div>
             <div class="vision-quote-card">
-              <p>&ldquo;Technology in healthcare should be easy to use and dependable when people need it most.&rdquo;</p>
+              <p>&ldquo;Every detail matters, from the first sketch to the final line of code.&rdquo;</p>
             </div>
           </div>
         </div>

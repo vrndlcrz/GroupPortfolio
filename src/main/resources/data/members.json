@@ -231,14 +231,14 @@
         "border": "vines-flowers.svg"
       },
       {
-        "title": "Career Goal",
-        "content": "My dream is to become a doctor, or to work in healthcare technology.\n\nI want to help build software that hospitals and clinics can rely on every day. That includes patient records and simple tools that make clinic visits smoother.\n\nHealthcare software needs clear text and dependable inputs so people get the right care without confusion.",
-        "border": "dripping-paint.svg"
-      },
-      {
-        "title": "Values",
+        "title": "Core Values",
         "content": "I always choose quality over quantity, and it genuinely bothers me if I leave something unfinished or slightly off.\n\nWhether I am drawing a layout in Figma or writing a Java class, I take the time to fix uneven margins and check my work before moving on.",
         "border": "bows-stars.svg"
+      },
+      {
+        "title": "Stationery Studio",
+        "content": "I collect quality pens and smooth notebook paper.\n\nWriting by hand with a 0.38mm fine pen helps me organize my thoughts and plan projects clearly before coding.\n\nI also enjoy trying different ink colors like matcha green, soft blush, and deep indigo.",
+        "border": "dripping-paint.svg"
       },
       {
         "title": "Contact",
