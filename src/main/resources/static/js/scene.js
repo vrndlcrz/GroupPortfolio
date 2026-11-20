@@ -1031,7 +1031,7 @@ class DeskScene {
     const person = new THREE.Group();
     person.position.set(0,floor - 1.5,-14.22); person.rotation.y = 0;
     this.teacher = person;
-    person.userData.type = 'teacher'; room.add(person); 
+    person.userData.type = 'teacher'; room.add(person);
     const skin = paint(0xb98058), slacks = paint(0x35373d), hair = paint(0x242021);
     this.teacherJacket = paint(Theme.ink);
     const oval = (parent, material, x,y,z, w,h,d) => {
@@ -1471,57 +1471,97 @@ class DeskScene {
     return folder;
   }
 
-  createThemeBook(member) {
-    const book = new THREE.Group();
-    const lacquer = new THREE.MeshStandardMaterial({ color: 0x21589b, roughness: 0.23 });
-    const paper = new THREE.MeshStandardMaterial({ color: 0xf4efdf, roughness: 0.95 });
-    const steel = new THREE.MeshStandardMaterial({ color: 0xb9c3ce, metalness: 0.75, roughness: 0.28 });
-    function addBox(w, h, d, x, y, z, material) {
-      const part = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
-      part.position.set(x, y, z);
-      part.castShadow = part.receiveShadow = true;
-      book.add(part);
-    }
-    addBox(1.10, 0.008, 1.54, 0, -0.036, 0, lacquer);
-    addBox(1.082, 0.064, 1.522, 0, 0, 0, paper);
-    addBox(1.10, 0.008, 1.54, 0, 0.036, 0, lacquer);
-    addBox(0.016, 0.08, 1.54, -0.542, 0, 0, lacquer);
-    for (const z of [-0.42, 0.42]) {
-      addBox(0.012, 0.009, 0.105, -0.515, 0.044, z, steel);
-      for (const end of [-0.048, 0.048]) {
-        addBox(0.012, 0.025, 0.009, -0.515, 0.033, z + end, steel);
-      }
-    }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = 840;
-    canvas.height = 1160;
-    const ctx = canvas.getContext('2d');
-    const cover = new Image();
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.anisotropy = 4;
-    const draw = () => {
-      ctx.fillStyle = '#21589b';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      if (cover.naturalWidth) ctx.drawImage(cover, 0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#071e50';
-      ctx.font = '600 35px "Dancing Script", cursive';
-      ctx.fillText(member.name, 232, 866, 500);
-      ctx.fillText(member.section || '', 345, 913, 385);
-      texture.needsUpdate = true;
-    };
-    cover.onload = draw;
-    cover.src = 'assets/textures/themebook-cover.png';
-    draw();
-    document.fonts.load('600 35px "Dancing Script"').then(draw).catch(() => {});
-    const face = new THREE.Mesh(new THREE.PlaneGeometry(1.10, 1.54),
-      new THREE.MeshStandardMaterial({ map: texture, roughness: 0.24 }));
-    face.rotation.x = -Math.PI / 2;
-    face.position.y = 0.0405;
-    face.receiveShadow = true;
-    book.add(face);
-    return book;
+createThemeBook(member) {
+  const book = new THREE.Group();
+
+  // Simple hardcover journal proportions
+  const bookW = 1.05;
+  const bookD = 1.55;
+  const bookH = 0.055;
+  const coverThick = 0.018;
+
+  const coverMat = new THREE.MeshStandardMaterial({
+    color: 0xc7b99c,
+    roughness: 0.85
+  });
+
+  const paperMat = new THREE.MeshStandardMaterial({
+    color: 0xf8f5ee,
+    roughness: 0.97
+  });
+
+  const spineMat = new THREE.MeshStandardMaterial({
+    color: 0xb09a7a,
+    roughness: 0.85
+  });
+
+  function addBox(w, h, d, x, y, z, material) {
+    const part = new THREE.Mesh(
+      new THREE.BoxGeometry(w, h, d),
+      material
+    );
+
+    part.position.set(x, y, z);
+    part.castShadow = true;
+    part.receiveShadow = true;
+    book.add(part);
+
+    return part;
   }
+
+  // Bottom hardcover
+  addBox(
+    bookW, coverThick, bookD,
+    0, -(bookH / 2 + coverThick / 2), 0,
+    coverMat
+  );
+
+  // Visible paper block
+  addBox(
+    bookW - 0.035, bookH, bookD - 0.035,
+    0.01, 0, 0,
+    paperMat
+  );
+
+  // Spine
+  addBox(
+    0.025, bookH + coverThick * 2, bookD,
+    -bookW / 2 + 0.0125, 0, 0,
+    spineMat
+  );
+
+  // Top hardcover
+  addBox(
+    bookW, coverThick, bookD,
+    0, bookH / 2 + coverThick / 2, 0,
+    coverMat
+  );
+
+  // Cover artwork
+  const coverTexture = new THREE.TextureLoader().load(
+    '/assets/textures/CM_cover.png'
+  );
+
+  coverTexture.anisotropy = 4;
+
+  const coverFace = new THREE.Mesh(
+    new THREE.PlaneGeometry(bookW, bookD),
+    new THREE.MeshStandardMaterial({
+      map: coverTexture,
+      roughness: 0.85
+    })
+  );
+
+  coverFace.rotation.x = -Math.PI / 2;
+  coverFace.position.y = bookH / 2 + coverThick + 0.001;
+  coverFace.receiveShadow = true;
+
+  book.add(coverFace);
+
+  return book;
+}
+
 
   buildFolders() {
     this.folders = [];

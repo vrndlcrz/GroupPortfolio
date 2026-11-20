@@ -169,11 +169,13 @@ class ClearBook {
       this.overlayElement.classList.toggle('theme-' + item, item === theme);
     }
     this.spiralTurn?.kill();
+    this.journalTurn?.kill();
     this.bookContainer.style.removeProperty('--book-offset');
     this.bookContainer.style.removeProperty('--left-opacity');
     this.isSpiral = this.overlayElement.classList.contains('theme-spiral');
-    // The standalone book tester loads ClearBook without the classroom's GSAP script.
-    if (this.isSpiral && !window.gsap && !document.querySelector('script[src$="/gsap.min.js"]')) {
+    this.isCharellaJournal = memberData.id === 3 && (theme === 'themebook' || theme === 'theme-book');
+    // The standalone book tester loads GSAP when a portfolio needs the page-turn animation.
+    if ((this.isSpiral || this.isCharellaJournal) && !window.gsap && !document.querySelector('script[src$="/gsap.min.js"]')) {
       const script = document.createElement('script');
       script.src = 'js/lib/gsap.min.js';
       document.head.appendChild(script);
@@ -208,26 +210,37 @@ class ClearBook {
   }
 
   isNotebook(member, theme = member.deskItem) {
-    return member.id === 1 && (!theme || theme === 'spiral-notebook' || theme === 'spiral');
+    return (
+      (member.id === 1 && (!theme || theme === 'spiral-notebook' || theme === 'spiral')) ||
+      (member.id === 3 && (theme === 'themebook' || theme === 'theme-book'))
+    );
   }
 
   prepareMusic(member) {
     this.musicPrepared = member.id;
-    if (this.isNotebook(member)) this.music.start(member.themeSong);
-    else this.music.stop();
+
+    if (member.id === 3) {
+      this.music.start('/assets/audio/SC-KalimutanKa.mp3');
+    } else if (this.isNotebook(member)) {
+      this.music.start(member.themeSong);
+    } else {
+      this.music.stop();
+    }
   }
 
   close() {
     if (!this.isOpen()) return;
     this.spiralTurn?.kill();
+    this.journalTurn?.kill();
     this.bookContainer.style.removeProperty('--book-offset');
     this.bookContainer.style.removeProperty('--left-opacity');
     this.isDragging = false;
     this.musicPrepared = null;
     clearTimeout(this.flipTimer);
     for (const leaf of this.pagesElements) {
-      leaf.classList.remove('turning', 'spiral-turning');
+      leaf.classList.remove('turning', 'spiral-turning', 'journal-turning');
       leaf.style.removeProperty('transform');
+      leaf.style.removeProperty('z-index');
     }
     this.deckElement.querySelector('.spiral-shadow')?.removeAttribute('style');
     this.music.stop();
@@ -364,20 +377,43 @@ class ClearBook {
         title: 'Welcome'
       });
     }
+
+    const isCharellaJournal =
+      member.id === 3 &&
+      (theme === 'themebook' || theme === 'theme-book');
+
     const insideCount = isSpiral ? (member.pages?.length || 6) : 6;
     const numberedPages = isSpiral ? insideCount + 1 : insideCount;
-    for (let i = 0; i < insideCount; i++) {
-      const pageData = (member.pages && member.pages[i]) ? member.pages[i] : {
-        title: titles[i] || `Section ${i + 1}`,
-        content: `Content for ${titles[i] || 'section'} will be added soon.`,
-        border: 'wavy-pink.svg'
-      };
-      pageConfigs.push({
-        type: 'inside',
-        index: i + 1,
-        pageData: pageData,
-        skills: (!isSpiral && i === 3) ? member.skills : null
+
+    if (isCharellaJournal) {
+      const journalImages = [
+        '/assets/textures/CM_1.png',
+        '/assets/textures/CM_2.png',
+        '/assets/textures/CM_3.png'
+      ];
+
+      journalImages.forEach((imageSrc, index) => {
+        pageConfigs.push({
+          type: 'inside-image',
+          index: index + 1,
+          imageSrc: imageSrc
+        });
       });
+    } else {
+      for (let i = 0; i < insideCount; i++) {
+        const pageData = (member.pages && member.pages[i]) ? member.pages[i] : {
+          title: titles[i] || `Section ${i + 1}`,
+          content: `Content for ${titles[i] || 'section'} will be added soon.`,
+          border: 'wavy-pink.svg'
+        };
+
+        pageConfigs.push({
+          type: 'inside',
+          index: i + 1,
+          pageData: pageData,
+          skills: (!isSpiral && i === 3) ? member.skills : null
+        });
+      }
     }
 
     // Page 7: Back Cover
@@ -409,8 +445,21 @@ class ClearBook {
         </div>
       `;
 
+      if (isCharellaJournal) {
+        backHTML = '';
+      }
+
       if (isJohn && (cfg.type==='cover' || cfg.type==='john-profile')) {
         frontHTML='';
+      } else if (
+        cfg.type === 'cover' &&
+        isCharellaJournal
+      ) {
+        frontHTML = `
+          <div class="cm-journal-cover">
+            <img src="/assets/textures/CM_cover.png" alt="Journal cover">
+          </div>
+        `;
       } else if (cfg.type === 'cover') {
         frontHTML = `
           <div class="book-cover" style="background: linear-gradient(145deg, ${coverColor} 0%, ${this.adjustColorBrightness(coverColor, -35)} 100%);">
@@ -436,8 +485,9 @@ class ClearBook {
         if (isSpiral) {
           frontHTML = `<div class="riam-collage-cover">
             <div class="riam-collage-tag"><img src="${member.photo}" alt="">
-            <span><strong>PORTFOLIO</strong><b>${member.name}</b><small>★ SECTION &nbsp; ${member.section}</small></span></div>
-          </div>`;
+            <span><strong>PORTFOLIO</strong><b>${member.name}</b><small>★ SECTION &nbsp; ${member.section}</small></span>
+          </div>
+        </div>`;
         }
 
         // Easy Easter Egg: Only 2 clicks (double click) to spin!
@@ -480,6 +530,17 @@ class ClearBook {
           <h4 class="signed-name">${write(member.name)}<svg aria-hidden="true" viewBox="0 0 150 10" preserveAspectRatio="none"><path d="M2 7Q28 3 50 5T94 4T148 3" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></h4>
           <span class="section-callout">${write(member.section)}</span>
           <p class="page-text">${write(member.id === 1 ? "HUSH HUSH HUSH" : member.tagline)}</p></div></div>`;
+      } else if (cfg.type === 'inside-image') {
+        frontHTML = `
+          <div class="cm-journal-page">
+            <img
+              src="${cfg.imageSrc}"
+              alt="Journal page ${cfg.index}"
+            >
+          </div>
+        `;
+
+
       } else if (cfg.type === 'inside') {
         const borderFile = cfg.pageData.border || 'wavy-pink.svg';
         const borderSrc = `assets/borders/${borderFile}`;
@@ -668,26 +729,37 @@ class ClearBook {
         }, 0);
 
       } else if (cfg.type === 'back-cover') {
-        frontHTML = `
-          <div class="book-back-cover" style="background: linear-gradient(145deg, ${this.adjustColorBrightness(coverColor, -20)} 0%, ${this.adjustColorBrightness(coverColor, -55)} 100%);">
-            <div>
-              <span class="cover-badge">Course Finale</span>
-              <h2 class="back-cover-title">The End</h2>
-              <p class="back-cover-subtitle">(Please Clap)</p>
+        if (isCharellaJournal) {
+          frontHTML = `
+            <div class="cm-journal-page">
+              <img
+                src="/assets/textures/CM-back.jfif"
+                alt=""
+              >
             </div>
+          `;
+        } else {
+          frontHTML = `
+            <div class="book-back-cover" style="background: linear-gradient(145deg, ${this.adjustColorBrightness(coverColor, -20)} 0%, ${this.adjustColorBrightness(coverColor, -55)} 100%);">
+              <div>
+                <span class="cover-badge">Course Finale</span>
+                <h2 class="back-cover-title">The End</h2>
+                <p class="back-cover-subtitle">(Please Clap)</p>
+              </div>
 
-            <div class="team-credits-card">
-              <h4>AET Group Portfolio</h4>
-              <p>Subject: <strong>Application and Emerging Technologies</strong></p>
-              <p>Tech: Three.js • GSAP • Spring Boot 3</p>
-              <p style="margin-top: 6px; font-size: 0.75rem; opacity: 0.8;">Zero databases were harmed in the making of this portfolio.</p>
-            </div>
+              <div class="team-credits-card">
+                <h4>AET Group Portfolio</h4>
+                <p>Subject: <strong>Application and Emerging Technologies</strong></p>
+                <p>Tech: Three.js • GSAP • Spring Boot 3</p>
+                <p style="margin-top: 6px; font-size: 0.75rem; opacity: 0.8;">Zero databases were harmed in the making of this portfolio.</p>
+              </div>
 
-            <div style="font-size: 0.85rem; opacity: 0.9;">
-              Thank you for reviewing our clear-book!
+              <div style="font-size: 0.85rem; opacity: 0.9;">
+                Thank you for reviewing our clear-book!
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        }
       }
 
       if (isSpiral) {
@@ -800,6 +872,7 @@ class ClearBook {
     if (this.isFlipping || this.currentPageIndex >= this.totalPages - 1) return;
 
     if (this.isSpiral) return this.turnSpiral(this.currentPageIndex + 1);
+    if (this.isCharellaJournal) return this.turnJournal(this.currentPageIndex + 1);
     this.isFlipping = true;
     const flippingPage = this.pagesElements[this.currentPageIndex];
     flippingPage.classList.add('turning');
@@ -822,6 +895,7 @@ class ClearBook {
     if (this.isFlipping || this.currentPageIndex <= 0) return;
 
     if (this.isSpiral) return this.turnSpiral(this.currentPageIndex - 1);
+    if (this.isCharellaJournal) return this.turnJournal(this.currentPageIndex - 1);
     this.isFlipping = true;
     this.currentPageIndex--;
     const returningPage = this.pagesElements[this.currentPageIndex];
@@ -843,11 +917,45 @@ class ClearBook {
   goToPage(idx) {
     if (this.isFlipping || idx === this.currentPageIndex || idx < 0 || idx >= this.totalPages) return;
     if (this.isSpiral) return this.turnSpiral(idx);
+    if (this.isCharellaJournal) return this.turnJournal(idx);
     this.currentPageIndex = idx;
     this.updatePageStates();
     if (window.PortfolioHumor && typeof window.PortfolioHumor.playSound === 'function') {
       window.PortfolioHumor.playSound('pageFlipSlow');
     }
+  }
+
+  turnJournal(destination) {
+    const forward = destination > this.currentPageIndex;
+    const leaf = this.pagesElements[forward ? this.currentPageIndex : destination];
+    if (!leaf) return;
+
+    this.currentPageIndex = destination;
+    this.isFlipping = true;
+    this.updatePageStates();
+    leaf.classList.add('journal-turning');
+    leaf.style.zIndex = '90';
+
+    const finish = () => {
+      leaf.classList.remove('journal-turning');
+      leaf.style.removeProperty('transform');
+      leaf.style.removeProperty('z-index');
+      this.isFlipping = false;
+      this.journalTurn = null;
+      this.updatePageStates();
+    };
+
+    if (window.PortfolioHumor?.playSound) window.PortfolioHumor.playSound('pageFlipSlow');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.gsap) {
+      finish();
+      return;
+    }
+
+    this.journalTurn = window.gsap.timeline({ onComplete: finish });
+    this.journalTurn.fromTo(leaf,
+      { rotationY: forward ? 0 : -180, z: 0 },
+      { rotationY: forward ? -180 : 0, z: 8, duration: 1.35, ease: 'power2.inOut', force3D: true }
+    );
   }
 
   turnSpiral(destination) {
