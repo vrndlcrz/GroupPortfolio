@@ -133,7 +133,7 @@ class ClearBook {
   }
 
   handleTouchStart(e) {
-    if (this.isFlipping || (e.touches && e.touches.length === 0)) return;
+    if (this.isFlipping || (e.touches && e.touches.length === 0) || e.target.closest('button') || e.target.closest('input') || e.target.closest('a')) return;
     this.isDragging = true;
     this.dragStartX = e.touches[0].clientX;
   }
@@ -170,6 +170,7 @@ class ClearBook {
     this.isNicole = memberData.id === 4;
     if (this.isNicole) {
       memberData.photo = 'assets/photos/nicole-portrait.jpg';
+      memberData.tagline = 'Powered by careful planning and a fear of redoing work.';
       if (!memberData.themeSong) {
         memberData.themeSong = {
           provider: 'file',
@@ -203,6 +204,9 @@ class ClearBook {
 
     const pages = this.preparePages(memberData, theme);
     this.deckElement.replaceChildren(...pages.deck);
+    if (this.isNicole) {
+      this.initNicoleInteractions(this.deckElement);
+    }
     const photos = this.deckElement.querySelectorAll('[data-notebook-photo]');
     if (photos.length && typeof API !== 'undefined') API.getClassroom().then(({ notebookPhotos = [] }) => {
       for (const img of photos) {
@@ -708,9 +712,6 @@ class ClearBook {
               }
             });
           }
-          if (isNicole) {
-            this.initNicoleInteractions(pageEl);
-          }
         }, 0);
 
       } else if (cfg.type === 'back-cover') {
@@ -784,6 +785,10 @@ class ClearBook {
         front.replaceChildren(this.johnDivider());
       } else if (cfg.type === 'john-profile') {
         pageEl.querySelector('.page-front').replaceChildren(this.johnProfile(member));
+      }
+
+      if (isNicole) {
+        this.initNicoleInteractions(pageEl);
       }
 
       pageEl.addEventListener('click', (e) => {
@@ -1346,11 +1351,11 @@ class ClearBook {
             <div class="memo-header-grid">
               <div class="memo-row"><span class="memo-label">STUDENT</span><span class="memo-val">${fullName}</span></div>
               <div class="memo-row"><span class="memo-label">SECTION</span><span class="memo-val">${member.section || 'BSIT 3-1'}</span></div>
-              <div class="memo-row"><span class="memo-label">COURSE</span><span class="memo-val">${member.subject || 'Advanced Emerging Technologies'}</span></div>
+              <div class="memo-row"><span class="memo-label">COURSE</span><span class="memo-val">${member.subject || 'Application and Emerging Technologies'}</span></div>
               <div class="memo-row"><span class="memo-label">GROUP</span><span class="memo-val">Sean Dyogi Truthers (Group 1)</span></div>
             </div>
             <div class="memo-divider"></div>
-            <p class="memo-body">This notebook collects my coursework, design samples, and notes for Advanced Emerging Technologies. Building these pages gave me practice in interface design, Java concepts, and clear documentation.</p>
+            <p class="memo-body">This notebook collects my coursework, design samples, and notes for Application and Emerging Technologies. Building these pages gave me practice in interface design, Java concepts, and clear documentation.</p>
             <div class="memo-sign-row">
               <div class="sign-line">
                 <span class="student-handwriting-sig">${fullName}</span>
@@ -1708,37 +1713,95 @@ class ClearBook {
   }
 
   initNicoleInteractions(pageEl) {
-    const copyBtn = pageEl.querySelector('#nicoleCopyEmailBtn');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', (e) => {
+    const copyBtns = pageEl.querySelectorAll('.nicole-copy-email-btn, #nicoleCopyEmailBtn');
+    copyBtns.forEach(copyBtn => {
+      if (copyBtn._hasCopyHandler) return;
+      copyBtn._hasCopyHandler = true;
+      copyBtn.addEventListener('click', async (e) => {
         e.stopPropagation();
+        e.preventDefault();
         const email = copyBtn.dataset.email || 'nicoleleighgdeguzman@gmail.com';
-        navigator.clipboard?.writeText(email).then(() => {
-          const original = copyBtn.textContent;
-          copyBtn.textContent = 'Copied! ✓';
-          copyBtn.style.background = '#4F6D54';
-          copyBtn.style.color = '#FFFDF7';
-          if (window.PortfolioHumor && typeof window.PortfolioHumor.showToast === 'function') {
-            window.PortfolioHumor.showToast('Copied email to clipboard!');
+        let copied = false;
+        if (navigator.clipboard && window.isSecureContext) {
+          try {
+            await navigator.clipboard.writeText(email);
+            copied = true;
+          } catch (err) {
+            copied = false;
           }
-          setTimeout(() => {
-            copyBtn.textContent = original;
-            copyBtn.style.background = '';
-            copyBtn.style.color = '';
-          }, 2000);
-        }).catch(() => {
-          copyBtn.textContent = 'Copied! ✓';
-        });
+        }
+        if (!copied) {
+          try {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = email;
+            tempInput.style.position = 'fixed';
+            tempInput.style.opacity = '0';
+            tempInput.style.left = '-9999px';
+            document.body.appendChild(tempInput);
+            tempInput.focus();
+            tempInput.select();
+            copied = document.execCommand('copy');
+            document.body.removeChild(tempInput);
+          } catch (err) {
+            console.error('Copy fallback failed', err);
+          }
+        }
+        const originalText = copyBtn.innerHTML;
+        copyBtn.textContent = 'Copied! ✓';
+        copyBtn.style.background = '#4F6D54';
+        copyBtn.style.color = '#FFFDF7';
+        if (window.PortfolioHumor && typeof window.PortfolioHumor.playSound === 'function') {
+          window.PortfolioHumor.playSound('pop');
+        }
+        if (window.PortfolioHumor && typeof window.PortfolioHumor.showToast === 'function') {
+          window.PortfolioHumor.showToast('Copied email to clipboard!');
+        }
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+          copyBtn.style.background = '';
+          copyBtn.style.color = '';
+        }, 2000);
       });
-    }
+    });
 
-    const guestbookBtn = pageEl.querySelector('#openGuestbookFromBookBtn');
-    if (guestbookBtn && !guestbookBtn._hasNicoleDeskHandler) {
+    const guestbookBtns = pageEl.querySelectorAll('.nicole-guestbook-btn, #openGuestbookFromBookBtn');
+    guestbookBtns.forEach(guestbookBtn => {
+      if (guestbookBtn._hasNicoleDeskHandler) return;
       guestbookBtn._hasNicoleDeskHandler = true;
       guestbookBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        e.preventDefault();
+        this.close();
         if (typeof this.options.onOpenGuestbook === 'function') {
           this.options.onOpenGuestbook(4);
+        }
+      });
+    });
+
+    const photoWrap = pageEl.querySelector('#coverPhotoWrap');
+    const photoImg = pageEl.querySelector('#coverPhotoImg');
+    if (photoWrap && photoImg && !photoWrap._hasNicoleSpinHandler) {
+      photoWrap._hasNicoleSpinHandler = true;
+      photoWrap.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.photoClickCount++;
+        if (this.photoClickCount >= 2) {
+          this.photoClickCount = 0;
+          photoImg.style.transition = 'transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          photoImg.style.transform = 'rotate(720deg) scale(1.18)';
+          setTimeout(() => {
+            photoImg.style.transform = 'rotate(0deg) scale(1)';
+          }, 1200);
+          if (window.PortfolioHumor && typeof window.PortfolioHumor.playSound === 'function') {
+            window.PortfolioHumor.playSound('spin');
+            window.PortfolioHumor.showToast('Academy crest spin easter egg unlocked!');
+          }
+        } else {
+          photoImg.style.transition = 'transform 0.15s ease';
+          photoImg.style.transform = 'scale(0.94) rotate(15deg)';
+          setTimeout(() => {
+            photoImg.style.transform = 'scale(1) rotate(0deg)';
+          }, 150);
         }
       });
     }

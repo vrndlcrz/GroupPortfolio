@@ -1793,6 +1793,9 @@ class DeskScene {
     ];
 
     membersList.forEach((member, i) => {
+      if (member.id === 4) {
+        member.tagline = 'Powered by careful planning and a fear of redoing work.';
+      }
       const layout = tabletopLayout.find(entry => entry.item === member.deskItem) || tabletopLayout.filter(entry => entry.item !== 'laptop')[i % 4];
       let folderMesh;
       switch (member.deskItem) {

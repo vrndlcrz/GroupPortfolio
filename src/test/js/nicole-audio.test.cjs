@@ -26,7 +26,7 @@ function setupThemeSong({ status = 200, source = '/assets/audio/notebook-theme.m
     pause() { this.paused = true; }
   }
 
-  const button = { hidden: true, addEventListener(name, fn) { this.click = fn; }, setAttribute() {}, textContent: '' };
+  const button = { hidden: true, addEventListener(name, fn) { this.click = fn; }, setAttribute() { }, textContent: '' };
   const credit = { hidden: true, textContent: '' };
   const context = {
     Audio: FakeAudio,
@@ -37,7 +37,7 @@ function setupThemeSong({ status = 200, source = '/assets/audio/notebook-theme.m
       requests.push({ url, options });
       return Promise.resolve({ ok: status < 400, status, headers: new Map() });
     },
-    gsap: { killTweensOf() {}, to: (target, options) => { tweens.push(options); return {}; } }
+    gsap: { killTweensOf() { }, to: (target, options) => { tweens.push(options); return {}; } }
   };
   context.window = context;
   vm.createContext(context);
@@ -105,6 +105,7 @@ test('members.json contains valid Nicole themeSong metadata', () => {
   assert.equal(nicole.themeSong.src, 'assets/audio/nicole-theme.opus');
   assert.equal(nicole.themeSong.title, 'Awit ng Paghahangad (Piano Instrumental)');
   assert.equal(nicole.themeSong.credit, '');
+  assert.equal(nicole.tagline, 'Powered by careful planning and a fear of redoing work.');
 
   // Content guidelines check on Nicole's visible strings
   for (const page of nicole.pages) {

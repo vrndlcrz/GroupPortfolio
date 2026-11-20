@@ -4287,6 +4287,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
 }
 
 .nicole-copy-email-btn:hover {
@@ -4322,6 +4325,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
 }
 
 .nicole-guestbook-btn:hover {

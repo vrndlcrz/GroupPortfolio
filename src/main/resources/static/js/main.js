@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     members = (fetchedMembers || []).map(m => {
       if (m.id === 4) {
         m.photo = 'assets/photos/nicole-portrait.jpg';
+        m.tagline = 'Powered by careful planning and a fear of redoing work.';
       }
       return m;
     });
