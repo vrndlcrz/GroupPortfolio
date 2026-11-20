@@ -264,12 +264,16 @@ const PortfolioHumor = (function() {
     if (!dialog) {
       dialog = document.createElement('div');
       dialog.id = 'laptopErrorModal';
+      dialog.setAttribute('role', 'dialog');
+      dialog.setAttribute('aria-modal', 'true');
+      dialog.setAttribute('aria-label', 'Laptop system warning');
+      dialog.inert = true;
       dialog.className = 'error-modal-overlay';
       dialog.innerHTML = `
         <div class="retro-error-window">
           <div class="retro-window-header">
             <span style="display:flex; align-items:center; gap:6px;"><svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> System Warning: Motivation.exe</span>
-            <button class="retro-close-x" onclick="PortfolioHumor.closeLaptopError()">✕</button>
+            <button class="retro-close-x laptop-close" type="button" aria-label="Close laptop" onclick="PortfolioHumor.closeLaptopError()"><span aria-hidden="true">&#215;</span></button>
           </div>
           <div class="retro-window-body">
             <div class="retro-error-icon" style="display:flex;align-items:center;justify-content:center;">
@@ -284,23 +288,90 @@ const PortfolioHumor = (function() {
           <div class="retro-window-footer">
             <button class="retro-btn" onclick="PortfolioHumor.restartMotivation()">Drink Coffee &amp; Restart</button>
             <button class="retro-btn secondary" onclick="PortfolioHumor.closeLaptopError()">Ignore &amp; Cry</button>
+            <button class="retro-btn secondary" id="laptopCaptchaBtn" type="button">Verify I’m a robot</button>
           </div>
         </div>
       `;
+      dialog.querySelector('#laptopCaptchaBtn').addEventListener('click',()=>showRobotCaptcha(dialog));
       document.body.appendChild(dialog);
     }
     return dialog;
   }
 
+  function showRobotCaptcha(laptop) {
+    const game=document.createElement('dialog');
+    game.className='robot-captcha';
+    game.setAttribute('aria-labelledby','robot-captcha-title');
+    game.innerHTML = [
+      '<h2 id="robot-captcha-title">Robot verification</h2>',
+      '<label><input type="checkbox"> I am a robot</label>',
+      '<section hidden><p>Select all squares that contain a memory you deeply regret.</p>',
+      '<div class="robot-captcha-grid" role="group" aria-label="Memory tiles"></div>',
+      '<p aria-live="polite"></p></section>',
+      '<form method="dialog"><button type="submit">Close</button></form>'
+    ].join('');
+    const [intro,status]=game.querySelectorAll('section p');
+    const panel=game.querySelector('section'),grid=game.querySelector('.robot-captcha-grid');
+    const scenes=['🌧️','📱','📚','🎈','🚌','🎧','🌱','🍜','💻'];
+    let round=0,target=4;
+    const draw=()=>{
+      intro.textContent=round?'Find the tiny traffic light that got away.':'Select all squares that contain a memory you deeply regret.';
+      grid.removeAttribute('aria-busy');
+      grid.replaceChildren(...scenes.map((symbol,i)=>{
+        const tile=document.createElement('button');
+        tile.type='button';tile.setAttribute('aria-label',round&&i===target?'Tile '+(i+1)+' with a traffic light':'Tile '+(i+1));
+        tile.textContent=symbol;
+        if (round && i===target) {
+          const light=document.createElement('span');
+          light.className='robot-captcha-light';light.textContent='🚦';tile.append(light);
+        }
+        tile.onclick=()=>{
+          if (round && i!==target) {status.textContent='The traffic light is hiding in another square.';return;}
+          if (grid.getAttribute('aria-busy')==='true') return;
+          if (++round===4) {
+            grid.replaceChildren();intro.textContent='Verification complete';
+            status.textContent='Certified robot. Human feelings detected.';
+            game.querySelector('form button').focus();return;
+          }
+          target=(i+2+round)%scenes.length;
+          grid.setAttribute('aria-busy','true');tile.disabled=true;tile.classList.add('captcha-fading');status.textContent='One more scan…';
+          setTimeout(()=>{if(game.open){draw();grid.querySelectorAll('button')[i]?.focus();}},220);
+        };
+        return tile;
+      }));
+    };
+    game.querySelector('input').addEventListener('change',event=>{
+      panel.hidden=!event.target.checked;
+      if (event.target.checked) {round=0;draw();}
+    });
+    game.addEventListener('close',()=>{game.remove();laptop.querySelector('#laptopCaptchaBtn').focus();},{once:true});
+    document.body.append(game);game.showModal();
+  }
+
   function showLaptopErrorDialog() {
     playSound('error');
-    laptopDialog().classList.add('active');
+    const dialog = laptopDialog();
+    dialog.inert = false;
+    dialog.classList.add('active');
+    dialog.querySelector('.laptop-close').focus({preventScroll:true});
   }
 
   function closeLaptopError() {
     const dialog = document.getElementById('laptopErrorModal');
-    if (dialog) dialog.classList.remove('active');
+    if (dialog) {
+      dialog.classList.remove('active');
+      dialog.inert = true;
+    }
   }
+
+  window.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || !document.getElementById('laptopErrorModal')?.classList.contains('active')) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const captcha = document.querySelector('.robot-captcha[open]');
+    if (captcha) captcha.close();
+    else closeLaptopError();
+  }, true);
 
   function restartMotivation() {
     closeLaptopError();

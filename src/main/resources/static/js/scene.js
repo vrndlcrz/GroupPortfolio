@@ -57,7 +57,9 @@ const studentDefaults = [
   ['s3','Bea Borres',"My baby daddy Meray, Hopea, I'm dinadaan-daanan lang",2,2,false,'#F0C9A0','twin buns','#4A2C2A','#9A7BC8','none'],
   ['s4','Lans','THIS IS LANS!!!',2,3,false,'#B97A52','ponytail','#231815','#F2B632','headband'],
   ['s5','Buseng','Sir, walang kanin, sir?',3,1,false,'#D69A6B','crew cut','#1B1B1B','#E8892B','spoon'],
-  ['s6','Mosh','Miss you mosh',3,2,false,'#E6B88C','side part','#3A2312','#7A1F3A','none']
+  ['s6','Mosh','Miss you mosh',3,2,false,'#E6B88C','side part','#3A2312','#7A1F3A','none'],
+  ['iannah','Iannah','...',1,2,false,'#BA805C','ponytail','#30201A','#648C72','none'],
+  ['sherwin','Sherwin','Patingin nga ng system niyo',3,4,false,'#F1CFB5','side part','#291D19','#6383B7','glasses']
 ].map(([id,name,line,row,col,dance,skin,hairStyle,hairColor,outfitColor,accessory]) =>
   ({id,name,line,row,col,dance,look:{skin,hairStyle,hairColor,outfitColor,accessory}}));
 const tabletopLayout = [
@@ -69,7 +71,7 @@ const tabletopLayout = [
 ];
 
 class CameraRig {
-  static SEAT_POSE = Object.freeze({ x: VIEWER_SLOT.x, y: 4, z: VIEWER_SLOT.z, yaw: Math.atan2(-VIEWER_SLOT.x,VIEWER_SLOT.z+11.55), pitch: -.10, fov: 50 });
+  static SEAT_POSE = Object.freeze({ x: VIEWER_SLOT.x, y: 3.45, z: VIEWER_SLOT.z, yaw: Math.atan2(-VIEWER_SLOT.x,VIEWER_SLOT.z+11.55), pitch: -.18, fov: 55 });
   static DESK_POSE = Object.freeze({ x: 0, y: 8, z: -11.55, yaw: Math.PI, pitch: -Math.PI * 85 / 180 });
 
   capturePose() {
@@ -303,7 +305,7 @@ class DeskScene {
     const room = this.roomGroup = new THREE.Group();
     this.scene.add(room);
     // Four scene units per metre. A 1.8-unit seat and 3.02-unit table are 45 and 75.5 cm high.
-    const floor = -2.84, ceiling = 10, front = -15, back = 9, side = 11;
+    const floor = -2.84, ceiling = 10.25, front = -15, back = 9, side = 11;
     const unitBox = new THREE.BoxGeometry(1, 1, 1);
     const paint = color => new THREE.MeshStandardMaterial({ color, roughness: 0.88 });
     const paints = new Map();
@@ -361,29 +363,35 @@ class DeskScene {
     box(room, paint(0x69ad42), 0, floor + wallHeight * .05, front + .11, 22, wallHeight * .1, .08);
     box(room, paint(Theme.gold), 0, ceiling - .25, front + .14, 22, .12, .12);
     box(room, white, 0, ceiling + 0.1, -3, 22, 0.2, 24);
-    for (const z of [back]) {
-      box(room, white, 0, (ceiling + floor) / 2, z, 22, ceiling - floor, 0.18);
-      box(room, green, 0, floor + 0.23, z + (z === front ? 0.11 : -0.11), 22, 0.46, 0.07);
-      for (const x of [-10.75, 10.75]) box(room, yellow, x, (ceiling + floor) / 2, z + (z === front ? 0.2 : -0.2), 0.5, ceiling - floor, 0.5);
+    const doorHeight = 8.38;
+    for (const side of [-1, 1]) {
+      box(room, white, side * 6.39, (ceiling + floor) / 2, back, 9.22, wallHeight, .18);
+      box(room, green, side * 6.39, floor + .23, back - .11, 9.22, .46, .07);
+      box(room, yellow, side * 10.75, (ceiling + floor) / 2, back - .2, .5, wallHeight, .5);
     }
+    box(room, white, 0, floor + (doorHeight + wallHeight) / 2, back, 3.56, wallHeight - doorHeight, .18);
+    box(room, paint('#DDC8A6'), 0, floor - .08, back + 2.75, 8, .16, 5.5);
     const door = new THREE.Group();
     door.position.set(0, floor, back - 0.25);
     door.userData = { type: 'door', enabled: false };
     room.add(door);
-    // TODO: Register the exit-to-outside handler when the door is enabled.
+    const leaf = this.exitDoorLeaf = new THREE.Group();
+    leaf.position.x = -1.76;
+    door.add(leaf);
+    const doorPart = (mat, x, ...args) => box(leaf, mat, x + 1.76, ...args);
     const timber = paint(Theme.wood);
     const daylight = new THREE.MeshStandardMaterial({
       color: 0xe8f2ef, emissive: 0xfff8d7, emissiveIntensity: 1.1, roughness: 0.95
     });
     for (const x of [-1.86, 1.86]) box(door, green, x, 4.23, 0, 0.18, 8.46, 0.35);
     box(door, green, 0, 8.48, 0, 3.9, 0.18, 0.35);
-    box(door, timber, 0, 4.22, 0, 3.52, 8.36, 0.19);
-    box(door, green, 0, 6.84, -0.12, 2.06, 1.63, 0.08);
-    box(door, daylight, 0, 6.84, -0.17, 1.88, 1.45, 0.035);
+    doorPart(timber, 0, 4.22, 0, 3.52, 8.36, 0.19);
+    doorPart(green, 0, 6.84, -0.12, 2.06, 1.63, 0.08);
+    doorPart(daylight, 0, 6.84, -0.17, 1.88, 1.45, 0.035);
     const steel = new THREE.MeshStandardMaterial({ color: 0xb9c1bf, metalness: 0.68, roughness: 0.35 });
-    box(door, steel, 0, 0.57, -0.11, 3.29, 0.91, 0.04);
-    box(door, steel, -1.38, 3.9, -0.17, 0.24, 0.62, 0.13);
-    box(door, steel, -1.16, 4, -0.29, 0.62, 0.09, 0.16);
+    doorPart(steel, 0, 0.57, -0.11, 3.29, 0.91, 0.04);
+    doorPart(steel, -1.38, 3.9, -0.17, 0.24, 0.62, 0.13);
+    doorPart(steel, -1.16, 4, -0.29, 0.62, 0.09, 0.16);
     box(door, daylight, 0, 0.026, -0.13, 3.49, 0.04, 0.07);
     box(room, white, -side, (ceiling + floor) / 2, -3, 0.18, ceiling - floor, 24);
     for (const x of [-10.89, 10.89]) box(room, green, x, floor + 0.23, -3, 0.08, 0.46, 24);
@@ -477,12 +485,14 @@ class DeskScene {
     const screen = new THREE.Mesh(new THREE.PlaneGeometry(4.72,2.61),
       new THREE.MeshBasicMaterial({map:this.tvTexture}));
     screen.position.z = .11; tv.add(screen);
+    screen.userData.type='classroom-tv';
+    this.interactiveObjects.push(screen);
     this.initDVD(screen);
     this.buildTeacher(room, floor, box, paint, texture);
     const notices = texture(1024, 560, ctx => {
       ctx.fillStyle = '#aa7952'; ctx.fillRect(0,0,1024,560);
       const cards = [
-        ['CLASS OFFICERS', 'President', 'Vice President', 'Secretary', 'Treasurer'],
+        ['CLASS OFFICERS', 'President: Nicole', 'Vice President', 'Secretary: Charella', 'Muse: Riam'],
         ['SCHEDULE', '7:30   Filipino', '8:30   Mathematics', '9:30   Recess', '10:00  Science'],
         ['PAALALA', 'Bawal magkalat.', 'Bawal kumain', 'sa loob ng klase.']
       ];
@@ -499,8 +509,8 @@ class DeskScene {
 
     const tube = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff4d9, emissiveIntensity: 0.95 });
     for (const x of [-5.3, 5.3]) {
-      box(room, silver, x, 9.84, -4, 0.58, 0.24, 5);
-      box(room, tube, x, 9.65, -4, 0.24, 0.14, 4.8);
+      box(room, silver, x, ceiling - .12, -5.2, 5, .24, .58);
+      box(room, tube, x, ceiling - .31, -5.2, 4.8, .14, .24);
     }
     this.classroomRotors = [];
     const fan = (x,y,z,wall) => {
@@ -542,20 +552,6 @@ class DeskScene {
     const supports = [[0.77,2.13,-0.36,0.1,1.04,0.1],[0,1.54,0,1.62,0.12,1.46]];
     for (const x of [-0.69,0.69]) for (const z of [-0.58,0.58]) supports.push([x,0.83,z,0.11,1.66,0.11]);
     chairBatch(this.chairMaterials.legs,supports,false);
-    // One plain monoblock for the viewer, on the restored back-row slot.
-    const viewerChair = this.viewerChair = new THREE.Group(); room.add(viewerChair);
-    viewerChair.position.set(CameraRig.SEAT_POSE.x,0,CameraRig.SEAT_POSE.z);
-    viewerChair.rotation.y=VIEWER_SLOT.yaw;
-    const plastic = this.viewerPlasticMaterial=Theme.toon('#8FB3C9').clone();plastic.color.set('#8FB3C9');
-    box(viewerChair,plastic,0,floor+1.73,0,1.67,.14,1.55);
-    const backShape = new THREE.Shape();
-    backShape.moveTo(-.82,-.65); backShape.lineTo(.82,-.65);
-    backShape.lineTo(.78,.45); backShape.quadraticCurveTo(.76,.78,0,.78);
-    backShape.quadraticCurveTo(-.76,.78,-.78,.45); backShape.closePath();
-    const plasticBack = new THREE.Mesh(new THREE.ExtrudeGeometry(backShape,{depth:.09,bevelEnabled:false}),plastic);
-    plasticBack.position.set(0,floor+2.42,.68); plasticBack.rotation.x=.12; viewerChair.add(plasticBack);
-    for (const x of [-.69,.69]) for (const z of [-.58,.58]) box(viewerChair,plastic,x,floor+.83,z,.11,1.66,.11);
-
     this.buildStudents(room, floor);
     this.buildAbsentSeat(room, floor);
 
@@ -712,6 +708,15 @@ class DeskScene {
     }
     if (look.accessory==='hairclip') part(head,'box','#F2B632',[[.35,.27,-.25,.16,.06,.06]]);
     if (look.accessory==='headband') part(head,'box','#FFF3D6',[[0,.34,-.32,.79,.085,.055]]);
+    if (look.accessory==='glasses') {
+      const frames=[];
+      for (const x of [-.16,.16]) {
+        frames.push([x,.16,-.414,.245,.025,.045],[x,-.03,-.414,.245,.025,.045],
+          [x-.12,.065,-.414,.025,.2,.045],[x+.12,.065,-.414,.025,.2,.045]);
+      }
+      frames.push([0,.08,-.426,.10,.025,.045]);
+      part(head,'box',Theme.ink,frames);
+    }
     if (look.accessory==='spoon') {
       part(arms[1],'box','#BEC9CF',[[.04,.08,-.91,.045,.045,.36]]);
       part(arms[1],'sphere','#BEC9CF',[[.04,.08,-1.12,.1,.035,.14]]);
@@ -962,7 +967,7 @@ class DeskScene {
   }
 
   updateDVD(seconds) {
-    if(seconds-this.tvLastCheck<1/15)return;
+    if(this.experiences?.tvPlaying || seconds-this.tvLastCheck<1/15)return;
     const dt=this.tvPrevious?Math.min(seconds-this.tvPrevious,.15):0;
     this.tvLastCheck=this.tvPrevious=seconds;
     if(this.view!=='seat'||this.interactionBlocked()||!this.inputEnabled||document.hidden)return;
@@ -1066,7 +1071,7 @@ class DeskScene {
     // Seated forearms remain resting on the desk.
     const blink=Math.abs((seconds%4.8)-2.4);
     for (const eye of this.teacherEyes) eye.scale.y=0.073*Math.min(1,blink/0.085);
-    if (this.view !== 'seat' || this.interactionBlocked()) { this.hideSean(); return; }
+    if ((this.view !== 'seat' || this.interactionBlocked()) && !this.experiences?.speaker) { this.hideSean(); return; }
     if (!this.speechUntil) return;
     if (seconds*1000 >= this.speechUntil) {
       this.teacherBubble.classList.remove('visible'); this.speechUntil=0; return;
@@ -1077,7 +1082,7 @@ class DeskScene {
     const half = this.teacherBubble.offsetWidth / 2 + 8;
     this.teacherBubble.style.left = THREE.MathUtils.clamp(rect.left + (p.x + 1) * rect.width / 2, half, window.innerWidth - half) + 'px';
     this.teacherBubble.style.top = THREE.MathUtils.clamp(rect.top + (1 - p.y) * rect.height / 2, this.teacherBubble.offsetHeight + (document.getElementById('topNavbar')?.offsetHeight || 52) + 32, window.innerHeight - 8) + 'px';
-    this.teacherBubble.classList.toggle('visible', Math.abs(p.z)<1 && !this.isCameraZoomed);
+    this.teacherBubble.classList.toggle('visible', Math.abs(p.z)<1 && (!this.isCameraZoomed || this.experiences?.cleaning));
   }
 
   attachWhiteboardDrawing(canvas) {
@@ -1117,12 +1122,13 @@ class DeskScene {
     if (!first) return null;
     if (this.view === 'seat') {
       // A visible item occludes the desk below it, but cannot open from the seat.
-      if (this.isSpeakingSeat(first.object) || first.object.userData.type==='student-extra' || first.object.userData.type==='floor-scrap' || first.object.userData.type==='exit-door') return first;
+      if (this.isSpeakingSeat(first.object) || ['student-extra','floor-scrap','exit-door','classroom-tv','basketball','labubu'].includes(first.object.userData.type)) return first;
       const sean = intersects.find(hit => hit.object.userData.type === 'teacher');
       if (sean) return sean;
       if (this.tabletopObject(first.object)) return { object: this.deskHit };
       return first;
     }
+    if (first.object.userData.type==='labubu') return first;
     return intersects.find(hit => hit.object.userData.type === 'folder') || intersects.find(hit => hit.object.userData.type !== "front-desk" && this.tabletopObject(hit.object)) || null;
   }
 
@@ -1742,7 +1748,7 @@ class DeskScene {
     coffeeHitBox.userData = { type: 'coffee' };
     cupGroup.add(coffeeHitBox);
 
-    cupGroup.position.set(5.45, .2, .15);
+    cupGroup.position.set(4.44, .2, 1.52);
     cupGroup.userData = { type: 'coffee' };
     this.scene.add(cupGroup);
 
@@ -1762,7 +1768,7 @@ class DeskScene {
     });
     this.puddle = new THREE.Mesh(puddleGeo, puddleMat);
     this.puddle.rotation.x = -Math.PI / 2;
-    this.puddle.position.set(5.15,.2,0);
+    this.puddle.position.set(4.12,.2,1.30);
     this.puddle.scale.set(0, 0, 0);
     this.puddle.userData = { type: 'coffee' };
     this.scene.add(this.puddle);
@@ -1991,7 +1997,7 @@ class DeskScene {
 
     const portrait = aspect < 0.75;
     const compact = aspect < 1.15;
-    this.camera.fov = portrait ? 68 : compact ? 58 : 50;
+    this.camera.fov = portrait ? 71 : compact ? 62 : CameraRig.SEAT_POSE.fov;
     if (this.view === 'seat' && !this.isCameraZoomed) this.camera.position.copy(this.rig.seat);
     this.camera.updateProjectionMatrix();
     if (this.renderer) {
@@ -2142,6 +2148,12 @@ class DeskScene {
       if (!matchMedia('(pointer: coarse)').matches) this.showSean();
     } else if (obj.userData.type === 'front-desk') {
       this.showTooltip('Click to view the front desk', e);
+    } else if (obj.userData.type==='classroom-tv') {
+      this.showTooltip('Click to zoom the TV',e);
+    } else if (obj.userData.type==='basketball') {
+      this.showTooltip('Click the basketball',e);
+    } else if (obj.userData.type==='labubu') {
+      this.showTooltip('Click to inspect Riam’s Labubu',e);
     } else if (obj.userData.type==='floor-scrap') {
       if(this.experiences?.speaking)this.hideTooltip();else this.showTooltip('Click to read the wrapper',e);
     } else if (obj.userData.type==='exit-door') {
@@ -2616,7 +2628,7 @@ class DeskScene {
     });
   }
 
-  closeNoteViewerModal() {
+  closeNoteViewerModal({throwing=false}={}) {
     const modal = document.getElementById('noteViewModal');
     if (modal) {
       modal.classList.remove('active');
@@ -2627,7 +2639,7 @@ class DeskScene {
     }
 
     // Animate sticky note back to desk surface
-    if (this.activeStickyMesh && typeof gsap !== 'undefined') {
+    if (!throwing && this.activeStickyMesh && typeof gsap !== 'undefined') {
       gsap.to(this.activeStickyMesh.position, {
         y: this.activeStickyMesh.userData.originalY !== undefined
           ? this.activeStickyMesh.userData.originalY
@@ -2637,7 +2649,13 @@ class DeskScene {
       });
     }
     this.activeStickyMesh = null;
-    this.returnToDesk();
+    if (throwing) {
+      this.camera.position.copy(this.preZoomPosition);
+      this.camera.quaternion.copy(this.preZoomOrientation);
+      this.isCameraZoomed=false;
+    } else {
+      this.returnToDesk();
+    }
   }
 
   triggerShakeNearestFolder() {

@@ -1,7 +1,7 @@
-/* Lazy phone UI. Spotify stays in its official iframe; videos stay local. */
+/* Lazy phone UI for the classroom apps. */
 class PortfolioPhone {
-  constructor({button,members=[],config={},canOpen=()=>true,stopNotebook=()=>{}}) {
-    Object.assign(this,{button,members,config:config||{},canOpen,stopNotebook});
+  constructor({button,config={},canOpen=()=>true,stopNotebook=()=>{}}) {
+    Object.assign(this,{button,config:config||{},canOpen,stopNotebook});
     this.opened=false;this.media=new Map();this.likes=new Set();this.gesture=false;
     button.addEventListener('click',event=>{this.gesture ||= event.isTrusted;this.opened?this.close():this.open()});
     document.addEventListener('keydown',event=>{
@@ -25,9 +25,9 @@ class PortfolioPhone {
   icon(type) {
     const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');
     svg.setAttribute('viewBox','0 0 64 64');svg.setAttribute('aria-hidden','true');
-    const shapes=type==='spotify'?
+    const shapes=type==='spotibai'?
       [['circle',{cx:32,cy:32,r:27,fill:'#42B86B'}],['path',{d:'M28 40V20l18-4v21M28 24l18-4',fill:'none'}],['ellipse',{cx:23,cy:42,rx:6,ry:4,fill:'#FFF3D4'}],['ellipse',{cx:41,cy:39,rx:6,ry:4,fill:'#FFF3D4'}]]:
-      type==='heart'?[['path',{d:'M32 53 10 32C-4 12 20 3 32 20 44 3 68 12 54 32Z',fill:'none'}]]:
+      type==='heart'||type==='labubu'?[['path',{d:'M32 53 10 32C-4 12 20 3 32 20 44 3 68 12 54 32Z',fill:'none'}]]:
       [['path',{d:'m8 17 32-8 10 35-32 9Z',fill:'#47BEB3'}],['path',{d:'m23 13 30 9-10 33-30-9Z',fill:'#EC7298'}],['path',{d:'m29 26 13 8-15 7Z',fill:'#FFF3D4'}]];
     for(const [tag,attrs] of shapes){const node=document.createElementNS(ns,tag);for(const [key,value] of Object.entries(attrs))node.setAttribute(key,value);svg.append(node)}return svg;
   }
@@ -42,7 +42,7 @@ class PortfolioPhone {
     const signal=this.element('span','phone-signal');for(let i=0;i<3;i++)signal.append(this.element('i'));
     status.append(signal,this.element('span','phone-notch'),this.element('span','phone-battery'));
     const header=this.element('header','phone-header');
-    this.back=this.action('‹',()=>this.showSpotify(),'phone-back');this.back.setAttribute('aria-label','Back to playlists');
+    this.back=this.action('‹',()=>this.showHome(),'phone-back');this.back.setAttribute('aria-label','Phone home');
     this.title=this.element('h2','','Phone');this.title.id='phone-title';
     this.closeButton=this.action('×',()=>this.close(),'phone-close');this.closeButton.setAttribute('aria-label','Close phone');header.append(this.back,this.title,this.closeButton);
     this.screen=this.element('div','phone-screen');
@@ -105,19 +105,11 @@ class PortfolioPhone {
   showHome() {
     this.stopMedia();this.app='home';this.title.textContent='Phone';this.back.hidden=true;
     const home=this.element('div','phone-apps');
-    for(const [type,name] of [['spotify','Spotify'],['tiktik','Tiktik']]){
-      const button=this.action('',()=>type==='spotify'?this.showSpotify():this.showTiktik(),'phone-app');
+    for(const [type,name,open] of [['spotibai','SpotiBai',()=>this.showSpotiBai()],['tiktik','Tiktik',()=>this.showTiktik()],['labubu','Labubu',()=>this.showLabubu()]]){
+      const button=this.action('',open,'phone-app');
       button.append(this.icon(type),this.element('span','',name));home.append(button);
     }
     this.screen.replaceChildren(home);
-  }
-  static embedUrl(link) {
-    try {
-      if(typeof link!=='string'||!link.trim())return null;
-      const url=new URL(link.trim()),match=url.pathname.match(/^\/(playlist|album)\/([A-Za-z0-9]+)$/);
-      if(url.protocol!=='https:'||url.host!=='open.spotify.com'||url.username||url.password||!match)return null;
-      return 'https://open.spotify.com/embed/'+match[1]+'/'+match[2]+'?utm_source=generator&theme=0';
-    }catch{return null}
   }
   static localVideoPath(value) {
     try {
@@ -127,27 +119,71 @@ class PortfolioPhone {
       return url.origin===location.origin&&url.pathname.startsWith('/assets/videos/')&&!url.search&&!url.hash?url.pathname:null;
     }catch{return null}
   }
-  showSpotify() {
-    this.stopMedia();this.app='spotify';this.title.textContent='Spotify';this.back.hidden=true;
+  showSpotiBai() {
+    this.stopMedia();this.app='spotibai';this.title.textContent='SpotiBai';this.back.hidden=false;
     const list=this.element('div','phone-playlists');
-    for(const [index,member] of this.members.entries()){
-      const entry=(Array.isArray(this.config.playlists)?this.config.playlists:[]).find(item=>item.memberName===member.name);
-      const url=PortfolioPhone.embedUrl(entry?.spotifyUrl),button=this.action('',()=>this.showPlaylist(member,url),'phone-playlist-card');
-      const tile=this.element('span','phone-playlist-cover',(member.name||'Member').trim().split(/\s+/).slice(0,2).map(part=>part[0]).join(''));
-      tile.style.backgroundColor=['#7FC5AB','#E9A08D','#B8A0D5','#EBC65E'][index%4];
-      const copy=this.element('span','phone-playlist-copy');copy.append(this.element('strong','',member.name||'Member'),this.element('small','',url?'Open playlist':'No playlist yet'));
-      button.append(tile,copy);list.append(button);
+    const status=this.element('p','phone-placeholder');
+    status.setAttribute('role','status');
+    for (const track of this.config.tracks || []) {
+      const row=this.element('article','phone-playlist-card spotibai-track');
+      const name=this.element('strong','phone-playlist-copy',track.title);
+      const play=this.action('Play',()=>{
+        const experience=this.experiences;
+        if (experience.track===track) {
+          experience.stopTrack();
+          play.textContent='Play';
+          status.textContent='';
+          return;
+        }
+        list.querySelectorAll('[data-track-play]').forEach(button=>button.textContent='Play');
+        experience.playTrack(track,()=>{
+          play.textContent='Play';
+          status.textContent='';
+        }).then(started=>{
+          play.textContent=started?'Stop':'Play';
+          status.textContent=started?'Playing '+track.title:'Audio could not start.';
+          if (started && track.id==='tma') this.close(true);
+        });
+      });
+      play.dataset.trackPlay='';
+      play.disabled=!track.audioAvailable;
+      if (this.experiences?.track===track) play.textContent='Stop';
+      row.append(name,play);
+      if (!track.audioAvailable) row.append(this.element('small','','Audio pending'));
+      if (track.videoAvailable) row.append(this.action('Connect to TV',()=>{
+        this.close(true);
+        this.experiences?.playTV(track);
+      }));
+      list.append(row);
     }
-    if(!this.members.length)list.append(this.element('p','phone-placeholder','No playlist yet'));
-    this.screen.replaceChildren(list);
+    this.screen.replaceChildren(list,status);
   }
-  showPlaylist(member,url) {
-    this.stopMedia();this.app='playlist';this.title.textContent='Spotify';this.back.hidden=false;
-    if(!url){this.screen.replaceChildren(this.element('p','phone-placeholder','No playlist yet'));return}
-    const iframe=this.iframe=document.createElement('iframe');iframe.className='phone-spotify-player';
-    iframe.allow='autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';iframe.loading='lazy';
-    iframe.title=(member.name||'Member')+' — Spotify playlist';iframe.src=url;this.screen.replaceChildren(iframe);
+
+  showLabubu(rolled = this.rolledLabubu) {
+    this.stopMedia();this.app='labubu';this.title.textContent='Labubu';this.back.hidden=false;
+    const card=this.element('div','phone-labubu');
+    const ready=!!this.experiences?.s.deskGroup;
+    if (ready && rolled) {
+      const toy=this.element('img','phone-labubu-preview');
+      toy.src='assets/photos/riam-labubu.png';toy.alt='Riam’s Labubu';
+      card.append(toy,this.element('strong','',rolled.color+' Riam Labubu'));
+      card.append(this.action('Keep and place on Sir Sean’s desk',()=>{
+        this.experiences.placeLabubu(rolled);
+        this.rolledLabubu=null;
+        this.close(true);
+        this.experiences.zoomLabubu();
+      }));
+    }
+    const roll=this.action(rolled?'Roll again':'Roll',()=>{
+      const styles=[{color:'Cocoa',fur:'#695044'},{color:'Rose',fur:'#D68B9C'},{color:'Mint',fur:'#70AA92'}];
+      this.rolledLabubu=styles[Math.floor(Math.random()*styles.length)];
+      this.showLabubu(this.rolledLabubu);
+    });
+    roll.disabled=!ready;
+    card.append(roll);
+    this.screen.replaceChildren(card);
   }
+
   showTiktik() {
     this.stopMedia();this.app='tiktik';this.title.textContent='Tiktik';this.back.hidden=true;
     this.entries=Array.isArray(this.config.videos)?this.config.videos:[];this.failed=new Set();this.visible=-1;
@@ -199,7 +235,7 @@ class PortfolioPhone {
     const current=this.media.get(index);if(current&&this.gesture)current.play().catch(()=>{});
   }
   stopMedia() {
-    this.iframe?.remove();this.iframe=null;this.videoObserver?.disconnect();this.videoObserver=null;
+    this.videoObserver?.disconnect();this.videoObserver=null;
     for(const index of [...this.media.keys()])this.unload(index);
   }
 }

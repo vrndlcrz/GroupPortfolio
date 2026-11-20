@@ -1101,3 +1101,8 @@ html, body {
   transition: opacity .25s;
 }
 .teacher-speech.visible { opacity: 1; }
+
+#lookGuide .zero-g-hint { color:#000; font-weight:900; }
+#laptopErrorModal .retro-window-header { gap:.75rem; align-items:center; }
+#laptopErrorModal .laptop-close { display:grid; place-items:center; flex:0 0 1.7rem; width:1.7rem; height:1.7rem; padding:0; line-height:1; font-size:1.25rem; }
+#laptopErrorModal .laptop-close::before,#laptopErrorModal .laptop-close::after { content:none; }

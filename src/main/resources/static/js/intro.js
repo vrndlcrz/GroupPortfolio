@@ -1,6 +1,6 @@
 /* One timeline per load. No persistence and no camera animation. */
 window.Intro = (() => {
-  const defaults = { enabled:true, title:'What if Sir Sean was a highschool teacher?', subtitle:'A Group 1 production', soundEnabled:true };
+  const defaults = { enabled:true, title:'What if Sir Sean was your highschool teacher?', subtitle:'A Group 1 production', soundEnabled:true };
   function start(classroomRequest) {
     let overlay = document.getElementById('intro'), timeline, fade, scene, done = false, skipping = false, watchdog;
     const heldKeys = new Set();

@@ -12,38 +12,43 @@
     "subject": "Advanced Emerging Technologies",
     "tagline": "Emerging technologies, emerging deadlines",
     "folderLabel": "FINAL_v7_REALLYFINAL_dontopen",
-    "photo": "assets/photos/member1.svg",
+    "photo": "assets/photos/riam-portrait.jpg",
     "coverColor": "#FF7A00",
     "pages": [
       {
         "title": "About Me",
-        "content": "Hi! I am Riam Jaye Santiago, an aspiring technologist in BSIT 3-1. I love tinkering with computers, building weird web experiments, and converting excessive caffeine into lines of working code. Motto: 'If it works, don't touch it!'\n\nOpen the cover and follow the pages in order, or skip ahead to the projects. Each section shows a different side of the person behind this little corner of the desk.",
+        "content": "Nickname: RJ\nAge: 17 😛\nObjective in Life: Makita si Zhang Linghe\nFavorite hobby: Watch Chinese dramas",
         "border": "wavy-pink.svg"
       },
       {
-        "title": "Hobbies",
-        "content": "• Mechanical keyboards & soldering\n• Late night gaming sessions\n• Watching 3-hour long video essays on tech history\n• Hunting for rare stickers to put on my laptop\n\nThere is a pattern in this list: curiosity usually wins over a perfectly sensible bedtime. Pick one of these topics for the guestbook and see where the conversation goes. A good recommendation is always worth saving for the next study break.",
+        "title": "Some interests I can think of",
+        "content": "• Baking!\n• Reading manhwas/mangas\n• Tingnan si Zhang Linghe hehehe\n• Photography!",
         "border": "blobs-orange.svg"
       },
       {
-        "title": "Skills",
-        "content": "Comfortable with Java, JavaScript, and emerging web technologies. Special ability: figuring out why code throws NullPointerException at 2:00 AM after staring at the screen in silence for 45 minutes.\n\nThe real test comes when a teammate asks for help. Start with the smallest example, talk through what should happen, and change one thing at a time. Sometimes explaining the problem out loud is enough to spot the answer.",
+        "title": "If I were…",
+        "content": "If I were not in IT rn….\nI’d probably be studying a health-allied field.\n\nIf I were not being practical..\nI would’ve loved to pursue film : ))\n\nIf I were not born in the Philippines….\nI would’ve been happy charot",
         "border": "vines-flowers.svg"
       },
       {
-        "title": "Projects",
-        "content": "• The Messy Desk 3D Portfolio (This website! Built with Spring Boot & Three.js)\n• Discord Bot for automated study timers\n• Terminal-based budget tracker written in Java\n\nThese ideas fit on one page, but getting a working demo takes more than a catchy title. The fun part is turning a rough sketch into something another person can actually open, try, and give feedback on.",
+        "title": "What I learned",
+        "content": "Favorite lessons that Sir Sean taught\nThe foundation of course, and I really enjoyed doing the activities he prepared\n\nSkills I got since 1st year:\n• Social skills + networking\n• Slight programming skills\n• Time management",
         "border": "dripping-paint.svg"
       },
       {
-        "title": "Fun Facts",
-        "content": "Has 47 browser tabs open right now and believes every single one is critical. Still uses console.log() as a primary life debugging tool. Believes dark mode is an internationally recognized human right.\n\nThe desk has a guestbook for exactly this kind of confession. If any of that sounds familiar, leave a note with your own most questionable study habit. The rubber duck has heard worse.",
+        "title": "Projects",
+        "content": "Academic-Based:\n• HealthWatch\n• Brgy Management System\n• PLM UHS Appointment System\n\nPersonal\n• MedFund",
         "border": "bows-stars.svg"
       },
       {
-        "title": "Contact",
-        "content": "Master distributed systems, build software that millions of people actually enjoy using, and finally get 8 hours of sleep.\n\nLeave a message in the desk guestbook to share a project idea or ask about one of the pages. A specific question makes a great conversation starter. Mention the part that caught your eye, or suggest something you would like to see in a future version.",
+        "title": "Dream…",
+        "content": "Destination: Switzerland!\nCountry to Live in: England\nCareer: Program Manager\n\nTop Music Right now\nWaiian - WEYAAT (Mingyu-inspired)",
         "border": "dotted-frame.svg"
+      },
+      {
+        "title": "My pictures",
+        "content": "",
+        "border": "wavy-pink.svg"
       }
     ],
     "skills": [
@@ -80,7 +85,7 @@
     "subject": "Advanced Emerging Technologies",
     "tagline": "You only fail when you stop trying",
     "folderLabel": "Do Not Open (Seriously)",
-    "photo": "assets/photos/member2.svg",
+    "photo": "assets/photos/vernie-portrait.jpg",
     "coverColor": "#1E40AF",
     "pages": [
       {

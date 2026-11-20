@@ -1,10 +1,13 @@
 site:
   phone:
-    playlists:
-      - {member-name: "Riam Jaye Santiago", spotify-url: ""}
-      - {member-name: "John Vernie Dela Cruz", spotify-url: ""}
-      - {member-name: "Charella Magalpoc", spotify-url: ""}
-      - {member-name: "Nicole De Guzman", spotify-url: ""}
+    tracks:
+      - {id: preso, title: "Hev Abi - Preso", audio: /assets/audio/preso.mp3, video: /assets/videos/preso.mp4}
+      - {id: bagyo, title: "Shean - Bagyo", audio: /assets/audio/bagyo.mp3}
+      - {id: since-day-one, title: "Since Day One", audio: /assets/audio/since-day-one.mp3}
+      - {id: closer-daddy-rob, title: "Closer x Daddy Rob", audio: /assets/audio/closer-daddy-rob.mp3}
+      - {id: muli-japanese, title: "Muli Japanese Version", audio: /assets/audio/muli-japanese.mp3}
+      - {id: muli-budots, title: "Muli Budots Version", audio: /assets/audio/muli-budots.mp3}
+      - {id: tma, title: "TMA", audio: /assets/audio/tma.mp3}
     videos: []
   students:
     - id: s1
@@ -44,9 +47,21 @@ site:
       row: 3
       col: 2
       look: {skin: "#E6B88C", hair-style: side part, hair-color: "#3A2312", outfit-color: "#7A1F3A", accessory: none}
+    - id: iannah
+      name: "Iannah"
+      line: "..."
+      row: 1
+      col: 2
+      look: {skin: "#BA805C", hair-style: ponytail, hair-color: "#30201A", outfit-color: "#648C72", accessory: none}
+    - id: sherwin
+      name: "Sherwin"
+      line: "Patingin nga ng system niyo"
+      row: 3
+      col: 4
+      look: {skin: "#F1CFB5", hair-style: side part, hair-color: "#291D19", outfit-color: "#6383B7", accessory: glasses}
   intro:
     enabled: true
-    title: "What if Sir Sean was a highschool teacher?"
+    title: "What if Sir Sean was your highschool teacher?"
     subtitle: "A Group 1 production"
     sound-enabled: true
   audio:
@@ -62,10 +77,10 @@ site:
       names: ["Riam Jaye Santiago","John Vernie Dela Cruz","Charella Magalpoc","Nicole De Guzman"]
     mission:
       title: "MISSION"
-      text: "TODO: write our mission"
+      text: "Buenos dias mi amor, por favor"
     vision:
       title: "VISION"
-      text: "TODO: write our vision"
+      text: "Kasi nga pag di ka inintindi, alam mo na yung magic word"
     whiteboardLines:
       - "AET Group Portfolio"
       - "07:30   Filipino"

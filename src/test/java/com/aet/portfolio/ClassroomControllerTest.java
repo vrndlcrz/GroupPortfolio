@@ -25,7 +25,7 @@ class ClassroomControllerTest {
         mvc.perform(get("/api/site/classroom"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.intro.enabled").value(true))
-            .andExpect(jsonPath("$.intro.title").value("What if Sir Sean was a highschool teacher?"))
+            .andExpect(jsonPath("$.intro.title").value("What if Sir Sean was your highschool teacher?"))
             .andExpect(jsonPath("$.intro.subtitle").value("A Group 1 production"))
             .andExpect(jsonPath("$.intro.soundEnabled").value(true))
             .andExpect(jsonPath("$.audio.notebookTheme").value("/assets/audio/notebook-theme.mp3"))

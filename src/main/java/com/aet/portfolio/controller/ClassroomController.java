@@ -38,5 +38,13 @@ public class ClassroomController {
     public record ClassroomResponse(java.util.List<String> whiteboardLines, java.util.List<String> tvSlides,
         java.util.List<String> teacherLines, SiteProperties.Board board, SiteProperties.Placard mission,
         SiteProperties.Placard vision, SiteProperties.Theme theme, SiteProperties.Audio audio, SiteProperties.Intro intro,
-        java.util.List<SiteProperties.Student> students, SiteProperties.Phone phone, java.util.Map<String, String> classroom) {}
+        java.util.List<SiteProperties.Student> students, SiteProperties.Phone phone, java.util.Map<String, String> classroom) {
+        @com.fasterxml.jackson.annotation.JsonProperty("notebookPhotos")
+        public java.util.List<String> notebookPhotos() {
+            return java.util.stream.Stream.of("zhang-linghe.jpg", "riam-album-1.jpg", "riam-album-2.jpg",
+                    "riam-album-3.jpg", "riam-album-4.jpg", "riam-album-5.jpg")
+                .filter(file -> new ClassPathResource("static/assets/photos/" + file).exists())
+                .toList();
+        }
+    }
 }
