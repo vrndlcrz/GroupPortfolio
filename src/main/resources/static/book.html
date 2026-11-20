@@ -129,6 +129,16 @@
         const member = await res.json();
         if (member.id === 4) {
           member.photo = 'assets/photos/nicole-portrait.jpg';
+          member.name = 'Nicole Leigh G. De Guzman';
+          member.titleText = 'Nicole Leigh G. De Guzman';
+          member.subject = 'Application and Emerging Technologies';
+          if (Array.isArray(member.pages)) {
+            member.pages.forEach(p => {
+              if (p.content) {
+                p.content = p.content.replace(/Advanced Emerging Technologies/g, 'Application and Emerging Technologies');
+              }
+            });
+          }
         }
         status.textContent = `Loaded ${member.name}. Opening portfolio...`;
         memberCache.set(id, member);

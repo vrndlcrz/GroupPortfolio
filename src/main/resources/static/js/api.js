@@ -58,7 +58,7 @@ const API = {
       const data = await response.json();
       for (const key of ['whiteboardLines', 'tvSlides', 'teacherLines']) {
         if (!Array.isArray(data[key]) || !data[key].length ||
-            !data[key].every(line => typeof line === 'string' && line.trim())) return classroomDefaults;
+          !data[key].every(line => typeof line === 'string' && line.trim())) return classroomDefaults;
       }
       const text = (value, fallback) => typeof value === 'string' && value.trim() ? value : fallback;
       const result = { ...classroomDefaults, ...data };

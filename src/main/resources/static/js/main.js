@@ -64,8 +64,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     members = (fetchedMembers || []).map(m => {
       if (m.id === 4) {
+        m.name = 'Nicole Leigh G. De Guzman';
+        m.titleText = 'Nicole Leigh G. De Guzman';
+        m.subject = 'Application and Emerging Technologies';
         m.photo = 'assets/photos/nicole-portrait.jpg';
         m.tagline = 'Powered by careful planning and a fear of redoing work.';
+        if (Array.isArray(m.pages)) {
+          m.pages.forEach(p => {
+            if (p.content) {
+              p.content = p.content.replace(/Advanced Emerging Technologies/g, 'Application and Emerging Technologies');
+            }
+          });
+        }
       }
       return m;
     });

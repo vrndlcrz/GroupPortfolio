@@ -169,8 +169,18 @@ class ClearBook {
     this.bookContainer.classList.toggle('is-nicole', memberData.id === 4);
     this.isNicole = memberData.id === 4;
     if (this.isNicole) {
+      memberData.name = 'Nicole Leigh G. De Guzman';
+      memberData.titleText = 'Nicole Leigh G. De Guzman';
+      memberData.subject = 'Application and Emerging Technologies';
       memberData.photo = 'assets/photos/nicole-portrait.jpg';
       memberData.tagline = 'Powered by careful planning and a fear of redoing work.';
+      if (Array.isArray(memberData.pages)) {
+        memberData.pages.forEach(p => {
+          if (p.content) {
+            p.content = p.content.replace(/Advanced Emerging Technologies/g, 'Application and Emerging Technologies');
+          }
+        });
+      }
       if (!memberData.themeSong) {
         memberData.themeSong = {
           provider: 'file',
@@ -274,7 +284,18 @@ class ClearBook {
 
   preparePages(member, theme = member.deskItem) {
     if (member && member.id === 4) {
+      member.name = 'Nicole Leigh G. De Guzman';
+      member.titleText = 'Nicole Leigh G. De Guzman';
+      member.subject = 'Application and Emerging Technologies';
       member.photo = 'assets/photos/nicole-portrait.jpg';
+      member.tagline = 'Powered by careful planning and a fear of redoing work.';
+      if (Array.isArray(member.pages)) {
+        member.pages.forEach(p => {
+          if (p.content) {
+            p.content = p.content.replace(/Advanced Emerging Technologies/g, 'Application and Emerging Technologies');
+          }
+        });
+      }
     }
     let entry = this.pageCache.get(member);
     if (!entry || entry.theme !== theme) {
@@ -954,6 +975,7 @@ class ClearBook {
   nicoleCoverHTML(member) {
     const fullName = member.titleText || member.name || "Nicole Leigh G. De Guzman";
     const teacherName = member.teacher || "Sir Sean Dyogi";
+    const subject = "Application and Emerging Technologies";
     return `
       <div class="nicole-page-container nicole-school-cover">
         <div class="school-spine-band" aria-hidden="true">
@@ -1060,7 +1082,7 @@ class ClearBook {
             </div>
             <div class="school-form-row">
               <span class="school-field-label">SUBJECT</span>
-              <span class="school-field-line"><span class="student-handwriting">${member.subject || 'Application and Emerging Technologies'}</span></span>
+              <span class="school-field-line"><span class="student-handwriting">${subject}</span></span>
             </div>
             <div class="school-form-row">
               <span class="school-field-label">GRADE / LEVEL</span>
@@ -1351,7 +1373,7 @@ class ClearBook {
             <div class="memo-header-grid">
               <div class="memo-row"><span class="memo-label">STUDENT</span><span class="memo-val">${fullName}</span></div>
               <div class="memo-row"><span class="memo-label">SECTION</span><span class="memo-val">${member.section || 'BSIT 3-1'}</span></div>
-              <div class="memo-row"><span class="memo-label">COURSE</span><span class="memo-val">${member.subject || 'Application and Emerging Technologies'}</span></div>
+              <div class="memo-row"><span class="memo-label">COURSE</span><span class="memo-val">Application and Emerging Technologies</span></div>
               <div class="memo-row"><span class="memo-label">GROUP</span><span class="memo-val">Sean Dyogi Truthers (Group 1)</span></div>
             </div>
             <div class="memo-divider"></div>
