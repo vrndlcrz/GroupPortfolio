@@ -406,7 +406,7 @@ class ClearBook {
             <svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
           </span>
           <h4>Clear-Book Sleeve #${idx + 1}</h4>
-          <p>Official student submission for <em>Advanced Emerging Technologies</em>.</p>
+          <p>Official student submission for <em>Application and Emerging Technologies</em>.</p>
           <div style="font-size:0.75rem; color:#94A3B8; margin-top:8px;">Turn backward or forward with arrows</div>
         </div>
       `;
@@ -419,7 +419,7 @@ class ClearBook {
             <div class="cover-header">
               <span class="cover-badge">Student Portfolio</span>
               <h1 class="cover-title">PORTFOLIO</h1>
-              <div class="cover-subject">${member.subject || 'Advanced Emerging Technologies'}</div>
+              <div class="cover-subject">${member.subject || 'Application and Emerging Technologies'}</div>
             </div>
 
             <div class="cover-photo-wrap" id="coverPhotoWrap">
@@ -615,7 +615,7 @@ class ClearBook {
                 <h3 class="page-title">Profile</h3>
                 <figure class="snapshot">
                   <img src="${member.photo}" alt="Portrait of ${member.name}">
-                  <figcaption>${member.subject || 'Advanced Emerging Technologies'}</figcaption>
+                  <figcaption>${member.subject || 'Application and Emerging Technologies'}</figcaption>
                 </figure>
                 <h4 class="signed-name">
                   ${member.name}
@@ -680,7 +680,7 @@ class ClearBook {
 
             <div class="team-credits-card">
               <h4>AET Group Portfolio</h4>
-              <p>Subject: <strong>Advanced Emerging Technologies</strong></p>
+              <p>Subject: <strong>Application and Emerging Technologies</strong></p>
               <p>Tech: Three.js • GSAP • Spring Boot 3</p>
               <p style="margin-top: 6px; font-size: 0.75rem; opacity: 0.8;">Zero databases were harmed in the making of this portfolio.</p>
             </div>

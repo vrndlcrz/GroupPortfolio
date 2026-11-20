@@ -9,7 +9,7 @@
     },
     "name": "Riam Jaye Santiago",
     "section": "BSIT 3-1",
-    "subject": "Advanced Emerging Technologies",
+    "subject": "Application and Emerging Technologies",
     "tagline": "Emerging technologies, emerging deadlines",
     "folderLabel": "FINAL_v7_REALLYFINAL_dontopen",
     "photo": "assets/photos/riam-portrait.jpg",
@@ -82,7 +82,7 @@
     "ageLine": "TODO years of existence",
     "objective": "TODO",
     "section": "BSIT 3-1",
-    "subject": "Advanced Emerging Technologies",
+    "subject": "Application and Emerging Technologies",
     "tagline": "You only fail when you stop trying",
     "folderLabel": "Do Not Open (Seriously)",
     "photo": "assets/photos/vernie-portrait.jpg",
@@ -90,7 +90,7 @@
     "pages": [
       {
         "title": "Profile",
-        "content": "• Name: John Vernie Dela Cruz\n• Section: BSIT 3-1\n• Advanced Emerging Technologies",
+        "content": "• Name: John Vernie Dela Cruz\n• Section: BSIT 3-1\n• Application and Emerging Technologies",
         "border": "wavy-pink.svg"
       },
       {
@@ -142,7 +142,7 @@
     "id": 3,
     "name": "Charella Magalpoc",
     "section": "BSIT 3-1",
-    "subject": "Advanced Emerging Technologies",
+    "subject": "Application and Emerging Technologies",
     "tagline": "99% skill, 1% luck, 100% procrastination",
     "folderLabel": "Homework (Unfinished)",
     "photo": "assets/photos/member3.svg",
@@ -207,7 +207,7 @@
     "id": 4,
     "name": "Nicole De Guzman",
     "section": "BSIT 3-1",
-    "subject": "Advanced Emerging Technologies",
+    "subject": "Application and Emerging Technologies",
     "tagline": "My code works, but nobody knows why (especially me)",
     "folderLabel": "secret_thesis_do_not_delete",
     "photo": "assets/photos/member4.svg",

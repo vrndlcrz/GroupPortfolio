@@ -1,3 +1,5 @@
+const SPOTIBAI_START_SECONDS = Object.freeze({ preso: 20, tma: 148 });
+
 /* Classroom events reuse the room's geometry, ink and toon palette. */
 class ClassroomExperiences {
   constructor(scene,{phone,book}) {
@@ -112,11 +114,9 @@ class ClassroomExperiences {
   showKim() {
     if(this.s.view!=='seat')return;this.stopRin();this.stopKim();this.stopTrack();
     const actor=this.buildActor('kim');
-    actor.group.visible=true;actor.group.position.set(0,-2.84,4.15);actor.group.rotation.y=0;
+    actor.group.visible=true;actor.group.position.set(0,-2.84,7.35);actor.group.rotation.y=Math.PI;
     this.kimActive=true;this.playCue('kim',36,40);this.speak('Kim Chiu','Sa classroom may batas, bawal lumabas',actor.anchor);
     this.kimTween=gsap.timeline().fromTo(actor.group.scale,{x:.05,y:.05,z:.05},{x:1,y:1,z:1,duration:this.reduced.matches?0:.5,ease:'back.out(1.3)'})
-      .to(actor.group.position,{z:8.18,duration:this.reduced.matches?.3:3.9,ease:'sine.inOut'},0)
-      .call(()=>{for(const limb of [...actor.legs,...actor.arms])limb.rotation.x=0;})
       .call(()=>this.stopKim(),null,5);
   }
   stopKim() {this.kimTween?.kill();if(this.actors.kim)this.actors.kim.group.visible=false;if(this.kimActive){this.stopCue();this.clearSpeaker()}this.kimActive=false}
@@ -233,7 +233,7 @@ class ClassroomExperiences {
     const door=this.s.exitDoorLeaf;
     group.visible=true;group.position.set(8.7,-1.76,7.0);
     group.rotation.set(Math.PI/2,-Math.PI/2,0,'YXZ');
-    this.playCue('rin',4);
+    this.playCue('rin',5);
     this.speak('Rin','MAMAAAAAAAAAAA',actor.anchor);
     const reduced=this.reduced.matches;
     this.rinTween=gsap.timeline()
@@ -264,7 +264,7 @@ class ClassroomExperiences {
     audio.onended=()=>this.stopTrack();
     audio.onerror=()=>{if(this.trackAudio===audio)this.stopTrack()};
     try {
-      if (track.id==='tma') audio.currentTime=148;
+      audio.currentTime=SPOTIBAI_START_SECONDS[track.id] ?? 0;
       await audio.play();
       if (this.trackAudio!==audio) return false;
       if (track.id==='tma') {
@@ -361,9 +361,12 @@ class ClassroomExperiences {
     document.body.append(stop);
 
     video.onended=video.onerror=()=>{if(this.tvVideo===video)this.stopTV();};
+    const startTime=SPOTIBAI_START_SECONDS[track.id] ?? 0;
+    video.currentTime=startTime;
     const playback=[video.play()];
     if (track.audioAvailable) {
       const audio=this.tvAudio=new Audio(track.audio);
+      audio.currentTime=startTime;
       audio.muted=window.AudioMaster?.muted??false;
       audio.ontimeupdate=()=>{
         if (video.readyState>=2 && !video.seeking && Math.abs(video.currentTime-audio.currentTime)>.4) {
@@ -664,12 +667,6 @@ class ClassroomExperiences {
         if(index!==this.cueIndex){this.cueIndex=index;this.concertLine.textContent=index>=0?this.lyrics[index].text:'Nadarang'}}
     }
     if(this.cleaning&&!this.reduced.matches){const actor=this.actors.jeo;actor.legs[0].rotation.x=.25*Math.sin(seconds*6);actor.legs[1].rotation.x=-actor.legs[0].rotation.x;}
-    if (this.kimActive && !this.reduced.matches && this.kimTween.time()<3.9) {
-      const actor=this.actors.kim;
-      const swing=.55*Math.sin(this.kimTween.time()*8);
-      actor.legs.forEach((leg,i)=>{leg.rotation.x=i?swing:-swing;});
-      actor.arms.forEach((arm,i)=>{arm.rotation.x=i?-swing:swing;});
-    }
     if (this.rinTween && !this.reduced.matches) {
       const actor=this.actors.rin,stroke=this.rinTween.time()*Math.PI*2.5;
       actor.arms.forEach((arm,i)=>{arm.rotation.x=stroke+i*Math.PI;arm.rotation.z=i?.25:-.25;});

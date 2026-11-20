@@ -8,7 +8,7 @@ const JohnFolderArt = (() => {
       const canvas = document.createElement('canvas');
       canvas.width = 1024;
       canvas.height = 1536;
-      canvas.textContent = 'Advanced Emerging Technologies - John Vernie Dela Cruz';
+      canvas.textContent = 'Application and Emerging Technologies - John Vernie Dela Cruz';
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#0F172A';
       ctx.fillRect(0, 0, 1024, 1536);
@@ -22,6 +22,25 @@ const JohnFolderArt = (() => {
       const drawCover = () => {
         if (coverImg.naturalWidth) {
           ctx.drawImage(coverImg, 0, 0, 1024, 1536);
+          // Draw the corrected subject over the cover image's printed lettering.
+          ctx.save();
+          ctx.scale(canvas.width / 764, canvas.height / 1024);
+          ctx.fillStyle = '#1E1E1D';
+          ctx.fillRect(202, 369, 425, 60);
+          ctx.fillRect(201, 435, 454, 64);
+          ctx.fillRect(197, 504, 518, 57);
+          ctx.font = '900 50px Georgia, serif';
+          ctx.lineJoin = 'round';
+          ctx.lineWidth = 5;
+          ctx.strokeStyle = '#EBF6FA';
+          ctx.fillStyle = '#2A638A';
+          for (const [line, y, width] of [
+            ['APPLICATION AND', 422, 419], ['EMERGING', 490, 446], ['TECHNOLOGIES', 553, 508]
+          ]) {
+            ctx.strokeText(line, 207, y, width);
+            ctx.fillText(line, 207, y, width);
+          }
+          ctx.restore();
         }
         texture.needsUpdate = true;
       };
@@ -492,7 +511,7 @@ class DeskScene {
     const notices = texture(1024, 560, ctx => {
       ctx.fillStyle = '#aa7952'; ctx.fillRect(0,0,1024,560);
       const cards = [
-        ['CLASS OFFICERS', 'President: Nicole', 'Vice President', 'Secretary: Charella', 'Muse: Riam'],
+        ['CLASS OFFICERS', 'President: Nicole', 'Vice President: Vernie', 'Secretary: Charella', 'Muse: Riam'],
         ['SCHEDULE', '7:30   Filipino', '8:30   Mathematics', '9:30   Recess', '10:00  Science'],
         ['PAALALA', 'Bawal magkalat.', 'Bawal kumain', 'sa loob ng klase.']
       ];
@@ -536,22 +555,23 @@ class DeskScene {
     };
     fan(0,9.24,-9,false); fan(0,9.24,1,false); fan(-10.48,6.3,2,true);
 
-    // Each tablet-arm chair uses the same local parts; one instanced draw per material.
+    // The viewer gets the same seat and legs as the class, without a tablet or its support.
     const seats = SEAT_SLOTS.filter(slot => slot !== VIEWER_SLOT);
-    const chairBatch = (material, parts, castShadow=true) => {
-      const mesh = new THREE.InstancedMesh(unitBox, material, seats.length * parts.length);
+    const chairBatch = (material, parts, slots=SEAT_SLOTS, castShadow=true) => {
+      const mesh = new THREE.InstancedMesh(unitBox, material, slots.length * parts.length);
       const pose = new THREE.Object3D(); let i = 0;
-      for (const {x,z,yaw} of seats) for (const [dx,dy,dz,w,h,d,tilt=0] of parts) {
+      for (const {x,z,yaw} of slots) for (const [dx,dy,dz,w,h,d,tilt=0] of parts) {
         pose.position.set(x+dx,floor+dy,z+dz); pose.scale.set(w,h,d);
         pose.rotation.set(tilt,yaw,0); pose.updateMatrix(); mesh.setMatrixAt(i++,pose.matrix);
       }
       mesh.castShadow = castShadow; mesh.receiveShadow = true; mesh.name='wooden-student-chairs';room.add(mesh);
     };
     chairBatch(this.chairMaterials.plank, [[0,1.73,0,1.67,0.14,1.55],[0,2.56,0.68,1.62,1.24,0.13,0.1]]);
-    chairBatch(this.chairMaterials.tablet, [[0.48,2.7,-0.48,1.22,0.12,1.28]]);
-    const supports = [[0.77,2.13,-0.36,0.1,1.04,0.1],[0,1.54,0,1.62,0.12,1.46]];
+    chairBatch(this.chairMaterials.tablet, [[0.48,2.7,-0.48,1.22,0.12,1.28]], seats);
+    const supports = [[0,1.54,0,1.62,0.12,1.46]];
     for (const x of [-0.69,0.69]) for (const z of [-0.58,0.58]) supports.push([x,0.83,z,0.11,1.66,0.11]);
-    chairBatch(this.chairMaterials.legs,supports,false);
+    chairBatch(this.chairMaterials.legs,supports,SEAT_SLOTS,false);
+    chairBatch(this.chairMaterials.legs,[[0.77,2.13,-0.36,0.1,1.04,0.1]],seats,false);
     this.buildStudents(room, floor);
     this.buildAbsentSeat(room, floor);
 

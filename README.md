@@ -1,6 +1,6 @@
 # Sean Dyogi Truthers — Group 1 Portfolio: "The Messy Desk"
 
-**Subject:** Advanced Emerging Technologies (AET)
+**Subject:** Application and Emerging Technologies (AET)
 **Team size:** 4 members
 **Stack:** HTML, CSS, JavaScript (Three.js + GSAP) on the frontend, Java Spring Boot on the backend
 **Runs on:** `http://localhost:8080` (no database, no hosting)
@@ -55,7 +55,7 @@ Each portfolio has a **cover**, **6 inside pages** and a **back cover**. Every p
 
 | Page | Title | Content | Border style |
 |---|---|---|---|
-| Cover | "PORTFOLIO" | Member photo, name, section, subject: *Advanced Emerging Technologies*, funny tagline | Solid color with a spine strip (like the reference) |
+| Cover | "PORTFOLIO" | Member photo, name, section, subject: *Application and Emerging Technologies*, funny tagline | Solid color with a spine strip (like the reference) |
 | 1 | About Me | Short intro, age or year, course, motto | Wavy outline (pink) |
 | 2 | Hobbies | List of hobbies with small doodles or icons | Colorful blobs (orange and red) |
 | 3 | Skills | Skills with funny proficiency labels | Vines and flowers |
@@ -195,7 +195,7 @@ Agree on this shape as a team before coding. It connects the backend and the fro
     "id": 1,
     "name": "Joshua Deliva",
     "section": "BSIT 3-1",
-    "subject": "Advanced Emerging Technologies",
+    "subject": "Application and Emerging Technologies",
     "tagline": "Emerging technologies, emerging deadlines",
     "folderLabel": "FINAL_v7_REALLYFINAL_dontopen",
     "photo": "assets/photos/member1.jpg",
