@@ -89,9 +89,15 @@ class ThemeSong {
             ? 'Music: ' + song.credit
             : '';
         this.credit.hidden = !song?.credit;
-      }).catch(() => {
+      }).catch((err) => {
         // Closing/reopening can abort an older play request; do not disable a new one.
-        if (generation === this.generation) this.disable();
+        if (generation === this.generation) {
+          if (err && err.name === 'AbortError') {
+            this.stop(false);
+          } else {
+            this.disable();
+          }
+        }
       });
     } catch {
       this.disable();

@@ -1393,7 +1393,230 @@ class DeskScene {
     return notebook;
   }
 
+  createNicoleNotebook(member) {
+    const book = new THREE.Group();
+    const cream = new THREE.MeshStandardMaterial({ color: 0xfffcf0, roughness: 0.95 });
+    const spineMat = new THREE.MeshStandardMaterial({ color: 0x14461B, roughness: 0.65 });
+
+    function addPart(w, h, d, x, y, z, material) {
+      const part = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+      part.position.set(x, y, z);
+      part.castShadow = part.receiveShadow = true;
+      book.add(part);
+    }
+
+    // Page block stack
+    addPart(1.02, 0.065, 1.38, 0, 0, 0, cream);
+    // Slim dark-green cloth spine strip covering the left edge
+    addPart(0.012, 0.067, 1.382, -0.51, 0, 0, spineMat);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 1100;
+    const ctx = canvas.getContext('2d');
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.anisotropy = 4;
+
+    const ringDots = [];
+    for (let i = 0; i < 23; i++) {
+      ringDots.push(`<circle cx="38" cy="${38 + i * 46}" r="4" fill="#FFFFFF" opacity="0.88"/>`);
+    }
+
+    // High-resolution SVG vector artwork matching Image 5 (actual notebook cover)
+    const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1100" viewBox="0 0 800 1100">
+      <defs>
+        <pattern id="coverGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+          <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(79, 109, 84, 0.09)" stroke-width="1"/>
+        </pattern>
+        <linearGradient id="spineGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#14461B"/>
+          <stop offset="25%" stop-color="#235E28"/>
+          <stop offset="55%" stop-color="#2E7D32"/>
+          <stop offset="85%" stop-color="#235E28"/>
+          <stop offset="100%" stop-color="#14461B"/>
+        </linearGradient>
+        <radialGradient id="patronHaloGlow" cx="50%" cy="38%" r="44%">
+          <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+          <stop offset="65%" stop-color="#C2DEC8" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#B2D8BD" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Background with graph paper grid -->
+      <rect width="800" height="1100" fill="#FAF7EF"/>
+      <rect x="76" width="724" height="1100" fill="url(#coverGrid)"/>
+
+      <!-- Left Green Spine Band -->
+      <rect x="0" y="0" width="76" height="1100" fill="url(#spineGrad)"/>
+      <line x1="76" y1="0" x2="76" y2="1100" stroke="#0D2E12" stroke-width="2"/>
+
+      <!-- White Dashed Stitching Line -->
+      <line x1="38" y1="15" x2="38" y2="1085" stroke="rgba(255, 255, 255, 0.75)" stroke-width="2.5" stroke-dasharray="8 8"/>
+
+      <!-- White Ring Dots / Eyelets -->
+      ${ringDots.join('')}
+
+      <!-- School Header: Crest -->
+      <g transform="translate(118, 58)">
+        <g fill="none" stroke="#1E6532" stroke-width="2.2" stroke-linecap="round">
+          <path d="M50 88 C32 88 18 74 18 50 C18 36 26 22 38 14" />
+          <path d="M22 65 Q14 60 18 52 Q24 58 22 65 Z" fill="#1E6532" />
+          <path d="M20 48 Q12 42 18 36 Q23 42 20 48 Z" fill="#1E6532" />
+          <path d="M26 33 Q18 26 26 22 Q29 29 26 33 Z" fill="#1E6532" />
+          <path d="M36 21 Q30 14 38 12 Q40 19 36 21 Z" fill="#1E6532" />
+          <path d="M50 88 C68 88 82 74 82 50 C82 36 74 22 62 14" />
+          <path d="M78 65 Q86 60 82 52 Q76 58 78 65 Z" fill="#1E6532" />
+          <path d="M80 48 Q88 42 82 36 Q77 42 80 48 Z" fill="#1E6532" />
+          <path d="M74 33 Q82 26 74 22 Q71 29 74 33 Z" fill="#1E6532" />
+          <path d="M64 21 Q70 14 62 12 Q60 19 64 21 Z" fill="#1E6532" />
+        </g>
+        <path d="M34 26 L66 26 C66 52 50 68 50 68 C50 68 34 52 34 26 Z" fill="#E8F4EA" stroke="#1E6532" stroke-width="2.4" />
+        <path d="M40 38 Q50 35 50 42 Q50 35 60 38 L60 48 Q50 45 50 52 Q50 45 40 48 Z" fill="#FFFFFF" stroke="#1E6532" stroke-width="1.4" />
+        <line x1="50" y1="36" x2="50" y2="52" stroke="#1E6532" stroke-width="1.4" />
+        <circle cx="50" cy="30" r="3" fill="#D9822B" />
+        <polygon points="50,6 52,11 57,11 53,14 55,19 50,16 45,19 47,14 43,11 48,11" fill="#1E6532" />
+        <path d="M24 84 Q50 92 76 84 L73 78 Q50 84 27 78 Z" fill="#1E6532" />
+        <text x="50" y="83" font-family="'Plus Jakarta Sans', sans-serif" font-size="4.6" font-weight="800" fill="#FFF" text-anchor="middle" letter-spacing="0.5">EST. 2026</text>
+      </g>
+
+      <!-- Centerpiece Framed Portrait (San John Gi) -->
+      <g transform="translate(246, 230)">
+        <rect x="0" y="0" width="356" height="420" fill="#BDD9C3" stroke="#1E6532" stroke-width="4.5" rx="2"/>
+        <rect x="8" y="8" width="340" height="404" fill="none" stroke="#1E6532" stroke-width="1.8" stroke-dasharray="5 3"/>
+
+        <g transform="translate(8, 8) scale(1.41, 1.43)">
+          <circle cx="120" cy="115" r="76" fill="url(#patronHaloGlow)" stroke="#1E6532" stroke-width="2.2" />
+          <circle cx="120" cy="115" r="71" fill="none" stroke="#1E6532" stroke-width="0.8" stroke-dasharray="3 3" />
+
+          <path d="M42 278 C46 220 78 190 102 184 L102 165 L138 165 L138 184 C162 190 194 220 198 278 Z" fill="#1E6532" />
+          <path d="M85 200 C80 230 75 260 70 278" stroke="#134720" stroke-width="3" stroke-linecap="round" />
+          <path d="M155 200 C160 230 165 260 170 278" stroke="#134720" stroke-width="3" stroke-linecap="round" />
+
+          <rect x="108" y="165" width="24" height="42" fill="#FFFFFF" stroke="#1E6532" stroke-width="1.8" />
+          <line x1="120" y1="165" x2="120" y2="207" stroke="#1E6532" stroke-width="1.5" />
+          <path d="M102 165 L138 165 L134 158 L106 158 Z" fill="#FFFFFF" stroke="#1E6532" stroke-width="1.5" />
+
+          <ellipse cx="120" cy="120" rx="38" ry="46" fill="#E8F4EB" stroke="#1E6532" stroke-width="2" />
+          <path d="M84 104 C84 76 156 76 156 104 C156 86 142 80 120 80 C98 80 84 86 84 104 Z" fill="#1E6532" />
+          <ellipse cx="120" cy="80" rx="28" ry="10" fill="#1E6532" />
+          <path d="M83 104 C81 122 84 136 86 142 C89 132 88 116 86 104 Z" fill="#1E6532" />
+          <path d="M157 104 C159 122 156 136 154 142 C151 132 152 116 154 104 Z" fill="#1E6532" />
+
+          <path d="M96 108 Q107 105 114 108" fill="none" stroke="#1E6532" stroke-width="2.5" stroke-linecap="round" />
+          <path d="M126 108 Q133 105 144 108" fill="none" stroke="#1E6532" stroke-width="2.5" stroke-linecap="round" />
+          <ellipse cx="106" cy="115" rx="5" ry="3.5" fill="#1E6532" />
+          <ellipse cx="134" cy="115" rx="5" ry="3.5" fill="#1E6532" />
+          <path d="M100 112 Q106 110 112 113" fill="none" stroke="#1E6532" stroke-width="1.6" />
+          <path d="M128 113 Q134 110 140 112" fill="none" stroke="#1E6532" stroke-width="1.6" />
+          <path d="M120 110 L118 132 L124 133" fill="none" stroke="#1E6532" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M110 145 Q120 148 130 145" fill="none" stroke="#1E6532" stroke-width="2.2" stroke-linecap="round" />
+          <path d="M114 154 Q120 156 126 154" fill="none" stroke="#1E6532" stroke-width="1.5" />
+          <path d="M96 125 Q99 135 102 142" fill="none" stroke="#1E6532" stroke-width="1" stroke-dasharray="1 2" />
+          <path d="M144 125 Q141 135 138 142" fill="none" stroke="#1E6532" stroke-width="1" stroke-dasharray="1 2" />
+        </g>
+      </g>
+
+      <!-- Form Underline Rules aligned with Image 5 -->
+      <line x1="295" y1="795" x2="735" y2="795" stroke="#1E6532" stroke-width="2.2"/>
+      <line x1="295" y1="885" x2="735" y2="885" stroke="#1E6532" stroke-width="2.2"/>
+      <line x1="295" y1="950" x2="735" y2="950" stroke="#1E6532" stroke-width="2.2"/>
+      <line x1="295" y1="1010" x2="735" y2="1010" stroke="#1E6532" stroke-width="2.2"/>
+
+      <!-- Outer fine border -->
+      <rect x="1" y="1" width="798" height="1098" fill="none" stroke="#235E28" stroke-width="2" rx="4"/>
+    </svg>`;
+
+    const img = new Image();
+    let isRendered = false;
+
+    const render = () => {
+      ctx.clearRect(0, 0, 800, 1100);
+      if (img.naturalWidth) {
+        ctx.drawImage(img, 0, 0, 800, 1100);
+      } else {
+        // Immediate base background before image load
+        ctx.fillStyle = '#FAF7EF';
+        ctx.fillRect(0, 0, 800, 1100);
+        ctx.fillStyle = '#235E28';
+        ctx.fillRect(0, 0, 76, 1100);
+        ctx.strokeStyle = '#1E6532';
+        ctx.lineWidth = 2.2;
+        [795, 885, 950, 1010].forEach(y => {
+          ctx.beginPath();
+          ctx.moveTo(295, y);
+          ctx.lineTo(735, y);
+          ctx.stroke();
+        });
+      }
+
+      // School Institution Title & Subtitle rendered with crisp document web fonts
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#1E6532';
+      ctx.font = '900 32px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.fillText('STA. JOHN GI ACADEMY', 202, 102);
+
+      ctx.fillStyle = '#2E7D32';
+      ctx.font = '800 12.5px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.fillText('OFFICIAL STUDENT NOTEBOOK', 204, 128);
+
+      // Form Field Labels
+      ctx.fillStyle = '#1E6532';
+      ctx.font = '800 17px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.fillText('NAME', 120, 785);
+      ctx.fillText('SUBJECT', 120, 845);
+      ctx.fillText('GRADE / LEVEL', 120, 940);
+      ctx.fillText('TEACHER', 120, 1000);
+
+      // Student Blue Ballpen Handwriting in Patrick Hand (exact match to Image 5)
+      ctx.fillStyle = '#174092';
+      ctx.font = 'bold 34px "Patrick Hand", "Caveat", cursive';
+      ctx.fillText(member.name || 'Nicole De Guzman', 300, 785);
+
+      ctx.font = 'bold 29px "Patrick Hand", "Caveat", cursive';
+      ctx.fillText('Advanced Emerging', 300, 836);
+      ctx.fillText('Technologies', 300, 872);
+
+      ctx.font = 'bold 34px "Patrick Hand", "Caveat", cursive';
+      ctx.fillText(member.section || 'BSIT 3-1', 300, 940);
+      ctx.fillText(member.teacher || 'Sir Sean Dyogi', 300, 1000);
+
+      texture.needsUpdate = true;
+      isRendered = true;
+    };
+
+    img.onload = render;
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+
+    if (img.complete && img.naturalWidth) {
+      render();
+    } else {
+      render(); // Initial fast draw
+    }
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(render).catch(() => { });
+      if (document.fonts.load) {
+        Promise.all([
+          document.fonts.load('900 32px "Plus Jakarta Sans"'),
+          document.fonts.load('bold 34px "Patrick Hand"')
+        ]).then(render).catch(() => { });
+      }
+    }
+
+    const face = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.02, 1.38),
+      new THREE.MeshStandardMaterial({ map: texture, roughness: 0.88 })
+    );
+    face.rotation.x = -Math.PI / 2;
+    face.position.y = 0.0335;
+    face.receiveShadow = true;
+    book.add(face);
+
+    return book;
+  }
+
   createIntermediatePad(member) {
+    if (member?.id === 4) return this.createNicoleNotebook(member);
     const pad = new THREE.Group();
     const cream = new THREE.MeshStandardMaterial({ color: 0xfff5d8, roughness: 1 });
     const edge = new THREE.MeshStandardMaterial({ color: 0xe1d7bb, roughness: 1 });
@@ -1607,7 +1830,7 @@ createThemeBook(member) {
       const layout = tabletopLayout.find(entry => entry.item === member.deskItem) || tabletopLayout.filter(entry => entry.item !== 'laptop')[i % 4];
       let folderMesh;
       switch (member.deskItem) {
-        case 'intermediate-pad': folderMesh = this.createIntermediatePad(member); break;
+        case 'intermediate-pad': folderMesh = member.id === 4 ? this.createNicoleNotebook(member) : this.createIntermediatePad(member); break;
         case 'long-folder': folderMesh = this.createLongFolder(member); break;
         case 'theme-book': folderMesh = this.createThemeBook(member); break;
         case 'spiral-notebook': folderMesh = this.createSpiralNotebook(member); break;
@@ -2226,7 +2449,9 @@ createThemeBook(member) {
     } else if (obj.userData.type === 'folder') {
       const folder = obj.userData.folderMesh || obj;
       const member = folder.userData.member;
-      this.showTooltip(`<strong>${member.deskItem === 'spiral-notebook' ? 'Spiral notebook' : member.deskItem === 'theme-book' ? 'Theme book' : member.deskItem === 'intermediate-pad' ? 'Intermediate pad' : 'Long folder'}: ${member.name}</strong><br><em>“${member.tagline}”</em><br><small style="color:#38BDF8">Click anywhere to open portfolio</small>`, e);
+      const itemLabel = member.id === 4 ? 'School notebook' : (member.deskItem === 'spiral-notebook' ? 'Spiral notebook' : member.deskItem === 'theme-book' ? 'Theme book' : member.deskItem === 'intermediate-pad' ? 'Intermediate pad' : 'Long folder');
+      const displayName = member.titleText || member.name;
+      this.showTooltip(`<strong>${itemLabel}: ${displayName}</strong><br><em>“${member.tagline}”</em><br><small style="color:#38BDF8">Click anywhere to open portfolio</small>`, e);
     } else if (obj.userData.type === 'coffee') {
       const coffeeHint = this.isSpilled
         ? '<strong>Spilled Coffee:</strong> What a mess...<br><small style="color:#34D399">Click to clean desk &amp; brew fresh coffee</small>'
