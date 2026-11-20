@@ -236,6 +236,11 @@
         "border": "bows-stars.svg"
       },
       {
+        "title": "Projects",
+        "content": "TechCare\nA Web-Based Telepsychiatry Consultation Scheduling System\n\nErmel's Glass and Aluminum Works\nA Web-Based Order Management and Service Reservation System with Predictive Analytics for Ermel's Glass and Aluminum Works\n\nDiaBeates\nWeb-Based Diabetes Complication Risk Assessment System Using Rule-Based Scoring and Calibrated Machine Learning Models",
+        "border": "bows-stars.svg"
+      },
+      {
         "title": "Contact",
         "content": "Feel free to reach out about design, class projects, or stationery recommendations.\n\nEmail\nnicoleleighgdeguzman@gmail.com\n\nSection\nBSIT 3-1, Advanced Emerging Technologies\n\nYou can also leave a note on the desk guestbook.",
         "border": "dotted-frame.svg"

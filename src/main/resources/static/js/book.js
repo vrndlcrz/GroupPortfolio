@@ -369,7 +369,7 @@ class ClearBook {
         title: 'Welcome'
       });
     }
-    const insideCount = (isSpiral || isNicole) ? (member.pages?.length || 5) : 6;
+    const insideCount = (isSpiral || isNicole) ? (member.pages?.length || 6) : 6;
     const numberedPages = isSpiral ? insideCount + 1 : insideCount;
     for (let i = 0; i < insideCount; i++) {
       const pageData = (member.pages && member.pages[i]) ? member.pages[i] : {
@@ -1241,8 +1241,67 @@ class ClearBook {
       `;
     }
 
-    // Spread 5 Left Page (Sheet 4 Verso - Course Summary: Official Memorandum)
+    // Spread 5 Left Page (Sheet 4 Verso - Project Overview: Systems and Applications)
     if (idx === 4) {
+      return `
+        <div class="nicole-verso-container nicole-projects-overview-page">
+          <div class="nicole-washi-strip washi-matcha">STA. JOHN GI ACADEMY</div>
+          <div class="nicole-page-header">
+            <span class="nicole-page-num">PORTFOLIO</span>
+            <h2 class="nicole-section-title">Project Overview</h2>
+          </div>
+          <div class="project-overview-card">
+            <div class="overview-lead-box">
+              <div class="overview-icon-badge">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+                </svg>
+              </div>
+              <div>
+                <h4>Systems and Applications</h4>
+                <span class="overview-sub">Practical Software Development</span>
+              </div>
+            </div>
+            <p class="overview-intro">These web systems demonstrate my work in healthcare scheduling, business order management, and clinical risk evaluation. Each project focuses on clear user workflows, reliable data validation, and clean interface presentation.</p>
+            <div class="overview-pillar-list">
+              <div class="pillar-row">
+                <div class="pillar-bullet">01</div>
+                <div class="pillar-content">
+                  <strong>Healthcare Systems</strong>
+                  <span>Telepsychiatry appointments and diabetes risk assessment tools.</span>
+                </div>
+              </div>
+              <div class="pillar-row">
+                <div class="pillar-bullet">02</div>
+                <div class="pillar-content">
+                  <strong>Business Operations</strong>
+                  <span>Order tracking, reservations, and predictive analytics for local glass and aluminum services.</span>
+                </div>
+              </div>
+              <div class="pillar-row">
+                <div class="pillar-bullet">03</div>
+                <div class="pillar-content">
+                  <strong>Quality and Usability</strong>
+                  <span>Structured forms, clear navigation, and error prevention for users.</span>
+                </div>
+              </div>
+            </div>
+            <div class="overview-stamp-row">
+              <div class="overview-verified-badge">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <span>ACADEMIC PORTFOLIO</span>
+              </div>
+              <span class="overview-term-stamp">BSIT 3-1 &bull; NOV 2026</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Spread 6 Left Page (Sheet 5 Verso - Course Summary: Official Memorandum)
+    if (idx === 5) {
       return `
         <div class="nicole-verso-container nicole-memo-page">
           <div class="nicole-washi-strip washi-matcha">STA. JOHN GI ACADEMY</div>
@@ -1271,8 +1330,8 @@ class ClearBook {
       `;
     }
 
-    // Spread 6 Left Page / Inside Back Cover (Sheet 5 Verso)
-    if (idx === 5) {
+    // Spread 7 Left Page / Inside Back Cover (Sheet 6 Verso)
+    if (idx === 6) {
       return `
         <div class="nicole-verso-container nicole-endpaper-page">
           <div class="academy-circulation-pocket">
@@ -1316,7 +1375,7 @@ class ClearBook {
         <div class="nicole-page-container nicole-meet-page">
           <div class="nicole-washi-strip washi-cream">ABOUT ME</div>
           <div class="nicole-page-header">
-            <span class="nicole-page-num">01 / 05</span>
+            <span class="nicole-page-num">01 / 06</span>
             <h2 class="nicole-section-title">Hello, I'm Nicole!</h2>
           </div>
           <div class="nicole-meet-editorial">
@@ -1344,7 +1403,7 @@ class ClearBook {
         <div class="nicole-page-container nicole-skills-page">
           <div class="nicole-washi-strip washi-cream">COURSEWORK</div>
           <div class="nicole-page-header">
-            <span class="nicole-page-num">02 / 05</span>
+            <span class="nicole-page-num">02 / 06</span>
             <h2 class="nicole-section-title">Software and Skills</h2>
           </div>
           <div class="nicole-engineering-stack">
@@ -1407,7 +1466,7 @@ class ClearBook {
         <div class="nicole-page-container nicole-sensory-page">
           <div class="nicole-washi-strip washi-cream">INTERESTS</div>
           <div class="nicole-page-header">
-            <span class="nicole-page-num">03 / 05</span>
+            <span class="nicole-page-num">03 / 06</span>
             <h2 class="nicole-section-title">Skincare and Fragrance</h2>
           </div>
           <div class="sensory-stack">
@@ -1461,7 +1520,7 @@ class ClearBook {
         <div class="nicole-page-container nicole-vision-page">
           <div class="nicole-washi-strip washi-cream">CORE VALUES</div>
           <div class="nicole-page-header">
-            <span class="nicole-page-num">04 / 05</span>
+            <span class="nicole-page-num">04 / 06</span>
             <h2 class="nicole-section-title">Quality in Practice</h2>
           </div>
           <div class="nicole-vision-content">
@@ -1489,13 +1548,72 @@ class ClearBook {
       `;
     }
 
-    // Spread 5 Right Page (Sheet 5 Recto)
+    // Spread 5 Right Page (Sheet 5 Recto - Academic Projects)
     if (idx === 5) {
+      return `
+        <div class="nicole-page-container nicole-projects-page">
+          <div class="nicole-washi-strip washi-cream">PROJECTS</div>
+          <div class="nicole-page-header">
+            <span class="nicole-page-num">05 / 06</span>
+            <h2 class="nicole-section-title">Academic Projects</h2>
+          </div>
+          <div class="nicole-projects-stack">
+            <div class="nicole-project-card">
+              <div class="project-card-header">
+                <div class="project-card-badge">WEB APPLICATION</div>
+                <span class="project-card-year">2026</span>
+              </div>
+              <h3 class="project-card-title">TechCare</h3>
+              <div class="project-card-subtitle">A Web-Based Telepsychiatry Consultation Scheduling System</div>
+              <p class="project-card-desc">A web platform designed for scheduling telepsychiatry consultations with appointment management and patient records.</p>
+              <div class="project-card-tags">
+                <span class="project-tag">Telepsychiatry</span>
+                <span class="project-tag">Scheduling</span>
+                <span class="project-tag">Healthcare</span>
+              </div>
+            </div>
+
+            <div class="nicole-project-card">
+              <div class="project-card-header">
+                <div class="project-card-badge">MANAGEMENT SYSTEM</div>
+                <span class="project-card-year">2026</span>
+              </div>
+              <h3 class="project-card-title">Ermel's Glass and Aluminum Works</h3>
+              <div class="project-card-subtitle">Order Management and Service Reservation System with Predictive Analytics</div>
+              <p class="project-card-desc">A web application managing customer orders and service reservations with predictive analytics for material inventory and sales tracking.</p>
+              <div class="project-card-tags">
+                <span class="project-tag">Order Management</span>
+                <span class="project-tag">Reservations</span>
+                <span class="project-tag">Predictive Analytics</span>
+              </div>
+            </div>
+
+            <div class="nicole-project-card">
+              <div class="project-card-header">
+                <div class="project-card-badge">HEALTHCARE AI</div>
+                <span class="project-card-year">2026</span>
+              </div>
+              <h3 class="project-card-title">DiaBeates</h3>
+              <div class="project-card-subtitle">Diabetes Complication Risk Assessment System</div>
+              <p class="project-card-desc">A clinical risk assessment system combining rule-based scoring and calibrated machine learning models to identify potential complications early.</p>
+              <div class="project-card-tags">
+                <span class="project-tag">Risk Assessment</span>
+                <span class="project-tag">Rule-Based Scoring</span>
+                <span class="project-tag">Machine Learning</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Spread 6 Right Page (Sheet 6 Recto - Contact and Notes)
+    if (idx === 6) {
       return `
         <div class="nicole-page-container nicole-contact-page">
           <div class="nicole-washi-strip washi-cream">CONTACT</div>
           <div class="nicole-page-header">
-            <span class="nicole-page-num">05 / 05</span>
+            <span class="nicole-page-num">06 / 06</span>
             <h2 class="nicole-section-title">Contact and Notes</h2>
           </div>
           <div class="nicole-letterhead-card">
