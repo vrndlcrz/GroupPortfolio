@@ -170,6 +170,14 @@ class ClearBook {
     this.isNicole = memberData.id === 4;
     if (this.isNicole) {
       memberData.photo = 'assets/photos/nicole-portrait.jpg';
+      if (!memberData.themeSong) {
+        memberData.themeSong = {
+          provider: 'file',
+          src: 'assets/audio/nicole-theme.opus',
+          title: 'Awit ng Paghahangad (Piano Instrumental)',
+          credit: 'Himig Heswita'
+        };
+      }
     }
     for (const item of ['spiral-notebook', 'long-folder', 'theme-book', 'intermediate-pad']) {
       this.overlayElement.classList.toggle('theme-' + item, item === theme);
@@ -213,14 +221,31 @@ class ClearBook {
     this.updatePageStates();
   }
 
-  isNotebook(member, theme = member.deskItem) {
-    return member.id === 1 && (!theme || theme === 'spiral-notebook' || theme === 'spiral');
+  isNotebook(member, theme = member?.deskItem) {
+    if (!member) return false;
+    if (member.id === 1 && (!theme || theme === 'spiral-notebook' || theme === 'spiral')) return true;
+    if (member.id === 4) return true;
+    return Boolean(member.themeSong);
   }
 
   prepareMusic(member) {
+    if (!member) {
+      this.musicPrepared = null;
+      this.music.stop();
+      return;
+    }
     this.musicPrepared = member.id;
-    if (this.isNotebook(member)) this.music.start(member.themeSong);
-    else this.music.stop();
+    if (this.isNotebook(member)) {
+      const song = member.themeSong || (member.id === 4 ? {
+        provider: 'file',
+        src: 'assets/audio/nicole-theme.opus',
+        title: 'Awit ng Paghahangad (Piano Instrumental)',
+        credit: 'Himig Heswita'
+      } : null);
+      this.music.start(song);
+    } else {
+      this.music.stop();
+    }
   }
 
   close() {
@@ -1325,7 +1350,7 @@ class ClearBook {
               <div class="memo-row"><span class="memo-label">GROUP</span><span class="memo-val">Sean Dyogi Truthers (Group 1)</span></div>
             </div>
             <div class="memo-divider"></div>
-            <p class="memo-body">This notebook collects my coursework, design samples, and notes for Advanced Emerging Technologies. Building these pages gave me practice in interface design, basic Java OOP concepts, and clear documentation.</p>
+            <p class="memo-body">This notebook collects my coursework, design samples, and notes for Advanced Emerging Technologies. Building these pages gave me practice in interface design, Java concepts, and clear documentation.</p>
             <div class="memo-sign-row">
               <div class="sign-line">
                 <span class="student-handwriting-sig">${fullName}</span>

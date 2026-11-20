@@ -205,6 +205,12 @@
   },
   {
     "id": 4,
+    "themeSong": {
+      "provider": "file",
+      "src": "assets/audio/nicole-theme.opus",
+      "title": "Awit ng Paghahangad (Piano Instrumental)",
+      "credit": "Himig Heswita"
+    },
     "name": "Nicole De Guzman",
     "titleText": "Nicole Leigh G. De Guzman",
     "section": "BSIT 3-1",

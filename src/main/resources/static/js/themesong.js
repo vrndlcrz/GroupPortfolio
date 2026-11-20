@@ -63,17 +63,31 @@ class ThemeSong {
     audio.volume = 0.5;
     audio.muted = this.muted;
     this.button.title = song?.title || 'Notebook theme';
+    const targetSrc = (typeof song?.src === 'string' && song.src.trim()) ? song.src.trim() : this.src;
+    if (audio.src && typeof audio.src === 'string') {
+      const cleanTarget = targetSrc.replace(/^\.?\//, '');
+      if (!audio.src.endsWith(cleanTarget)) {
+        audio.src = targetSrc;
+        if (typeof audio.load === 'function') audio.load();
+      }
+    }
     try {
       audio.currentTime = 0;
       audio.play().then(() => {
         if (generation !== this.generation || this.disabled) return;
         this.updateButton();
         this.button.hidden = false;
-        this.credit.textContent = song?.credit ? 'Music: ' + song.credit : '';
+        this.credit.textContent = song?.credit ? (song.credit.startsWith('Music') ? song.credit : 'Music by ' + song.credit) : '';
         this.credit.hidden = !song?.credit;
-      }).catch(() => {
+      }).catch((err) => {
         // Closing/reopening can abort an older play request; do not disable a new one.
-        if (generation === this.generation) this.stop(false);
+        if (generation === this.generation) {
+          if (err && err.name === 'AbortError') {
+            this.stop(false);
+          } else {
+            this.disable();
+          }
+        }
       });
     } catch { this.disable(); }
   }
