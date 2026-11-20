@@ -1502,11 +1502,11 @@ class ClearBook {
                   <span class="sensory-sub">Notes and Blends</span>
                 </div>
               </div>
-              <p class="sensory-desc">I enjoy light and fresh fragrances with green tea, soft florals, and woody notes.</p>
+              <p class="sensory-desc">I enjoy clean, airy skin scents with powdery iris, white musk, and dry woody notes.</p>
               <div class="olfactory-pyramid">
-                <div class="pyr-tier top"><span class="tier-label">FRESH</span><span class="tier-notes">Green tea, bergamot, fresh linen</span></div>
-                <div class="pyr-tier heart"><span class="tier-label">FLORAL</span><span class="tier-notes">Soft iris, jasmine</span></div>
-                <div class="pyr-tier base"><span class="tier-label">WARM</span><span class="tier-notes">Cedarwood, amber</span></div>
+                <div class="pyr-tier top"><span class="tier-label">FRESH</span><span class="tier-notes">Green tea, crisp aldehydes, clean linen</span></div>
+                <div class="pyr-tier heart"><span class="tier-label">FLORAL</span><span class="tier-notes">Powdery iris, pink pepper, violet</span></div>
+                <div class="pyr-tier base"><span class="tier-label">WARM</span><span class="tier-notes">White musk, ambrette, cedarwood</span></div>
               </div>
             </div>
           </div>
@@ -1561,7 +1561,7 @@ class ClearBook {
             <div class="nicole-project-card">
               <div class="project-card-header">
                 <div class="project-card-badge">WEB APPLICATION</div>
-                <span class="project-card-year">2026</span>
+                <span class="project-card-year">2025</span>
               </div>
               <h3 class="project-card-title">TechCare</h3>
               <div class="project-card-subtitle">A Web-Based Telepsychiatry Consultation Scheduling System</div>
