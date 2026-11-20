@@ -369,7 +369,7 @@ class ClearBook {
         title: 'Welcome'
       });
     }
-    const insideCount = isSpiral ? (member.pages?.length || 6) : 6;
+    const insideCount = (isSpiral || isNicole) ? (member.pages?.length || 5) : 6;
     const numberedPages = isSpiral ? insideCount + 1 : insideCount;
     for (let i = 0; i < insideCount; i++) {
       const pageData = (member.pages && member.pages[i]) ? member.pages[i] : {
@@ -1170,79 +1170,8 @@ class ClearBook {
       `;
     }
 
-    // Spread 3 Left Page (Sheet 2 Verso - Skincare Research)
+    // Spread 3 Left Page (Sheet 2 Verso - Stationery and Pens)
     if (idx === 2) {
-      return `
-        <div class="nicole-verso-container nicole-stationery-page">
-          <div class="nicole-washi-strip washi-matcha">INTERESTS</div>
-          <div class="nicole-page-header">
-            <span class="nicole-page-num">NOTES</span>
-            <h2 class="nicole-section-title">Skincare Research</h2>
-          </div>
-          <div class="stationery-feature-card">
-            <div class="stationery-lead">
-              <p>Learning about skincare formulas and ingredients is a relaxing hobby away from the screen. I enjoy researching gentle routines that keep skin healthy.</p>
-            </div>
-            <div class="nib-diagram-box">
-              <div class="nib-diagram-header">
-                <div class="nib-icon-badge">
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M10 2v7.31L4.69 18.5A2 2 0 0 0 6.44 21.5h11.12a2 2 0 0 0 1.75-3L14 9.31V2"/><line x1="8.5" y1="2" x2="15.5" y2="2"/><line x1="7" y1="16" x2="17" y2="16"/>
-                  </svg>
-                </div>
-                <div>
-                  <h4>Gentle Ingredients</h4>
-                  <span class="nib-sub">Hydration and Barrier Care</span>
-                </div>
-              </div>
-              <div class="nib-spec-grid">
-                <div class="nib-spec-item"><span class="spec-label">KEY ACTIVES</span><span class="spec-val">Ceramides and Peptides</span></div>
-                <div class="nib-spec-item"><span class="spec-label">HYDRATION</span><span class="spec-val">Hyaluronic Acid and Glycerin</span></div>
-                <div class="nib-spec-item"><span class="spec-label">PH BALANCE</span><span class="spec-val">Balanced and Gentle</span></div>
-                <div class="nib-spec-item"><span class="spec-label">DAILY FOCUS</span><span class="spec-val">Simple and Consistent Steps</span></div>
-              </div>
-            </div>
-            <div class="stationery-quote-tape">
-              <span class="quote-tape-pin" aria-hidden="true"></span>
-              <p>&ldquo;Good skincare is about patience and finding what works gently.&rdquo;</p>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Spread 4 Left Page (Sheet 3 Verso - Core Values: Replaces Career Goal)
-    if (idx === 3) {
-      return `
-        <div class="nicole-verso-container nicole-manifesto-page">
-          <div class="nicole-washi-strip washi-matcha">CORE VALUES</div>
-          <div class="nicole-page-header">
-            <span class="nicole-page-num">VALUES</span>
-            <h2 class="nicole-section-title">Quality Over Quantity</h2>
-          </div>
-          <div class="manifesto-card">
-            <div class="manifesto-quote-badge">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-              </svg>
-              <span>FUN FACT &bull; WORK HABIT</span>
-            </div>
-            <blockquote class="manifesto-pullquote">
-              &ldquo;I always choose quality over quantity, and it genuinely bothers me if I leave something unfinished or slightly off.&rdquo;
-            </blockquote>
-            <p class="manifesto-body">Whether I am adjusting spacing in Figma or writing a Java class, I prefer spending extra time to make sure things look right and run without errors.</p>
-            <div class="manifesto-seal">
-              <div class="seal-ring">
-                <span class="seal-inner-text">DOING WORK PROPERLY</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Spread 5 Left Page (Sheet 4 Verso - Stationery and Pens: Pairs with Ink Swatches)
-    if (idx === 4) {
       return `
         <div class="nicole-verso-container nicole-stationery-page">
           <div class="nicole-washi-strip washi-matcha">STATIONERY</div>
@@ -1282,8 +1211,38 @@ class ClearBook {
       `;
     }
 
-    // Spread 6 Left Page (Sheet 5 Verso - Course Summary)
-    if (idx === 5) {
+    // Spread 4 Left Page (Sheet 3 Verso - Core Values: Replaces Career Goal)
+    if (idx === 3) {
+      return `
+        <div class="nicole-verso-container nicole-manifesto-page">
+          <div class="nicole-washi-strip washi-matcha">CORE VALUES</div>
+          <div class="nicole-page-header">
+            <span class="nicole-page-num">VALUES</span>
+            <h2 class="nicole-section-title">Quality Over Quantity</h2>
+          </div>
+          <div class="manifesto-card">
+            <div class="manifesto-quote-badge">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <span>FUN FACT &bull; WORK HABIT</span>
+            </div>
+            <blockquote class="manifesto-pullquote">
+              &ldquo;I always choose quality over quantity, and it genuinely bothers me if I leave something unfinished or slightly off.&rdquo;
+            </blockquote>
+            <p class="manifesto-body">Whether I am adjusting spacing in Figma or writing a Java class, I prefer spending extra time to make sure things look right and run without errors.</p>
+            <div class="manifesto-seal">
+              <div class="seal-ring">
+                <span class="seal-inner-text">DOING WORK PROPERLY</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Spread 5 Left Page (Sheet 4 Verso - Course Summary: Official Memorandum)
+    if (idx === 4) {
       return `
         <div class="nicole-verso-container nicole-memo-page">
           <div class="nicole-washi-strip washi-matcha">STA. JOHN GI ACADEMY</div>
@@ -1312,8 +1271,8 @@ class ClearBook {
       `;
     }
 
-    // Spread 7 Left Page / Inside Back Cover (Sheet 6 Verso)
-    if (idx === 6) {
+    // Spread 6 Left Page / Inside Back Cover (Sheet 5 Verso)
+    if (idx === 5) {
       return `
         <div class="nicole-verso-container nicole-endpaper-page">
           <div class="academy-circulation-pocket">
@@ -1357,7 +1316,7 @@ class ClearBook {
         <div class="nicole-page-container nicole-meet-page">
           <div class="nicole-washi-strip washi-cream">ABOUT ME</div>
           <div class="nicole-page-header">
-            <span class="nicole-page-num">01 / 06</span>
+            <span class="nicole-page-num">01 / 05</span>
             <h2 class="nicole-section-title">Hello, I'm Nicole!</h2>
           </div>
           <div class="nicole-meet-editorial">
@@ -1385,7 +1344,7 @@ class ClearBook {
         <div class="nicole-page-container nicole-skills-page">
           <div class="nicole-washi-strip washi-cream">COURSEWORK</div>
           <div class="nicole-page-header">
-            <span class="nicole-page-num">02 / 06</span>
+            <span class="nicole-page-num">02 / 05</span>
             <h2 class="nicole-section-title">Software and Skills</h2>
           </div>
           <div class="nicole-engineering-stack">
@@ -1448,7 +1407,7 @@ class ClearBook {
         <div class="nicole-page-container nicole-sensory-page">
           <div class="nicole-washi-strip washi-cream">INTERESTS</div>
           <div class="nicole-page-header">
-            <span class="nicole-page-num">03 / 06</span>
+            <span class="nicole-page-num">03 / 05</span>
             <h2 class="nicole-section-title">Skincare and Fragrance</h2>
           </div>
           <div class="sensory-stack">
@@ -1496,13 +1455,13 @@ class ClearBook {
       `;
     }
 
-    // Spread 4 Right Page (Sheet 4 Recto - Quality in Practice)
+    // Spread 4 Right Page (Sheet 4 Recto)
     if (idx === 4) {
       return `
         <div class="nicole-page-container nicole-vision-page">
           <div class="nicole-washi-strip washi-cream">CORE VALUES</div>
           <div class="nicole-page-header">
-            <span class="nicole-page-num">04 / 06</span>
+            <span class="nicole-page-num">04 / 05</span>
             <h2 class="nicole-section-title">Quality in Practice</h2>
           </div>
           <div class="nicole-vision-content">
@@ -1533,70 +1492,10 @@ class ClearBook {
     // Spread 5 Right Page (Sheet 5 Recto)
     if (idx === 5) {
       return `
-        <div class="nicole-page-container nicole-quality-page">
-          <div class="nicole-washi-strip washi-cream">INTERACTIVE</div>
-          <div class="nicole-page-header">
-            <span class="nicole-page-num">05 / 06</span>
-            <h2 class="nicole-section-title">Ink Swatches</h2>
-          </div>
-          <div class="nicole-swatch-box" id="nicoleSwatchBox">
-            <div class="nicole-swatch-header">
-              <span class="swatch-title">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;" aria-hidden="true">
-                  <path d="m12 19 7-7 3 3-7 7-3-3z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18"/><circle cx="11.5" cy="11.5" r="1.5"/>
-                </svg>
-                Interactive Ink Swatches
-              </span>
-              <span class="swatch-subtitle">Click an ink bottle to swatch</span>
-            </div>
-            <div class="nicole-ink-bottles" id="inkBottleRow">
-              <button class="ink-bottle active" data-color="#4F6D54" data-detail="#344C38" data-name="Matcha Latte" data-desc="Earthy herbal green &bull; Smooth ink &bull; Fast drying" style="--bottle-color:#4F6D54;" aria-label="Swatch Matcha Latte ink">
-                <span class="bottle-cap"></span>
-                <span class="bottle-glass"><span class="ink-fluid"></span></span>
-                <span class="bottle-name">Matcha</span>
-              </button>
-              <button class="ink-bottle" data-color="#D98274" data-detail="#B4594A" data-name="Sakura Petal" data-desc="Soft warm blush &bull; Smooth ink &bull; Gentle shade" style="--bottle-color:#D98274;" aria-label="Swatch Sakura Petal ink">
-                <span class="bottle-cap"></span>
-                <span class="bottle-glass"><span class="ink-fluid"></span></span>
-                <span class="bottle-name">Sakura</span>
-              </button>
-              <button class="ink-bottle" data-color="#2D4A5E" data-detail="#1B3140" data-name="Midnight Indigo" data-desc="Deep blue &bull; Dark line &bull; Everyday writing" style="--bottle-color:#2D4A5E;" aria-label="Swatch Midnight Indigo ink">
-                <span class="bottle-cap"></span>
-                <span class="bottle-glass"><span class="ink-fluid"></span></span>
-                <span class="bottle-name">Midnight</span>
-              </button>
-              <button class="ink-bottle" data-color="#C68B59" data-detail="#9C6234" data-name="Amber Roast" data-desc="Warm caramel tea &bull; Smooth flow &bull; Warm tone" style="--bottle-color:#C68B59;" aria-label="Swatch Amber Roast ink">
-                <span class="bottle-cap"></span>
-                <span class="bottle-glass"><span class="ink-fluid"></span></span>
-                <span class="bottle-name">Amber</span>
-              </button>
-            </div>
-            <div class="nicole-swatch-canvas-card">
-              <div class="swatch-card-header">
-                <strong class="swatch-card-name" id="swatchCardName">Matcha Latte</strong>
-                <span class="swatch-nib-badge">0.38mm Pen</span>
-              </div>
-              <div class="swatch-stroke-area" id="swatchStrokeArea">
-                <svg class="swatch-stroke-svg" viewBox="0 0 340 50" preserveAspectRatio="none">
-                  <path id="swatchStrokePath" d="M 12 25 Q 60 8 115 26 T 225 20 T 328 25" fill="none" stroke="#4F6D54" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path id="swatchStrokeDetail" d="M 16 26 Q 64 11 118 27 T 227 21 T 324 26" fill="none" stroke="#344C38" stroke-width="3" stroke-linecap="round"/>
-                </svg>
-                <div class="swatch-written-sample" id="swatchSampleText" style="color:#4F6D54;">&ldquo;Quality over quantity.&rdquo;</div>
-              </div>
-              <div class="swatch-meta" id="swatchMeta">Earthy herbal green &bull; Smooth ink &bull; Fast drying</div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Spread 6 Right Page (Sheet 6 Recto)
-    if (idx === 6) {
-      return `
         <div class="nicole-page-container nicole-contact-page">
           <div class="nicole-washi-strip washi-cream">CONTACT</div>
           <div class="nicole-page-header">
-            <span class="nicole-page-num">06 / 06</span>
+            <span class="nicole-page-num">05 / 05</span>
             <h2 class="nicole-section-title">Contact and Notes</h2>
           </div>
           <div class="nicole-letterhead-card">
@@ -1658,49 +1557,6 @@ class ClearBook {
   }
 
   initNicoleInteractions(pageEl) {
-    const swatchBox = pageEl.querySelector('#nicoleSwatchBox');
-    if (swatchBox) {
-      const bottles = swatchBox.querySelectorAll('.ink-bottle');
-      const cardName = swatchBox.querySelector('#swatchCardName');
-      const meta = swatchBox.querySelector('#swatchMeta');
-      const strokePath = swatchBox.querySelector('#swatchStrokePath');
-      const strokeDetail = swatchBox.querySelector('#swatchStrokeDetail');
-      const sampleText = swatchBox.querySelector('#swatchSampleText');
-      const strokeArea = swatchBox.querySelector('#swatchStrokeArea');
-
-      bottles.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          bottles.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-
-          const color = btn.dataset.color;
-          const detail = btn.dataset.detail;
-          const name = btn.dataset.name;
-          const desc = btn.dataset.desc;
-
-          if (cardName) cardName.textContent = `${name} (Custom Blend)`;
-          if (meta) meta.textContent = desc;
-          if (strokePath) strokePath.setAttribute('stroke', color);
-          if (strokeDetail) strokeDetail.setAttribute('stroke', detail);
-          if (sampleText) {
-            sampleText.style.color = color;
-            sampleText.textContent = `“Quality over quantity — swatched in ${name}.”`;
-          }
-
-          if (strokeArea) {
-            strokeArea.classList.remove('ink-wet-anim');
-            void strokeArea.offsetWidth;
-            strokeArea.classList.add('ink-wet-anim');
-          }
-
-          if (window.PortfolioHumor && typeof window.PortfolioHumor.playSound === 'function') {
-            window.PortfolioHumor.playSound('pop');
-          }
-        });
-      });
-    }
-
     const copyBtn = pageEl.querySelector('#nicoleCopyEmailBtn');
     if (copyBtn) {
       copyBtn.addEventListener('click', (e) => {
