@@ -364,20 +364,43 @@ class ClearBook {
         title: 'Welcome'
       });
     }
+
+    const isCharellaJournal =
+      member.id === 3 &&
+      (theme === 'themebook' || theme === 'theme-book');
+
     const insideCount = isSpiral ? (member.pages?.length || 6) : 6;
     const numberedPages = isSpiral ? insideCount + 1 : insideCount;
-    for (let i = 0; i < insideCount; i++) {
-      const pageData = (member.pages && member.pages[i]) ? member.pages[i] : {
-        title: titles[i] || `Section ${i + 1}`,
-        content: `Content for ${titles[i] || 'section'} will be added soon.`,
-        border: 'wavy-pink.svg'
-      };
-      pageConfigs.push({
-        type: 'inside',
-        index: i + 1,
-        pageData: pageData,
-        skills: (!isSpiral && i === 3) ? member.skills : null
+
+    if (isCharellaJournal) {
+      const journalImages = [
+        '/assets/textures/CM_1.png',
+        '/assets/textures/CM_2.png',
+        '/assets/textures/CM_3.png'
+      ];
+
+      journalImages.forEach((imageSrc, index) => {
+        pageConfigs.push({
+          type: 'inside-image',
+          index: index + 1,
+          imageSrc: imageSrc
+        });
       });
+    } else {
+      for (let i = 0; i < insideCount; i++) {
+        const pageData = (member.pages && member.pages[i]) ? member.pages[i] : {
+          title: titles[i] || `Section ${i + 1}`,
+          content: `Content for ${titles[i] || 'section'} will be added soon.`,
+          border: 'wavy-pink.svg'
+        };
+
+        pageConfigs.push({
+          type: 'inside',
+          index: i + 1,
+          pageData: pageData,
+          skills: (!isSpiral && i === 3) ? member.skills : null
+        });
+      }
     }
 
     // Page 7: Back Cover
@@ -409,8 +432,21 @@ class ClearBook {
         </div>
       `;
 
+      if (isCharellaJournal) {
+        backHTML = '';
+      }
+
       if (isJohn && (cfg.type==='cover' || cfg.type==='john-profile')) {
         frontHTML='';
+      } else if (
+        cfg.type === 'cover' &&
+        isCharellaJournal
+      ) {
+        frontHTML = `
+          <div class="cm-journal-cover">
+            <img src="/assets/textures/CM_cover.png" alt="Journal cover">
+          </div>
+        `;
       } else if (cfg.type === 'cover') {
         frontHTML = `
           <div class="book-cover" style="background: linear-gradient(145deg, ${coverColor} 0%, ${this.adjustColorBrightness(coverColor, -35)} 100%);">
@@ -436,8 +472,9 @@ class ClearBook {
         if (isSpiral) {
           frontHTML = `<div class="riam-collage-cover">
             <div class="riam-collage-tag"><img src="${member.photo}" alt="">
-            <span><strong>PORTFOLIO</strong><b>${member.name}</b><small>★ SECTION &nbsp; ${member.section}</small></span></div>
-          </div>`;
+            <span><strong>PORTFOLIO</strong><b>${member.name}</b><small>★ SECTION &nbsp; ${member.section}</small></span>
+          </div>
+        </div>`;
         }
 
         // Easy Easter Egg: Only 2 clicks (double click) to spin!
@@ -480,6 +517,17 @@ class ClearBook {
           <h4 class="signed-name">${write(member.name)}<svg aria-hidden="true" viewBox="0 0 150 10" preserveAspectRatio="none"><path d="M2 7Q28 3 50 5T94 4T148 3" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></h4>
           <span class="section-callout">${write(member.section)}</span>
           <p class="page-text">${write(member.id === 1 ? "HUSH HUSH HUSH" : member.tagline)}</p></div></div>`;
+      } else if (cfg.type === 'inside-image') {
+        frontHTML = `
+          <div class="cm-journal-page">
+            <img
+              src="${cfg.imageSrc}"
+              alt="Journal page ${cfg.index}"
+            >
+          </div>
+        `;
+
+
       } else if (cfg.type === 'inside') {
         const borderFile = cfg.pageData.border || 'wavy-pink.svg';
         const borderSrc = `assets/borders/${borderFile}`;
