@@ -54,28 +54,47 @@ class ThemeSong {
   }
 
   start(song) {
-    // isActive is transient; hasBeenActive would allow later programmatic autoplay.
     if (this.disabled || !this.ready || !navigator.userActivation?.isActive) return;
+
+    const source = typeof song === 'string'
+      ? song
+      : song?.src || song?.url;
+
+    if (source && source !== this.src) {
+      this.src = source;
+      this.ready = false;
+      this.audio.src = source;
+      this.audio.load();
+      this.ready = true;
+    }
+
     this.stop(false);
     this.active = true;
+
     const generation = this.generation;
     const audio = this.audio;
+
     audio.volume = 0.5;
     audio.muted = this.muted;
     this.button.title = song?.title || 'Notebook theme';
+
     try {
       audio.currentTime = 0;
       audio.play().then(() => {
         if (generation !== this.generation || this.disabled) return;
         this.updateButton();
         this.button.hidden = false;
-        this.credit.textContent = song?.credit ? 'Music: ' + song.credit : '';
+        this.credit.textContent =
+          typeof song === 'object' && song?.credit
+            ? 'Music: ' + song.credit
+            : '';
         this.credit.hidden = !song?.credit;
       }).catch(() => {
-        // Closing/reopening can abort an older play request; do not disable a new one.
         if (generation === this.generation) this.stop(false);
       });
-    } catch { this.disable(); }
+    } catch {
+      this.disable();
+    }
   }
 
   stop(fade = true) {

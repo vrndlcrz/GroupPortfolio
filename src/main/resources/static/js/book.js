@@ -210,15 +210,24 @@ class ClearBook {
   }
 
   isNotebook(member, theme = member.deskItem) {
-    return member.id === 1 && (!theme || theme === 'spiral-notebook' || theme === 'spiral');
+    return (
+      (member.id === 1 && (!theme || theme === 'spiral-notebook' || theme === 'spiral')) ||
+      (member.id === 3 && (theme === 'themebook' || theme === 'theme-book'))
+    );
   }
 
   prepareMusic(member) {
     this.musicPrepared = member.id;
-    if (this.isNotebook(member)) this.music.start(member.themeSong);
-    else this.music.stop();
-  }
 
+    if (member.id === 3) {
+      this.music.start('/assets/audio/SC-KalimutanKa.mp3');
+    } else if (this.isNotebook(member)) {
+      this.music.start(member.themeSong);
+    } else {
+      this.music.stop();
+    }
+  }
+  
   close() {
     if (!this.isOpen()) return;
     this.spiralTurn?.kill();
