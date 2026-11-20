@@ -14,8 +14,6 @@
 .phone-header h2 { flex:1; margin:0; font:inherit; font-size:22px; line-height:1.1; }
 .phone-header button { width:29px; height:29px; flex:none; padding:0; border-radius:8px; font-size:25px; line-height:1; box-shadow:2px 2px 0 var(--ink,#3A2312); }
 .phone-screen { min-height:0; flex:1; overflow:hidden; border:3px solid var(--ink,#3A2312); border-radius:12px; background:#FFF2CD; }
-.phone-home-bar { flex:none; height:24px; width:100%; border:0!important; background:transparent!important; display:flex; align-items:center; justify-content:center; padding:6px; }
-.phone-home-bar span { width:85px; height:6px; background:var(--ink,#3A2312); border-radius:5px; }
 .phone-apps { display:grid; grid-template-columns:1fr 1fr; align-content:start; gap:24px 18px; padding:34px 15px; height:100%; background:#F8D677; }
 .phone-app { display:flex; flex-direction:column; align-items:center; gap:9px; border:0!important; background:transparent!important; padding:0; font-size:17px!important; }
 .phone-app svg { width:72px; height:72px; stroke:var(--ink,#3A2312); stroke-width:3px; stroke-linecap:round; stroke-linejoin:round; }
@@ -30,11 +28,13 @@
 .phone-video-caption strong { font-size:15px; }.phone-video-caption p { margin:4px 0 0; font-family:'Patrick Hand',cursive; font-size:17px; line-height:1.15; }
 .phone-heart { position:absolute; right:8px; bottom:16px; width:41px; height:43px; padding:2px; border-radius:12px; background:#FFF0C2!important; box-shadow:2px 2px 0 var(--ink,#3A2312); }
 .phone-heart svg { width:100%; height:100%; stroke:var(--ink,#3A2312); stroke-width:4px; stroke-linejoin:round; }.phone-heart[aria-pressed=true] svg path { fill:#EC7298; }
-@media(max-width:480px) { .portfolio-phone { right:4vw; bottom:12px; } }
+@media(max-width:480px) { .portfolio-phone { right:4vw; bottom:3.6rem; max-height:calc(100dvh - 4.6rem); } }
 
 .spotibai-track { flex-wrap:wrap; }
 .spotibai-track small { flex-basis:100%; }
 .spotibai-track button,.phone-labibi button { border:1px solid currentColor; border-radius:.5rem; background:#f6e5bc; color:#32251d; padding:.35rem .55rem; cursor:pointer; }
 .spotibai-track button:disabled,.phone-labibi button:disabled { opacity:.55; cursor:default; }
-.phone-labibi { display:grid; justify-items:center; gap:.65rem; padding:1rem; text-align:center; }
-.phone-labibi-preview { width:min(60%,140px); height:140px; object-fit:contain; border-radius:.65rem; }
+.phone-labibi { height:100%; display:grid; grid-template-rows:1fr; place-items:center; gap:.3rem; text-align:center; }
+.phone-labibi-rolled { grid-template-rows:minmax(0,1fr) auto auto; }
+.phone-labibi-preview { display:block; width:100%; height:100%; min-height:0; object-fit:contain; }
+.phone-labibi-controls { display:flex; justify-content:center; flex-wrap:wrap; gap:.4rem; padding:0 .4rem .4rem; }

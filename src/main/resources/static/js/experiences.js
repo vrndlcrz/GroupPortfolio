@@ -12,11 +12,6 @@ class ClassroomExperiences {
     const enter=scene.enterDeskView.bind(scene);scene.enterDeskView=(...args)=>{this.stopConcert();return enter(...args)};
     window.addEventListener('keydown',event=>{
       if(this.dark){event.preventDefault();event.stopImmediatePropagation();if(event.key==='Escape')this.leaveDark();return;}
-      if(event.key!=='Escape')return;
-      if(this.concertTransition){event.preventDefault();event.stopImmediatePropagation();this.stopConcert();}
-      else if(this.cameraFocus){event.preventDefault();event.stopImmediatePropagation();if(this.cleaning)this.finishCleanup();else this.releaseFocus();}
-      else if(this.concertActive){event.preventDefault();event.stopImmediatePropagation();this.stopConcert();}
-      else if(this.scrapOpen){event.preventDefault();event.stopImmediatePropagation();this.closeScrap();}
     },true);
     window.AudioMaster?.onChange(muted=>{
       for (const media of [this.audio,this.trackAudio,this.tvAudio,this.cueAudio]) if (media) media.muted=muted;
@@ -317,32 +312,23 @@ class ClassroomExperiences {
     this.cameraFocus={type,pose:s.rig.capturePose(),input:s.rig.inputEnabled};
     s.isCameraZoomed=true;s.rig.setInputEnabled(false);s.pendingHover=null;s.resetHoverState();s.hideSean();
     s.isDraggingView=false;s.hasDraggedMeaningfully=false;
+    window.dispatchEvent(new Event('portfolio-navigation'));
     return true;
   }
 
   releaseFocus() {
     if (!this.cameraFocus) return;
     const s=this.s,{pose,input}=this.cameraFocus;
-    this.cameraFocus=null;this.focusBack?.remove();this.focusBack=null;
+    this.cameraFocus=null;
     this.hearts?.remove();this.hearts=null;s.isCameraZoomed=false;
     s.rig.applyPose(pose);
     if (this.dark) this.darkHome.input=input;
     s.rig.setInputEnabled(!this.dark&&input&&s.inputEnabled);
-  }
-
-  focusButton(label) {
-    const button=this.focusBack=document.createElement('button');
-    button.type='button';button.className='experience-focus-back';button.textContent=label;
-    button.addEventListener('click', event => {
-      event.stopPropagation();
-      this.releaseFocus();
-    });
-    document.body.append(button);button.focus({preventScroll:true});
+    window.dispatchEvent(new Event('portfolio-navigation'));
   }
 
   zoomTV() {
     if (!this.s.tvScreen || !this.lockFocus('tv')) return;
-    this.focusButton('Back from TV');
     this.updateFocus(performance.now()/1000);
   }
 
@@ -358,8 +344,9 @@ class ClassroomExperiences {
     this.s.tvScreen.material.map=texture;this.s.tvScreen.material.needsUpdate=true;
 
     const stop=this.tvStopButton=document.createElement('button');
-    stop.type='button';stop.className='experience-focus-back tv-stop-button';stop.textContent='Stop video';
-    stop.addEventListener('click',()=>{this.stopTV();this.focusBack?.focus({preventScroll:true});});
+    stop.type='button';stop.className='tv-stop-button';stop.textContent='Stop video';
+    stop.addEventListener('click',()=>{this.stopTV();
+      if (this.cameraFocus?.type==='tv') document.getElementById('deskBackBtn').focus({preventScroll:true});});
     document.body.append(stop);
 
     video.onended=video.onerror=()=>{if(this.tvVideo===video)this.stopTV();};
@@ -434,7 +421,6 @@ class ClassroomExperiences {
 
   zoomLabibi() {
     if (!this.labibi || !this.lockFocus('labibi')) return;
-    this.focusButton('Back from Labibi');
     this.updateFocus(performance.now()/1000);
   }
 

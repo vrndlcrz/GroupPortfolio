@@ -50,5 +50,5 @@ body { font-family:var(--font-text); color:var(--ink); background:var(--cream); 
 #topNavbar #muteToggleBtn { pointer-events:auto; visibility:visible!important; opacity:1!important; background:var(--gold)!important; border:3px solid var(--ink)!important; box-shadow:4px 4px 0 var(--ink)!important; }
 #muteToggleBtn:focus-visible { outline:3px dashed var(--ink); outline-offset:5px; }
 
-#deskBackBtn { position:fixed; top:20px; left:20px; z-index:2147482999; background:var(--gold)!important; color:var(--ink)!important; border:3px solid var(--ink)!important; box-shadow:4px 4px 0 var(--ink)!important; }
+#deskBackBtn { position:fixed; bottom:1rem; left:1rem; z-index:2147483003; background:var(--gold)!important; color:var(--ink)!important; border:3px solid var(--ink)!important; box-shadow:4px 4px 0 var(--ink)!important; }
 #deskBackBtn[hidden] { display:none!important; }

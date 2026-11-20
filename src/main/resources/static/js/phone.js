@@ -48,12 +48,10 @@ class PortfolioPhone {
     const signal=this.element('span','phone-signal');for(let i=0;i<3;i++)signal.append(this.element('i'));
     status.append(signal,this.element('span','phone-notch'),this.element('span','phone-battery'));
     const header=this.element('header','phone-header');
-    this.back=this.action('‹',()=>this.showHome(),'phone-back');this.back.setAttribute('aria-label','Phone home');
     this.title=this.element('h2','','Phone');this.title.id='phone-title';
-    this.closeButton=this.action('×',()=>this.close(),'phone-close');this.closeButton.setAttribute('aria-label','Close phone');header.append(this.back,this.title,this.closeButton);
+    header.append(this.title);
     this.screen=this.element('div','phone-screen');
-    const home=this.action('',()=>this.showHome(),'phone-home-bar');home.setAttribute('aria-label','Phone home');home.append(this.element('span'));
-    root.append(status,header,this.screen,home);document.body.append(root);
+    root.append(status,header,this.screen);document.body.append(root);
     for(const type of ['pointerdown','pointerup','pointermove','mousedown','mouseup','mousemove','click','dblclick','wheel','touchstart','touchmove','touchend'])
       root.addEventListener(type,event=>event.stopPropagation(),{passive:true});
     root.addEventListener('pointerdown',event=>{this.gesture ||= event.isTrusted});
@@ -65,12 +63,12 @@ class PortfolioPhone {
     });
     document.addEventListener('keydown',event=>{
       if(!this.opened)return;
-      if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();this.close();return}
       if(event.key!=='Tab')return;
-      const nodes=[...root.querySelectorAll('button,video[tabindex]')].filter(node=>!node.disabled&&node.getClientRects().length);
+      const nodes=[...root.querySelectorAll('button,video[tabindex]'),document.getElementById('deskBackBtn')]
+        .filter(node=>node&&!node.disabled&&node.getClientRects().length);
       const first=nodes[0],last=nodes[nodes.length-1],active=document.activeElement;
-      if(event.shiftKey&&(active===first||!root.contains(active))){event.preventDefault();last?.focus()}
-      else if(!event.shiftKey&&(active===last||!root.contains(active))){event.preventDefault();first?.focus()}
+      if(event.shiftKey&&(active===first||!nodes.includes(active))){event.preventDefault();last?.focus()}
+      else if(!event.shiftKey&&(active===last||!nodes.includes(active))){event.preventDefault();first?.focus()}
     },true);
     window.AudioMaster?.onChange(muted=>{for(const video of this.media.values())video.muted=muted});
     // Watch overlay roots, not frame-by-frame scene/bubble style changes. Discover lazy bag DOM too.
@@ -98,7 +96,7 @@ class PortfolioPhone {
     this.build();this.stopNotebook();this.opened=true;this.root.hidden=false;this.root.inert=false;
     this.root.style.pointerEvents='auto';this.button.setAttribute('aria-expanded','true');this.showHome();
     if(window.gsap){gsap.killTweensOf(this.root);gsap.fromTo(this.root,{yPercent:110},{yPercent:0,duration:.5,ease:'power2.out'})}
-    this.closeButton.focus();return true;
+    this.screen.querySelector('button')?.focus();return true;
   }
   close(immediate=false) {
     if(!this.root||!this.opened)return;
@@ -109,13 +107,18 @@ class PortfolioPhone {
     if(restore)this.button.focus();
   }
   showHome() {
-    this.stopMedia();this.app='home';this.title.textContent='Phone';this.back.hidden=true;
+    this.stopMedia();this.app='home';this.title.textContent='Phone';
     const home=this.element('div','phone-apps');
-    for(const [type,name,open] of [['spotibai','SpotiBai',()=>this.showSpotiBai()],['tiktik','Tiktik',()=>this.showTiktik()],['labibi','Labibi',()=>this.showLabibi()]]){
+    for(const [type,name,open] of [['spotibai','SpotiBai',()=>this.showSpotiBai()],['labibi','Labibi',()=>this.showLabibi()]]){
       const button=this.action('',open,'phone-app');
       button.append(this.icon(type),this.element('span','',name));home.append(button);
     }
     this.screen.replaceChildren(home);
+  }
+
+  goBack() {
+    if (this.app==='home') this.close(true);
+    else {this.showHome();this.screen.querySelector('button')?.focus();}
   }
   static localVideoPath(value) {
     try {
@@ -126,7 +129,7 @@ class PortfolioPhone {
     }catch{return null}
   }
   showSpotiBai() {
-    this.stopMedia();this.app='spotibai';this.title.textContent='SpotiBai';this.back.hidden=false;
+    this.stopMedia();this.app='spotibai';this.title.textContent='SpotiBai';
     const list=this.element('div','phone-playlists');
     const status=this.element('p','phone-placeholder');
     status.setAttribute('role','status');
@@ -166,31 +169,34 @@ class PortfolioPhone {
   }
 
   showLabibi(rolled = this.rolledLabibi) {
-    this.stopMedia();this.app='labibi';this.title.textContent='Labibi';this.back.hidden=false;
-    const card=this.element('div','phone-labibi');
+    this.stopMedia();this.app='labibi';this.title.textContent='Labibi';
+    const card=this.element('div',rolled?'phone-labibi phone-labibi-rolled':'phone-labibi');
+    const controls=this.element('div','phone-labibi-controls');
     const ready=!!this.experiences?.s.deskGroup;
     if (ready && rolled) {
       const toy=this.element('img','phone-labibi-preview');
       toy.src='assets/photos/'+rolled.photo;toy.alt=rolled.name;
       card.append(toy,this.element('strong','',rolled.name));
-      card.append(this.action('Keep and place on Sir Sean’s desk',()=>{
+      const keep=this.action('Keep and place on Sir Sean’s desk',()=>{
         this.experiences.placeLabibi(rolled);
         this.rolledLabibi=null;
         this.close(true);
         this.experiences.zoomLabibi();
-      }));
+      });
+      keep.setAttribute('aria-label',keep.textContent);keep.textContent='Keep';
+      controls.append(keep);
     }
     const roll=this.action(rolled?'Roll again':'Roll',()=>{
       this.rolledLabibi=LABIBI_ROLLS[Math.floor(Math.random()*LABIBI_ROLLS.length)];
       this.showLabibi(this.rolledLabibi);
     });
     roll.disabled=!ready;
-    card.append(roll);
+    controls.append(roll);card.append(controls);
     this.screen.replaceChildren(card);
   }
 
   showTiktik() {
-    this.stopMedia();this.app='tiktik';this.title.textContent='Tiktik';this.back.hidden=true;
+    this.stopMedia();this.app='tiktik';this.title.textContent='Tiktik';
     this.entries=Array.isArray(this.config.videos)?this.config.videos:[];this.failed=new Set();this.visible=-1;
     const feed=this.feed=this.element('div','phone-video-feed');feed.setAttribute('aria-label','Group videos');feed.tabIndex=0;
     this.pages=[];this.mounts=[];

@@ -1130,7 +1130,6 @@
 
 .book-overlay .page-dot.active { background:var(--amber); }
 
-#deskBackBtn[aria-hidden="true"] { visibility: hidden; }
 
 /* John Dela Cruz Blue Theme, Cloud Divider & FLAMES Card */
 .theme-long-folder .john-collage-cover {

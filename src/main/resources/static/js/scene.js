@@ -1180,7 +1180,7 @@ class DeskScene {
 
   glideTo(pose, duration, view) {
     this.viewTween?.kill();
-    this.view = 'gliding'; this.backButton.hidden = true;
+    this.view = 'gliding'; window.dispatchEvent(new Event('portfolio-navigation'));
     this.rig.setInputEnabled(false);
     this.isDraggingView = false; this.hasDraggedMeaningfully = false;
     this.pendingHover = null; this.resetHoverState(); this.hideSean();
@@ -1193,7 +1193,7 @@ class DeskScene {
         this.viewTween.kill(); this.viewTween = null;
         this.rig.applyPose(pose); this.view = view;
         this.rig.setInputEnabled(view === 'seat' && this.inputEnabled);
-        this.backButton.hidden = view !== 'desk';
+        window.dispatchEvent(new Event('portfolio-navigation'));
         this.renderer.shadowMap.needsUpdate = true;
       }
     });
@@ -1973,13 +1973,6 @@ class DeskScene {
 
   bindEvents() {
     this.rig.bindKeyboardLook(() => this.isCameraZoomed || this.view !== 'seat');
-    this.backButton = document.getElementById('deskBackBtn');
-    this.backButton.addEventListener('click', () => this.backToSeat());
-    window.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && this.view === 'desk' && !this.interactionBlocked()) {
-        event.preventDefault(); event.stopImmediatePropagation(); this.backToSeat();
-      }
-    }, true);
     window.addEventListener('resize', () => this.onWindowResize());
 
     // Seated Look Around Event Listeners
@@ -2415,6 +2408,7 @@ class DeskScene {
     const previousFocus = document.activeElement;
     const close = () => {
       document.removeEventListener('keydown', onKey, true);
+      this.closePlacard=null;
       card.remove();
       this.returnToDesk();
       previousFocus?.focus();
@@ -2423,6 +2417,7 @@ class DeskScene {
       if (event.key === 'Escape') { event.stopImmediatePropagation(); close(); }
       if (event.key === 'Tab') event.preventDefault();
     };
+    this.closePlacard=close;
     document.body.appendChild(card);
     const button = card.querySelector('button');
     button.addEventListener('click', close);
