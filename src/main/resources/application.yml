@@ -16,7 +16,7 @@ site:
       row: 1
       col: 1
       dance: true
-      look: {skin: "#C68A5E", hair-style: curly, hair-color: "#3B2A1E", outfit-color: "#D8402F", accessory: none}
+      look: {skin: "#C68A5E", hair-style: bald, hair-color: "#3B2A1E", outfit-color: "#D8402F", accessory: none}
     - id: s2
       name: "Diwata Pares"
       line: "I love pares"

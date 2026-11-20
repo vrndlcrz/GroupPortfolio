@@ -61,7 +61,7 @@ class PortfolioPhone {
       if(!this.opened)return;
       if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();this.close();return}
       if(event.key!=='Tab')return;
-      const nodes=[...root.querySelectorAll('button,iframe,video[tabindex]')].filter(node=>!node.disabled&&node.getClientRects().length);
+      const nodes=[...root.querySelectorAll('button,video[tabindex]')].filter(node=>!node.disabled&&node.getClientRects().length);
       const first=nodes[0],last=nodes[nodes.length-1],active=document.activeElement;
       if(event.shiftKey&&(active===first||!root.contains(active))){event.preventDefault();last?.focus()}
       else if(!event.shiftKey&&(active===last||!root.contains(active))){event.preventDefault();first?.focus()}

@@ -36,7 +36,7 @@ class ClassroomExperiences {
   }
   buildBanner() {
     const canvas=document.createElement('canvas');canvas.width=2048;canvas.height=160;canvas.textContent='Para sa G ang temang to';
-    const map=new THREE.CanvasTexture(canvas);this.bannerTexture=map;
+    const map=new THREE.CanvasTexture(canvas);
     document.fonts.load('86px "Lilita One"').catch(()=>{}).then(()=>{
       const draw=()=>{const ctx=canvas.getContext('2d'),text=canvas.textContent;ctx.strokeStyle=Theme.ink;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(10,18);ctx.quadraticCurveTo(1024,65,2038,18);ctx.stroke();ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='86px "Lilita One", sans-serif';ctx.lineJoin='round';
         for(let i=0;i<text.length;i++){if(text[i]===' ')continue;const x=90+i*(1868/(text.length-1)),y=92+12*Math.sin(i*.45);ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(i*7)*.08);ctx.strokeStyle=Theme.ink;ctx.lineWidth=7;ctx.fillStyle=['#FFE3A3','#77BCAE','#E99D67'][i%3];ctx.strokeText(text[i],0,0);ctx.fillText(text[i],0,0);ctx.restore()}map.needsUpdate=true};
@@ -66,7 +66,7 @@ class ClassroomExperiences {
     });
   }
   registerDoor() {
-    const hit=this.doorHit=new THREE.Mesh(this.s.studentGeometry.box,this.s.studentHitMaterial);hit.position.set(0,1.38,8.58);hit.scale.set(3.55,8.36,.4);hit.layers.set(1);hit.userData.type='exit-door';this.s.roomGroup.add(hit);this.s.interactiveObjects.push(hit);
+    const hit=new THREE.Mesh(this.s.studentGeometry.box,this.s.studentHitMaterial);hit.position.set(0,1.38,8.58);hit.scale.set(3.55,8.36,.4);hit.layers.set(1);hit.userData.type='exit-door';this.s.roomGroup.add(hit);this.s.interactiveObjects.push(hit);
   }
   handleClick(object) {
     const type=object.userData.type;
@@ -93,7 +93,7 @@ class ClassroomExperiences {
   buildActor(kind) {
     if(this.actors[kind])return this.actors[kind];
     const group=new THREE.Group(),head=new THREE.Group(),arms=[],legs=[];this.s.roomGroup.add(group);group.position.y=-2.84;group.visible=false;
-    const outfit={jeo:'#FFF8E7',rin:'#E35542',tubo:'#D8402F'}[kind]||'#E4A64C',skin='#D9A278',hair='#231C1A';
+    const outfit={jeo:'#FFF8E7',rin:'#3975D2',tubo:'#D8402F'}[kind]||'#E4A64C',skin='#D9A278',hair='#231C1A';
     this.mesh(group,'box',outfit,0,2.15,0,1.05,1.4,.62);
     for(const side of [-1,1]){
       const leg=new THREE.Group();leg.position.set(side*.27,1.5,0);group.add(leg);this.mesh(leg,'box','#35465C',0,-.65,0,.41,1.35,.43);this.mesh(leg,'box',Theme.ink,0,-1.35,.14,.5,.28,.7);legs.push(leg);
@@ -101,8 +101,10 @@ class ClassroomExperiences {
     }
     head.position.set(0,3.45,.03);group.add(head);this.mesh(head,'sphere',skin,0,0,0,.56,.66,.48);
     this.batch(head,'sphere',Theme.ink,[[-.21,.07,.46,.049,.056,.026],[.21,.07,.46,.049,.056,.026],[0,-.24,.46,.12,.025,.026]]);
-    this.mesh(head,'sphere',hair,0,.43,-.05,.59,.3,.49);
-    this.mesh(head,'box',hair,0,-.18,-.34,.95,kind==='jeo'?1.4:.95,.37);
+    if (kind !== 'tubo') {
+      this.mesh(head,'sphere',hair,0,.43,-.05,.59,.3,.49);
+      this.mesh(head,'box',hair,0,-.18,-.34,.95,kind==='jeo'?1.4:.95,.37);
+    }
     if(kind==='jeo'){
       this.mesh(head,'box','#111111',0,.28,.41,1.1,.18,.09);
       const knot=this.mesh(head,'box','#111111',.42,.12,-.47,.14,.65,.09);knot.rotation.z=-.4;
@@ -465,7 +467,7 @@ class ClassroomExperiences {
     this.cueAudio?.pause();this.cueAudio=null;
   }
 
-  onCurtainOpened() {this.curtainOpened=true;if(!this.titan)this.buildTitan();this.titan.visible=true}
+  onCurtainOpened() {if(!this.titan)this.buildTitan();this.titan.visible=true}
   buildTitan() {
     const titan=this.titan=new THREE.Group();titan.name='cartoon-colossal-titan';titan.position.set(14.4,-7,.6);titan.rotation.y=-Math.PI/2;titan.scale.setScalar(3);this.s.scene.add(titan);
     const muscle='#AC4B3C',bone='#E6C4A2',dark='#49312F';
@@ -560,7 +562,7 @@ class ClassroomExperiences {
     if(this.audio)return;
     const audio=this.audio=new Audio('/assets/audio/nadarang.mp3');audio.preload='metadata';audio.volume=.5;audio.muted=window.AudioMaster?.muted??false;
     audio.onloadedmetadata=()=>{if(this.concertActive)audio.currentTime=this.concertStart};audio.onended=()=>this.stopConcert();audio.onerror=()=>this.stopConcert();
-    this.lyricReady=fetch('/assets/audio/nadarang.lrc').then(r=>r.ok?r.text():'').then(text=>{
+    fetch('/assets/audio/nadarang.lrc').then(r=>r.ok?r.text():'').then(text=>{
       const offset=Number(text.match(/\[offset:([+-]?\d+)\]/i)?.[1]||0)/1000,rows=[];
       for(const line of text.split(/\r?\n/)){const times=[...line.matchAll(/\[(\d+):(\d+(?:\.\d+)?)\]/g)];if(!times.length)continue;const words=line.replace(/\[[^\]]*\]/g,'').trim();for(const time of times)rows.push({time:Number(time[1])*60+Number(time[2])-offset,text:words})}
       rows.sort((a,b)=>a.time-b.time);this.lyrics=rows;this.cueIndex=-1;
@@ -607,6 +609,7 @@ class ClassroomExperiences {
   }
 
   beginConcert() {
+    this.s.pendingHover=null;this.s.resetHoverState();this.s.hideSean();
     this.stopKim();this.stopRin();this.stopTrack();this.stopTV();this.phone.close(true);this.book.music.stop(true);
     if(this.s.isFloating){this.s.stopAntiGravity();this.s.finishAntiGravityReset()}
     this.prepareMedia();this.prepareStage();this.concertActive=true;this.concertHome=new Map();

@@ -71,7 +71,7 @@ const SEAT_SLOTS = Object.freeze([
 const VIEWER_SLOT = SEAT_SLOTS.find(slot => slot.row===4 && slot.col===2);
 const ABSENT_SLOT = SEAT_SLOTS.find(slot => slot.row===4 && slot.col===1);
 const studentDefaults = [
-  ['s1','Dinorobong Tubo','',1,1,true,'#C68A5E','curly','#3B2A1E','#D8402F','none'],
+  ['s1','Dinorobong Tubo','',1,1,true,'#C68A5E','bald','#3B2A1E','#D8402F','none'],
   ['s2','Diwata Pares','I love pares',1,4,false,'#E0AC82','bob','#1E1A18','#2E9C8F','hairclip'],
   ['s3','Bea Borres',"My baby daddy Meray, Hopea, I'm dinadaan-daanan lang",2,2,false,'#F0C9A0','twin buns','#4A2C2A','#9A7BC8','none'],
   ['s4','Lans','THIS IS LANS!!!',2,3,false,'#B97A52','ponytail','#231815','#F2B632','headband'],
@@ -359,7 +359,6 @@ class DeskScene {
     grain.wrapS=grain.wrapT=THREE.RepeatWrapping;grain.repeat.set(2,2);
     const wood = color => {const material=Theme.toon(color).clone();material.color.set(color);material.map=grain;return material;};
     this.chairMaterials={plank:wood('#A8743F'),tablet:wood('#B98650'),legs:wood('#5A3A1E')};
-    this.chairGrain=grain;
     this.roomTexture=texture;
     const panel = (map, w, h, x, y, z, yaw = 0) => {
       const face = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
@@ -472,7 +471,7 @@ class DeskScene {
     Promise.all([document.fonts.load('76px "Gochi Hand"'), document.fonts.load('70px Caveat')]).then(writeBoard).catch(() => {});
     this.whiteboardFace=panel(board, boardWidth - .36, boardHeight - .36, boardX, boardY, front + .29);
     this.whiteboardBaseCanvas=board.image;
-    const boardHit=this.whiteboardHitbox=new THREE.Mesh(unitBox,this.studentHitMaterial);
+    const boardHit=new THREE.Mesh(unitBox,this.studentHitMaterial);
     boardHit.position.set(boardX,boardY,front+.45);boardHit.scale.set(boardWidth*1.15,boardHeight*1.15,.18);boardHit.layers.set(1);
     boardHit.userData.type='whiteboard';room.add(boardHit);this.interactiveObjects.push(boardHit);
     const trayY = boardY - boardHeight / 2;
@@ -708,6 +707,7 @@ class DeskScene {
     part(head,'sphere',Theme.ink,[[-.16,.06,-.38,.043,.046,.025],[.16,.06,-.38,.043,.046,.025],[0,-.19,-.379,.09,.025,.02]]);
     const hair = [[0,.34,.06,.45,.23,.4]];
     switch (look.hairStyle) {
+      case 'bald': hair.length=0; break;
       case 'curly': hair.splice(0,1,[-.28,.34,0,.25,.26,.35],[.27,.36,0,.25,.26,.35],[0,.48,.06,.27,.25,.36]); break;
       case 'bob': hair[0]=[0,.16,.17,.48,.48,.35]; break;
       case 'twin buns': hair.push([-.4,.44,.1,.21,.21,.21],[.4,.44,.1,.21,.21,.21]); break;
@@ -715,7 +715,7 @@ class DeskScene {
       case 'crew cut': hair[0]=[0,.43,.04,.43,.13,.37]; break;
       case 'side part': hair.push([-.16,.44,-.13,.29,.12,.27]); break;
     }
-    part(head,'sphere',look.hairColor,hair);
+    if (hair.length) part(head,'sphere',look.hairColor,hair);
     if (look.hairStyle==='curly') part(torso,'sphere',look.outfitColor,[[0,1.13,.28,.48,.38,.23]]);
     if (look.hairStyle==='bob') part(torso,'box','#FFF3D6',[[0,.74,-.211,.32,.06,.025]]);
     if (look.hairStyle==='twin buns') part(torso,'box','#FFF3D6',[[0,.43,-.211,.05,.86,.025]]);
@@ -887,13 +887,13 @@ class DeskScene {
       ctx.font='600 48px "Patrick Hand", cursive';ctx.fillText(lines[1],256,188,472);
     });
     const paper=new THREE.MeshBasicMaterial({map,toneMapped:false});
-    const geometry=new THREE.PlaneGeometry(1.2,.6),card=this.absentCard=new THREE.Group();
+    const geometry=new THREE.PlaneGeometry(1.2,.6),card=new THREE.Group();
     card.position.set(ABSENT_SLOT.x+.48,floor+3.05,ABSENT_SLOT.z-.48);card.rotation.y=-Math.PI/2;room.add(card);
     for (const side of [-1,1]) {
       const face=new THREE.Mesh(geometry,paper);face.position.z=side*.157;face.rotation.set(-side*.55,side>0?0:Math.PI,0);card.add(face);
     }
     const anchor=new THREE.Object3D();anchor.position.set(ABSENT_SLOT.x+.48,floor+3.65,ABSENT_SLOT.z-.48);room.add(anchor);
-    const hitbox=this.absentSeatHitbox=new THREE.Mesh(this.studentGeometry.box,this.studentHitMaterial);
+    const hitbox=new THREE.Mesh(this.studentGeometry.box,this.studentHitMaterial);
     hitbox.position.set(ABSENT_SLOT.x,floor+2.5,ABSENT_SLOT.z);hitbox.scale.set(1.6,3,1.5);hitbox.layers.set(1);
     hitbox.userData={type:'absent-seat',student:{id:'absent',name:'Absent',line:''},anchor};room.add(hitbox);this.interactiveObjects.push(hitbox);
   }
@@ -918,10 +918,6 @@ class DeskScene {
     this.teacherBubble.style.overflowWrap='anywhere';
     this.speechUntil=performance.now()+duration;
     this.hideTooltip();
-  }
-
-  onStudentClick(id) {
-    // TODO: later feature
   }
 
   buildWindowView(side,sill,lintel,start,end) {
@@ -1005,8 +1001,8 @@ class DeskScene {
   }
 
   buildTeacher(room, floor, box, paint, texture) {
-    const desk = paint(Theme['wood-dark']), black = paint(Theme.ink), mint = this.chairMaterials.plank;
-    const teacherChair = this.teacherChair = new THREE.Group(); room.add(teacherChair);
+    const black = paint(Theme.ink), mint = this.chairMaterials.plank;
+    const teacherChair = new THREE.Group(); room.add(teacherChair);
     teacherChair.position.set(0,0,-.68);
     box(teacherChair,mint,0,floor+1.74,-13.44,1.82,.18,1.4);
     box(teacherChair,mint,0,floor+3.05,-14.02,1.82,2.4,.16);
@@ -1048,7 +1044,6 @@ class DeskScene {
       forearm.scale.set(.8,.45,.8); forearm.rotation.x = Math.PI / 2;
       forearm.position.set(side*.08,-.24,.98); forearm.castShadow = true; arm.add(forearm);
       oval(arm,skin,side*.08,-.24,1.36,.23,.21,.32);
-      if (side === -1) this.teacherArm = arm;
       box(torso,black,side*0.16,1.5,0.66,0.045,0.98,0.035).rotation.z=-side*0.32;
     }
     const badge = texture(256,112,ctx => {
@@ -1836,7 +1831,6 @@ class DeskScene {
     this.scene.add(stickyNote);
 
     this.interactiveObjects.push(dontTouchHitBox);
-    this.dontTouchNote = stickyNote;
 
     // 4. DESK CALENDAR
     const calCanvas = document.createElement('canvas');
@@ -1877,7 +1871,6 @@ class DeskScene {
   }
 
   buildStickyNotes() {
-    this.deskStickyNotes = [];
     const colors = ['#FEF08A', '#FBCFE8', '#BAE6FD', '#BBF7D0', '#DDD6FE'];
     const notesToPlace = this.notes.slice(-6);
     notesToPlace.forEach((n, idx) => {
@@ -1981,7 +1974,7 @@ class DeskScene {
     // Mouse Drag to Look Around
     dom.addEventListener('mousedown', (e) => this.onMouseDown(e));
     window.addEventListener('mousemove', (e) => this.onMouseMove(e));
-    window.addEventListener('mouseup', (e) => this.onMouseUp(e));
+    window.addEventListener('mouseup', () => this.onMouseUp());
 
     // Mouse Wheel to Tilt POV Up / Down smoothly
     dom.addEventListener('wheel', (e) => {
@@ -2041,11 +2034,10 @@ class DeskScene {
     this.isDraggingView = true;
     this.dragStartPos = { x: e.clientX, y: e.clientY };
     this.dragStartAngles = { yaw: this.rig.targetYaw, pitch: this.rig.targetPitch };
-    this.mouseDownTime = Date.now();
     this.hasDraggedMeaningfully = false;
   }
 
-  onMouseUp(e) {
+  onMouseUp() {
     this.isDraggingView = false;
   }
 
@@ -2058,7 +2050,6 @@ class DeskScene {
     this.isDraggingView = true;
     this.dragStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     this.dragStartAngles = { yaw: this.rig.targetYaw, pitch: this.rig.targetPitch };
-    this.mouseDownTime = Date.now();
     this.hasDraggedMeaningfully = false;
   }
 
@@ -2110,6 +2101,7 @@ class DeskScene {
   }
 
   updateHover(e) {
+    if (this.experiences?.concertActive) return;
     if (this.interactionBlocked()) { this.resetHoverState(); this.hideSean(); return; }
     // Raycast hovered props & folders
     const rect = this.renderer.domElement.getBoundingClientRect();
@@ -2304,7 +2296,7 @@ class DeskScene {
 
   interactionBlocked() {
     return !!this.experiences?.blocking || !this.inputEnabled || this.view === 'gliding' || this.isCameraZoomed || !!document.querySelector(
-      '#bookOverlay.active, #whiteboard-overlay.active, .error-modal-overlay.active, .guestbook-modal-overlay.active, .note-view-modal-overlay.active, #termsModal.active');
+      '#bookOverlay.active, #whiteboard-overlay.active, .error-modal-overlay.active, .guestbook-modal-overlay.active, .note-view-modal-overlay.active');
   }
 
   hideSean() {
@@ -2344,8 +2336,6 @@ class DeskScene {
 
     if (type === 'whiteboard') {
       if(this.view==='seat')this.whiteboardController?.open();
-    } else if (type === 'student') {
-      if (!this.studentInteractionBlocked()) this.onStudentClick(obj.userData.student.id);
     } else if (type === 'front-desk') {
       this.enterDeskView();
     } else if (type === 'placard') {

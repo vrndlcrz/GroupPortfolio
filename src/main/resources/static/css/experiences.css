@@ -3,7 +3,7 @@
 .teacher-speech .speaker-name { display:block; font-family:'Lilita One',sans-serif; font-size:.78em; line-height:1.15; margin-bottom:.35em; }
 .teacher-speech .speaker-line { display:block; white-space:pre-line; overflow-wrap:anywhere; }
 .teacher-speech .speaker-hint { display:block; margin-top:.6em; padding-top:.4em; border-top:2px solid var(--ink,#3A2312); font:.68em 'Lilita One',sans-serif; }
-.book-overlay .page-text,.book-overlay .page-content-text { font-size:clamp(20px,1.65vw,26px)!important; line-height:1.5!important; }
+.book-overlay .page-text { font-size:clamp(20px,1.65vw,26px)!important; line-height:1.5!important; }
 .book-overlay .page-body-content { overflow-y:auto; min-height:0; }
 .book-overlay :is(.page-category-tag,.folder-letterhead,.skill-funny-label,.signed-name,.book-key-hints) { font-size:clamp(16px,1.2vw,20px)!important; }
 .book-overlay .john-profile-details { font-size:clamp(16px,1.4vw,22px)!important; }

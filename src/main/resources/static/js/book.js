@@ -248,7 +248,7 @@ class ClearBook {
     return entry.pages;
   }
 
-  johnDivider(member) {
+  johnDivider() {
     const dividerEl = document.createElement('div');
     dividerEl.className = 'john-cloud-divider';
     dividerEl.innerHTML = `
@@ -735,7 +735,7 @@ class ClearBook {
         front.replaceChildren(JohnFolderArt.get(member).canvas);
       } else if(cfg.type==='john-divider') {
         const front=pageEl.querySelector('.page-front');front.classList.add('john-divider-cover');
-        front.replaceChildren(this.johnDivider(member));
+        front.replaceChildren(this.johnDivider());
       } else if(cfg.type==='john-profile') {
         pageEl.querySelector('.page-front').replaceChildren(this.johnProfile(member));
       }

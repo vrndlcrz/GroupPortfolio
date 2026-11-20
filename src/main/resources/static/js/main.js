@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentVisitorCount = 0;
   let deskScene = null;
   let clearBook = null;
-  let activeMemberIdForNote = 1;
 
   // UI Elements
   const visitorCountBadge = document.getElementById('visitorCountBadge');
@@ -202,7 +201,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   function openGuestbookModal(memberId = null) {
     if (memberId && memberSelectDropdown) {
       memberSelectDropdown.value = memberId;
-      activeMemberIdForNote = memberId;
     }
     // Show modal: set display first, then add .active next frame for CSS transition to run
     guestbookModal.style.display = 'flex';

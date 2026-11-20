@@ -17,20 +17,6 @@ const PortfolioHumor = (function() {
   ];
   let konamiIndex = 0;
 
-  // Friendly Roasts list
-  const roasts = [
-    "Has 47 browser tabs open and uses none of them.",
-    "Says 'quick 5 minute break' and returns 3 business days later.",
-    "Believes 'git push --force' is a valid problem-solving strategy.",
-    "Debugs with console.log('test 1'), console.log('here'), console.log('WHY PLEASE').",
-    "Spends 2 hours searching for a Spotify playlist before writing 1 line of HTML.",
-    "Can explain the theory of quantum computing, but forgets the semicolon on line 4.",
-    "Owns a reusable water bottle that has seen more iced coffee than water.",
-    "Reads StackOverflow answers from 2013 with blind religious faith.",
-    "Uses dark mode so the bugs can't see them coming.",
-    "Calls a missing semicolon 'an unexpected design pause'."
-  ];
-
   const paperBuffers = new Map();
   function paperBuffer(ctx, spiral) {
     if (paperBuffers.has(spiral)) return paperBuffers.get(spiral);
@@ -204,10 +190,6 @@ const PortfolioHumor = (function() {
     }
   }
 
-  function toggleMute() {
-    return window.AudioMaster?.toggle();
-  }
-
   /**
    * Initializes both single-key ('E', 'G', 'F') and classic Konami easter eggs
    */
@@ -379,57 +361,13 @@ const PortfolioHumor = (function() {
     showToast('Motivation rebooted! Coffee levels at 100%.');
   }
 
-  function showTermsJokeModal() {
-    let dialog = document.getElementById('termsModal');
-    if (!dialog) {
-      dialog = document.createElement('div');
-      dialog.id = 'termsModal';
-      dialog.className = 'error-modal-overlay';
-      dialog.innerHTML = `
-        <div class="retro-error-window terms-window">
-          <div class="retro-window-header">
-            <span style="display:flex; align-items:center; gap:6px;"><svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg> Terms &amp; Conditions (Nobody Reads This)</span>
-            <button class="retro-close-x" onclick="document.getElementById('termsModal').classList.remove('active')">✕</button>
-          </div>
-          <div class="retro-window-body terms-body">
-            <p style="font-size:0.75rem; color:#64748B; margin-bottom:12px;">By looking at this website for more than 3 seconds, you agree to the following legally unenforceable clauses:</p>
-            <div class="terms-scroll-box">
-              <p>1. <strong>Clause of Universal Div Centering:</strong> The user acknowledges that centering a div in CSS is an art form comparable to classical renaissance sculpting.</p>
-              <p>2. <strong>Caffeine Conversion Rate:</strong> The developers maintain a 1:1 ratio between dark roast espresso and working REST endpoints.</p>
-              <p>3. <strong>The "It Worked On My Machine" Immunity:</strong> If any feature fails during grading, Article 42 establishes that it worked perfectly on the presenter's laptop at 10:33 PM.</p>
-              <p>4. <strong>Rubber Duck Arbitration:</strong> Any disputes regarding algorithms shall be submitted in writing to a yellow rubber duck sitting on the desk.</p>
-              <p style="background:#FEF3C7; padding:8px; border-radius:4px; color:#B45309; font-weight:bold;">
-                🎉 JOKE FOUND: You actually scrolled down here! You have been awarded 100 bonus imaginary credits. Please tell the professor our team deserves an A+!
-              </p>
-            </div>
-          </div>
-          <div class="retro-window-footer">
-            <button class="retro-btn" onclick="document.getElementById('termsModal').classList.remove('active'); PortfolioHumor.playSound('pop');">I Accept (Give Me An A+)</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(dialog);
-    }
-    dialog.classList.add('active');
-  }
-
-  function showHobbyNotFoundJoke() {
-    playSound('error');
-    showToast('⚠️ 404: Hobby Not Found! Sleeping is classified as a survival necessity, not a hobby.');
-  }
-
   return {
     playSound,
-    toggleMute,
-    initKonamiCode: initEasterEggs,
     initEasterEggs,
     showToast,
     showLaptopErrorDialog,
     closeLaptopError,
-    restartMotivation,
-    showTermsJokeModal,
-    showHobbyNotFoundJoke,
-    roasts
+    restartMotivation
   };
 })();
 
