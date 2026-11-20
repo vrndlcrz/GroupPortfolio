@@ -3103,6 +3103,7 @@
   aspect-ratio: 1;
   border-radius: 2px;
   object-fit: cover;
+  object-position: center 38%;
   display: block;
 }
 
