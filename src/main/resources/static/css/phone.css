@@ -34,7 +34,7 @@
 
 .spotibai-track { flex-wrap:wrap; }
 .spotibai-track small { flex-basis:100%; }
-.spotibai-track button,.phone-labubu button { border:1px solid currentColor; border-radius:.5rem; background:#f6e5bc; color:#32251d; padding:.35rem .55rem; cursor:pointer; }
-.spotibai-track button:disabled,.phone-labubu button:disabled { opacity:.55; cursor:default; }
-.phone-labubu { display:grid; justify-items:center; gap:.65rem; padding:1rem; text-align:center; }
-.phone-labubu-preview { width:min(60%,140px); aspect-ratio:1; object-fit:cover; border-radius:.65rem; }
+.spotibai-track button,.phone-labibi button { border:1px solid currentColor; border-radius:.5rem; background:#f6e5bc; color:#32251d; padding:.35rem .55rem; cursor:pointer; }
+.spotibai-track button:disabled,.phone-labibi button:disabled { opacity:.55; cursor:default; }
+.phone-labibi { display:grid; justify-items:center; gap:.65rem; padding:1rem; text-align:center; }
+.phone-labibi-preview { width:min(60%,140px); height:140px; object-fit:contain; border-radius:.65rem; }

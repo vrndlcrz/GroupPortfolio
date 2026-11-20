@@ -525,6 +525,24 @@ class DeskScene {
     box(room, frame, -10.84, 2.9, -4, 0.2, 4.4, 8.4);
     panel(notices, 8.15, 4.15, -10.72, 2.9, -4, Math.PI/2);
 
+    // Place the portrait just beyond the Class Officers end of the noticeboard.
+    const portraitZ = 1.95, portraitY = 3.18;
+    box(room, frame, -10.84, portraitY, portraitZ, .18, 3.45, 2.84);
+    box(room, paint(Theme.gold), -10.73, portraitY, portraitZ, .07, 3.25, 2.63);
+    const portraitMap = new THREE.TextureLoader().load('assets/photos/tzuyu-pic.jpg');
+    portraitMap.encoding = THREE.sRGBEncoding;
+    const portrait = panel(portraitMap, 2.4, 3, -10.68, portraitY, portraitZ, Math.PI/2);
+    portrait.name = 'mother of all';
+    const plaque = texture(512, 104, ctx => {
+      ctx.canvas.textContent = portrait.name;
+      ctx.fillStyle = '#F8E8BE'; ctx.fillRect(0, 0, 512, 104);
+      ctx.fillStyle = Theme.ink; ctx.font = 'bold 53px Georgia, serif'; ctx.textAlign = 'center';
+      ctx.fillText(portrait.name, 256, 69, 468);
+    });
+    box(room, frame, -10.8, 1.15, portraitZ, .15, .56, 2.5);
+    panel(plaque, 2.36, .48, -10.715, 1.15, portraitZ, Math.PI/2);
+
+
     const tube = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff4d9, emissiveIntensity: 0.95 });
     for (const x of [-5.3, 5.3]) {
       box(room, silver, x, ceiling - .12, -5.2, 5, .24, .58);
@@ -1137,13 +1155,13 @@ class DeskScene {
     if (!first) return null;
     if (this.view === 'seat') {
       // A visible item occludes the desk below it, but cannot open from the seat.
-      if (this.isSpeakingSeat(first.object) || ['student-extra','floor-scrap','exit-door','classroom-tv','basketball','labubu'].includes(first.object.userData.type)) return first;
+      if (this.isSpeakingSeat(first.object) || ['student-extra','floor-scrap','exit-door','classroom-tv','basketball','labibi'].includes(first.object.userData.type)) return first;
       const sean = intersects.find(hit => hit.object.userData.type === 'teacher');
       if (sean) return sean;
       if (this.tabletopObject(first.object)) return { object: this.deskHit };
       return first;
     }
-    if (first.object.userData.type==='labubu') return first;
+    if (first.object.userData.type==='labibi') return first;
     return intersects.find(hit => hit.object.userData.type === 'folder') || intersects.find(hit => hit.object.userData.type !== "front-desk" && this.tabletopObject(hit.object)) || null;
   }
 
@@ -2164,8 +2182,8 @@ class DeskScene {
       this.showTooltip('Click to zoom the TV',e);
     } else if (obj.userData.type==='basketball') {
       this.showTooltip('Click the basketball',e);
-    } else if (obj.userData.type==='labubu') {
-      this.showTooltip('Click to inspect Riam’s Labubu',e);
+    } else if (obj.userData.type==='labibi') {
+      this.showTooltip('Click to inspect '+this.experiences.labibi.name,e);
     } else if (obj.userData.type==='floor-scrap') {
       if(this.experiences?.speaking)this.hideTooltip();else this.showTooltip('Click to read the wrapper',e);
     } else if (obj.userData.type==='exit-door') {

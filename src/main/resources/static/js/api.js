@@ -17,11 +17,11 @@ const classroomDefaults = {
   },
   "mission": {
     "title": "MISSION",
-    "text": "Buenos dias mi amor, por favor"
+    "text": "Chocolate chocolate chocolate choco"
   },
   "vision": {
     "title": "VISION",
-    "text": "Kasi nga pag di ka inintindi, alam mo na yung magic word"
+    "text": "De canela, de canela, de canela"
   },
   "whiteboardLines": [
     "AET Group Portfolio",

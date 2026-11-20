@@ -1,4 +1,10 @@
 /* Lazy phone UI for the classroom apps. */
+const LABIBI_ROLLS = [
+  {name:'Riam Choco Labibi', photo:'labibi-riam.png', fur:'#674C41', trim:'#D8A781', face:[94/519, 240/870, 309/519, 259/870]},
+  {name:'Charella Berry Labibi', photo:'labibi-charella.png', fur:'#D987A7', trim:'#F4D4D4', face:[100/485, 226/831, 286/485, 239/831]},
+  {name:'Vernie The Black Dog Labibi', photo:'labibi-vernie.png', fur:'#4D5055', trim:'#DED1C6', face:[118/517, 424/964, 269/517, 203/964]},
+  {name:'Nicole Ube Labibi', photo:'labibi-nicole.png', fur:'#6BC9E1', trim:'#DCF1F0', face:[83/494, 385/979, 288/494, 241/979]}
+];
 class PortfolioPhone {
   constructor({button,config={},canOpen=()=>true,stopNotebook=()=>{}}) {
     Object.assign(this,{button,config:config||{},canOpen,stopNotebook});
@@ -27,7 +33,7 @@ class PortfolioPhone {
     svg.setAttribute('viewBox','0 0 64 64');svg.setAttribute('aria-hidden','true');
     const shapes=type==='spotibai'?
       [['circle',{cx:32,cy:32,r:27,fill:'#42B86B'}],['path',{d:'M28 40V20l18-4v21M28 24l18-4',fill:'none'}],['ellipse',{cx:23,cy:42,rx:6,ry:4,fill:'#FFF3D4'}],['ellipse',{cx:41,cy:39,rx:6,ry:4,fill:'#FFF3D4'}]]:
-      type==='heart'||type==='labubu'?[['path',{d:'M32 53 10 32C-4 12 20 3 32 20 44 3 68 12 54 32Z',fill:'none'}]]:
+      type==='heart'||type==='labibi'?[['path',{d:'M32 53 10 32C-4 12 20 3 32 20 44 3 68 12 54 32Z',fill:'none'}]]:
       [['path',{d:'m8 17 32-8 10 35-32 9Z',fill:'#47BEB3'}],['path',{d:'m23 13 30 9-10 33-30-9Z',fill:'#EC7298'}],['path',{d:'m29 26 13 8-15 7Z',fill:'#FFF3D4'}]];
     for(const [tag,attrs] of shapes){const node=document.createElementNS(ns,tag);for(const [key,value] of Object.entries(attrs))node.setAttribute(key,value);svg.append(node)}return svg;
   }
@@ -105,7 +111,7 @@ class PortfolioPhone {
   showHome() {
     this.stopMedia();this.app='home';this.title.textContent='Phone';this.back.hidden=true;
     const home=this.element('div','phone-apps');
-    for(const [type,name,open] of [['spotibai','SpotiBai',()=>this.showSpotiBai()],['tiktik','Tiktik',()=>this.showTiktik()],['labubu','Labubu',()=>this.showLabubu()]]){
+    for(const [type,name,open] of [['spotibai','SpotiBai',()=>this.showSpotiBai()],['tiktik','Tiktik',()=>this.showTiktik()],['labibi','Labibi',()=>this.showLabibi()]]){
       const button=this.action('',open,'phone-app');
       button.append(this.icon(type),this.element('span','',name));home.append(button);
     }
@@ -159,25 +165,24 @@ class PortfolioPhone {
     this.screen.replaceChildren(list,status);
   }
 
-  showLabubu(rolled = this.rolledLabubu) {
-    this.stopMedia();this.app='labubu';this.title.textContent='Labubu';this.back.hidden=false;
-    const card=this.element('div','phone-labubu');
+  showLabibi(rolled = this.rolledLabibi) {
+    this.stopMedia();this.app='labibi';this.title.textContent='Labibi';this.back.hidden=false;
+    const card=this.element('div','phone-labibi');
     const ready=!!this.experiences?.s.deskGroup;
     if (ready && rolled) {
-      const toy=this.element('img','phone-labubu-preview');
-      toy.src='assets/photos/riam-labubu.png';toy.alt='Riam’s Labubu';
-      card.append(toy,this.element('strong','',rolled.color+' Riam Labubu'));
+      const toy=this.element('img','phone-labibi-preview');
+      toy.src='assets/photos/'+rolled.photo;toy.alt=rolled.name;
+      card.append(toy,this.element('strong','',rolled.name));
       card.append(this.action('Keep and place on Sir Sean’s desk',()=>{
-        this.experiences.placeLabubu(rolled);
-        this.rolledLabubu=null;
+        this.experiences.placeLabibi(rolled);
+        this.rolledLabibi=null;
         this.close(true);
-        this.experiences.zoomLabubu();
+        this.experiences.zoomLabibi();
       }));
     }
     const roll=this.action(rolled?'Roll again':'Roll',()=>{
-      const styles=[{color:'Cocoa',fur:'#695044'},{color:'Rose',fur:'#D68B9C'},{color:'Mint',fur:'#70AA92'}];
-      this.rolledLabubu=styles[Math.floor(Math.random()*styles.length)];
-      this.showLabubu(this.rolledLabubu);
+      this.rolledLabibi=LABIBI_ROLLS[Math.floor(Math.random()*LABIBI_ROLLS.length)];
+      this.showLabibi(this.rolledLabibi);
     });
     roll.disabled=!ready;
     card.append(roll);
