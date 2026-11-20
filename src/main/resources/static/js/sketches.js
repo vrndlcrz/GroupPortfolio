@@ -25,11 +25,13 @@
     sampaguita: ['M29 24q-13-23-18-10-2 7 10 15-24-7-19 6 3 7 21 3-13 18-1 19 7 0 10-17 9 21 17 12 4-6-8-17 22 2 18-10-4-6-20 0 4-21-6-18-7 2-4 17z','M26 31q5-8 10-1t-6 7z','#fff8d9']
   };
   let serial = 0;
-  function get(name) {
+  function get(name, tint = null) {
     if (!Object.hasOwn(shapes, name)) return '';
     const [outline, details, wash] = shapes[name];
+    const fillWash = tint || wash;
+    const strokeColor = tint ? '#1E3A8A' : '#34312e';
     const id = 'pencil-wobble-' + ++serial;
-    return `<svg aria-hidden="true" viewBox="0 0 64 64"><defs><filter id="${id}" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence baseFrequency=".09" numOctaves="2" seed="4" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.3"/></filter></defs><g filter="url(#${id})" stroke="#34312e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="${outline}" fill="${wash}"/><path pathLength="1" d="${details}" fill="none"/></g></svg>`;
+    return `<svg aria-hidden="true" viewBox="0 0 64 64"><defs><filter id="${id}" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence baseFrequency=".09" numOctaves="2" seed="4" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.3"/></filter></defs><g filter="url(#${id})" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="${outline}" fill="${fillWash}"/><path pathLength="1" d="${details}" fill="none"/></g></svg>`;
   }
   window.Sketches = { get, SKETCH_LAYOUT };
 })();

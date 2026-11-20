@@ -1,7 +1,12 @@
 [
   {
     "id": 1,
-    "themeSong": { "provider": "file", "src": "assets/audio/notebook-theme.mp3", "title": "Notebook theme", "credit": "" },
+    "themeSong": {
+      "provider": "file",
+      "src": "assets/audio/notebook-theme.mp3",
+      "title": "Notebook theme",
+      "credit": ""
+    },
     "name": "Riam Jaye Santiago",
     "section": "BSIT 3-1",
     "subject": "Advanced Emerging Technologies",
@@ -73,62 +78,57 @@
     "objective": "TODO",
     "section": "BSIT 3-1",
     "subject": "Advanced Emerging Technologies",
-    "tagline": "Powered by coffee, panic, and StackOverflow",
+    "tagline": "You only fail when you stop trying",
     "folderLabel": "Do Not Open (Seriously)",
     "photo": "assets/photos/member2.svg",
-    "coverColor": "#8B5CF6",
+    "coverColor": "#1E40AF",
     "pages": [
       {
-        "title": "About Me",
-        "content": "Hello! I am John Vernie Dela Cruz, a front-end enthusiast and UI lover in BSIT 3-1. I believe websites should look like art galleries and run as fast as lightning. My life goal is centering divs on the first try without weeping.\n\nOpen the cover and follow the pages in order, or skip ahead to the projects. Each section shows a different side of the person behind this little corner of the desk.",
+        "title": "Profile",
+        "content": "• Name: John Vernie Dela Cruz\n• Section: BSIT 3-1\n• Advanced Emerging Technologies",
         "border": "wavy-pink.svg"
       },
       {
-        "title": "Hobbies",
-        "content": "• Digital illustration & vector art\n• Collecting aesthetic Notion templates\n• Organizing Spotify playlists by emotional weather\n• Exploring aesthetic coffee shops\n\nThere is a pattern in this list: curiosity usually wins over a perfectly sensible bedtime. Pick one of these topics for the guestbook and see where the conversation goes. A good recommendation is always worth saving for the next study break.",
+        "title": "About Me",
+        "content": "Hi! I am John Vernie C. Dela Cruz, an aspiring software engineer and UI/UX designer. I love building full-stack web apps, designing interfaces in Figma, and fixing laptops while questioning every life choice that led to cable management. My goal this semester is simple: center a div on the first try without invoking ancient CSS dark magic, and survive another round of runtime exceptions.",
         "border": "blobs-orange.svg"
       },
       {
-        "title": "Skills & Superpowers",
-        "content": "Proficient in modern CSS layout, SVG animation, and component design. Superpower: can spot a misaligned element by 1 single pixel from across the lecture hall without squinting.\n\nThe real test comes when a teammate asks for help. Start with the smallest example, talk through what should happen, and change one thing at a time. Sometimes explaining the problem out loud is enough to spot the answer.",
+        "title": "Hobbies",
+        "content": "• Building web apps and predictive dashboards that actually compile\n• Fixing laptops and desktop components while questioning every life choice that led to cable management\n• Playing OPM acoustic mashups with a capo on the first fret\n• Watching movies with chicken and mango shake",
+        "border": "vines-flowers.svg"
+      },
+      {
+        "title": "Skills",
+        "content": "• UI/UX design and prototyping (Figma, Canva)\n• Computer hardware diagnostics, assembly, and systems troubleshooting\n• Data preprocessing and time-series application logic",
         "border": "vines-flowers.svg"
       },
       {
         "title": "Projects",
-        "content": "• Interactive Design System in Vanilla CSS\n• Daily Habit Tracker with pastel gradients\n• Clear-Book 3D Flip Engine for our AET portfolio\n\nThese ideas fit on one page, but getting a working demo takes more than a catchy title. The fun part is turning a rough sketch into something another person can actually open, try, and give feedback on.",
+        "content": "<div class=\"john-projects-list\"><div class=\"john-proj\"><a href=\"https://healthwatch-ui.onrender.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">HEALTHWATCH</a><p>Regional dengue &amp; illness forecasting platform (React, FastAPI, Supabase, Prophet)</p></div><div class=\"john-proj\"><a href=\"https://vrndlcrz.github.io/ReadAble/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">ReadAble</a><p>Web reading platform for children with ASD — gamified modules, TTS, analytics (ages 4–10)</p></div><div class=\"john-proj\"><a href=\"https://vrndlcrz.github.io/EaseAccess/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">EaseAccess</a><p>Online document request system for Barangay 498, Sampaloc, Manila</p></div><div class=\"john-proj\"><a href=\"https://vrndlcrz.github.io/URL-Shortener/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">URL Shortener</a><p>Lightweight utility that transforms long URLs into clean, shareable short links</p></div></div>",
         "border": "dripping-paint.svg"
       },
       {
-        "title": "Fun Facts & Roast Me",
-        "content": "Spends 4 hours picking the perfect color palette and 15 minutes writing the actual code. Owns 12 water bottles but only drinks iced caramel macchiato. Favorite CSS property: filter: drop-shadow().\n\nThe desk has a guestbook for exactly this kind of confession. If any of that sounds familiar, leave a note with your own most questionable study habit. The rubber duck has heard worse.",
+        "title": "F.L.A.M.E.S Game",
+        "content": "",
         "border": "bows-stars.svg"
-      },
-      {
-        "title": "Contact & Goals",
-        "content": "Become a lead product designer at an innovative creative studio and author a book on accessible design.\n\nLeave a message in the desk guestbook to share a project idea or ask about one of the pages. A specific question makes a great conversation starter. Mention the part that caught your eye, or suggest something you would like to see in a future version.",
-        "border": "dotted-frame.svg"
       }
     ],
     "skills": [
       {
-        "name": "CSS Flexbox & Grid",
+        "name": "UI/UX Design (Figma, Canva)",
         "level": 92,
-        "funnyLabel": "Can center a div (first try 50% of the time)"
+        "funnyLabel": "Pixel-perfect layouts & wireframes"
       },
       {
-        "name": "Color Theory",
+        "name": "Hardware Troubleshooting",
+        "level": 90,
+        "funnyLabel": "Diagnostics, assembly & cable agony"
+      },
+      {
+        "name": "Time-Series & Full-Stack",
         "level": 88,
-        "funnyLabel": "Knows 40 shades of off-white"
-      },
-      {
-        "name": "Coffee Brewing",
-        "level": 99,
-        "funnyLabel": "Converts caffeine directly into pixels"
-      },
-      {
-        "name": "Figma Prototyping",
-        "level": 85,
-        "funnyLabel": "Auto-layout wizard"
+        "funnyLabel": "React, FastAPI, Prophet & PostgreSQL"
       }
     ],
     "deskItem": "long-folder"

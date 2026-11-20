@@ -1144,24 +1144,700 @@
 
 #deskBackBtn[aria-hidden="true"] { visibility: hidden; }
 
-/* John only: collage cover and the first open profile spread. */
-@font-face { font-family:'Jolly Lodger'; src:url('../fonts/JollyLodger-Regular.ttf') format('truetype'); font-display:swap; }
-.theme-long-folder .john-collage-cover { background:#1F3FBF; padding:0; }
-.john-collage-cover canvas { display:block; width:100%; height:100%; object-fit:fill; }
-.theme-long-folder .book-container.john-first-spread { width:min(1040px,92vw); max-width:92vw; }
-.john-profile-spread { display:grid; grid-template-columns:1fr 1fr; height:100%; background:#fffefa; color:#3A2312; }
-.john-blank-page { background:#fffefa; border-right:2px solid #d9d0bc; }
-.john-profile-page { position:relative; display:grid; grid-template-columns:36% 1fr; grid-template-rows:30% 1fr; align-content:start; gap:4% 5%; padding:8% 6% 6%; min-width:0; background:#fffefa; }
-.john-pushpin { position:absolute; top:3%; left:3%; width:13px; height:13px; background:#9B27AF; border:2px solid #4B1FA8; border-radius:50%; box-shadow:2px 2px 0 #3A2312; }
-.john-photo { margin:0; position:relative; border:1px solid #3A2312; background:#f0ece2; overflow:hidden; display:flex; justify-content:center; align-items:end; }
-.john-photo figcaption { z-index:1; width:100%; margin:0; text-align:center; padding:4px; background:#fffefa; font-size:clamp(10px,1.1vw,16px); }
-.john-silhouette { position:absolute; width:52%; height:49%; bottom:12%; background:#b7b5b0; border-radius:50% 50% 0 0; }
-.john-silhouette::before { content:''; position:absolute; width:55%; aspect-ratio:1; border-radius:50%; background:#b7b5b0; top:-64%; left:22%; }
-.john-angular-title { grid-column:2; grid-row:1; z-index:1; align-self:start; margin:0; min-width:0; }
-.john-angular-title canvas { width:100%; height:auto; display:block; }
-.john-profile-details { grid-column:2; grid-row:1 / 3; padding-top:47%; font-size:clamp(10px,1.2vw,18px); overflow-wrap:anywhere; }
-.john-profile-details p { margin:0 0 1.1em; line-height:1.45; }
-.john-profile-details strong { font-weight:800; }
-@media(max-width:600px) { .theme-long-folder .book-container.john-first-spread { height:min(68vh,400px); } .john-profile-page { padding:10% 5% 5%; } .john-profile-details { font-size:10px; } }
+/* John Dela Cruz Blue Theme, Cloud Divider & FLAMES Card */
+.theme-long-folder .john-collage-cover {
+  background: #0B132B;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.theme-long-folder .john-collage-cover canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-.john-first-spread .book-page.flipped:not(.turning) { visibility:hidden; }
+/* 3rd attached photo style: Spiral notepad cloud divider header with doodle stars */
+.john-divider-cover {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.john-cloud-divider {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: #FFFFFF;
+  position: relative;
+}
+.divider-fold-tab {
+  position: absolute;
+  top: 14px;
+  right: -2px;
+  background: #2563EB;
+  color: #FFFFFF;
+  padding: 4px 14px;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  border-radius: 6px 0 0 6px;
+  box-shadow: -2px 3px 6px rgba(0,0,0,0.18);
+  z-index: 10;
+  border: 1px solid #1D4ED8;
+}
+.fold-tab-label {
+  color: #FFFFFF !important;
+}
+.cloud-binder-top {
+  height: 48px;
+  background: #F8FAFC;
+  border-bottom: 2px dashed #93C5FD;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+}
+.binder-rings-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  justify-content: space-around;
+}
+.binder-rings-row i {
+  display: block;
+  width: 9px;
+  height: 26px;
+  background: linear-gradient(180deg, #64748B 0%, #CBD5E1 50%, #475569 100%);
+  border-radius: 5px;
+  box-shadow: 1px 2px 3px rgba(0,0,0,0.25);
+}
+.cloud-header-banner {
+  position: relative;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.clouds-backdrop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.clouds-svg {
+  width: 96%;
+  height: 90%;
+  filter: drop-shadow(0 6px 12px rgba(30, 64, 175, 0.15));
+}
+.cloud-banner-title {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+  font-weight: 700;
+  color: #1E3A8A;
+  text-shadow: 0 2px 0 #FFFFFF, 0 -2px 0 #FFFFFF, 2px 0 0 #FFFFFF, -2px 0 0 #FFFFFF;
+  letter-spacing: 0.02em;
+  transform: rotate(-1.5deg);
+}
+.cloud-author-watermark {
+  position: relative;
+  z-index: 2;
+  font-family: 'Cascadia Mono', monospace !important;
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+  color: #3B82F6;
+  opacity: 0.75;
+  margin-top: 6px;
+}
+.cloud-lined-notepad {
+  flex: 1;
+  position: relative;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 28px,
+    #BFDBFE 28px 29px
+  );
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.notepad-welcome-note {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+.notepad-hand-intro {
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 1.5rem !important;
+  line-height: 1.4 !important;
+  color: #1E3A8A !important;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.notepad-hand-sub {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.95rem !important;
+  color: #2563EB !important;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.notepad-hint-arrow {
+  margin-top: 28px;
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 1.25rem !important;
+  color: #1D4ED8 !important;
+  animation: pulse-arrow 1.8s infinite ease-in-out;
+}
+@keyframes pulse-arrow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(6px); }
+}
+
+/* John's All-Blue Portfolio Pages Style (Matches Riam's handwriting & blue drawings) */
+.theme-long-folder .book-page * {
+  font-family: 'Patrick Hand', cursive !important;
+}
+.theme-long-folder .page-inner {
+  background:
+    radial-gradient(circle at 14px 50%, #94A3B8 0 4px, #CBD5E1 5px, transparent 6px) left top / 28px 30% repeat-y,
+    linear-gradient(90deg, transparent 32px, #93C5FD 32px 34px, transparent 34px),
+    repeating-linear-gradient(#F8FAFC 0 25px, #DBEAFE 25px 26px) !important;
+  color: #1E3A8A !important;
+  border: 3px solid #1E40AF !important;
+}
+.theme-long-folder .page-title {
+  color: #1E40AF !important;
+  font-family: 'Gochi Hand', cursive !important;
+  font-size: 2.1rem !important;
+  -webkit-text-stroke: 1.5px #1E3A8A;
+  paint-order: stroke fill;
+  border-bottom: 2px dashed #93C5FD !important;
+  padding-bottom: 4px;
+}
+.theme-long-folder .page-text,
+.theme-long-folder .page-text p {
+  color: #1E3A8A !important;
+  font-size: 1.22rem !important;
+  line-height: 28px !important;
+}
+.theme-long-folder .folder-letterhead {
+  border-bottom: 2px solid #93C5FD !important;
+  color: #1D4ED8 !important;
+}
+.theme-long-folder .folder-letterhead span {
+  color: #1D4ED8 !important;
+}
+.theme-long-folder .page-category-tag {
+  color: #2563EB !important;
+}
+.theme-long-folder .skill-name {
+  color: #1E3A8A !important;
+  font-size: 1.15rem !important;
+}
+.theme-long-folder .skill-funny-label {
+  color: #3B82F6 !important;
+}
+.theme-long-folder .skill-bar-bg {
+  background: #DBEAFE !important;
+  border: 1px solid #93C5FD;
+}
+.theme-long-folder .skill-bar-fill {
+  background: linear-gradient(90deg, #3B82F6, #1D4ED8) !important;
+}
+/* F.L.A.M.E.S Game Card - old dark card (unused for John) */
+.flames-card-box {
+  margin-top: 14px;
+  padding: 16px;
+  background: linear-gradient(145deg, #1E1B2E 0%, #2D1B36 100%);
+  border: 2px solid #F59E0B;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  text-align: center;
+  color: #F8FAFC !important;
+}
+.flames-flame-icon {
+  font-size: 2rem;
+  margin-bottom: 4px;
+  animation: flicker 1.5s infinite alternate;
+}
+@keyframes flicker {
+  0% { transform: scale(1) rotate(-2deg); }
+  100% { transform: scale(1.15) rotate(3deg); }
+}
+.flames-names {
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 1.35rem !important;
+  font-weight: 700;
+  color: #FDE68A !important;
+  margin-bottom: 6px;
+}
+.flames-result-badge {
+  display: inline-block;
+  padding: 4px 18px;
+  background: linear-gradient(90deg, #F59E0B, #D97706);
+  color: #FFFFFF !important;
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 900;
+  font-size: 1.15rem;
+  letter-spacing: 0.1em;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  margin-bottom: 10px;
+}
+.flames-desc {
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 1.05rem !important;
+  line-height: 1.4 !important;
+  color: #E2E8F0 !important;
+  margin: 6px 0 10px !important;
+}
+.flames-quote {
+  font-family: 'Caveat', cursive !important;
+  font-size: 1.15rem !important;
+  color: #FDE047 !important;
+  font-style: italic;
+  margin: 0 !important;
+  border-top: 1px dashed rgba(253, 230, 138, 0.3);
+  padding-top: 8px;
+}
+
+/* =============================================
+   JOHN'S BALLPEN NOTEBOOK FLAMES GAME
+   ============================================= */
+.john-flames-notebook {
+  font-family: 'Patrick Hand', cursive !important;
+  color: #1E3A8A !important;
+  margin-top: 4px;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+/* F L A M E S letter row */
+.flames-header-word {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #BFDBFE;
+}
+
+.flames-letter {
+  position: relative;
+  font-family: 'Gochi Hand', cursive !important;
+  font-size: 1.9rem !important;
+  color: #1E3A8A !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  line-height: 1;
+}
+
+.flames-letter.crossed {
+  color: #3B82F6 !important;
+}
+.flames-letter.crossed .strike-x {
+  position: absolute;
+  inset: -2px;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* The active "A" letter */
+.flames-letter.active-a {
+  color: #1E3A8A !important;
+  font-weight: 900 !important;
+}
+.circle-scribble {
+  position: absolute;
+  inset: -18px;
+  width: calc(100% + 36px);
+  height: calc(100% + 36px);
+  pointer-events: none;
+  z-index: 2;
+}
+.affection-pointer-arrow {
+  position: absolute;
+  top: -38px;
+  right: -48px;
+  width: 55px;
+  height: 44px;
+  pointer-events: none;
+  z-index: 3;
+}
+.affection-label {
+  position: absolute;
+  top: -55px;
+  right: -88px;
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 0.72rem !important;
+  color: #1D4ED8 !important;
+  white-space: nowrap;
+  font-style: italic;
+  z-index: 4;
+  line-height: 1.2;
+}
+
+/* Match section: names + tally */
+.flames-match-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.flames-names-tally {
+  flex: 1;
+}
+.name-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.char {
+  position: relative;
+  font-family: 'Gochi Hand', cursive !important;
+  font-size: 1.25rem !important;
+  color: #1E3A8A !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  line-height: 1;
+}
+.char.crossed-char {
+  color: #3B82F6 !important;
+}
+.char-cross {
+  position: absolute;
+  inset: -1px;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+/* Tally / count side */
+.flames-tally-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding-top: 2px;
+}
+.remaining-badge {
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 0.72rem !important;
+  color: #2563EB !important;
+  font-style: italic;
+}
+.count-circle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Gochi Hand', cursive !important;
+  font-size: 1.1rem !important;
+  color: #1E3A8A !important;
+  border: 2.5px solid #1E3A8A;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+}
+.strike-tally {
+  position: absolute;
+  inset: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  pointer-events: none;
+}
+
+/* Bottom result line */
+.flames-bottom-result {
+  padding-top: 8px;
+  border-top: 1px dashed #93C5FD;
+}
+.flames-ballpen-text {
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 1.05rem !important;
+  color: #1E3A8A !important;
+  margin: 0 0 4px !important;
+}
+.flames-ballpen-desc {
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 0.88rem !important;
+  color: #2563EB !important;
+  margin: 0 !important;
+  font-style: italic;
+}
+
+/* Project links in John's folder */
+.theme-long-folder .page-text a.project-ext-link,
+.theme-long-folder .project-ext-link {
+  color: #1D4ED8 !important;
+  text-decoration: underline !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+.theme-long-folder .page-text a.project-ext-link:hover {
+  color: #1E40AF !important;
+  text-decoration: underline wavy !important;
+}
+
+/* John profile Riam-style: snapshot photo card, blue tape, signed name */
+.john-profile-riam-style {
+  gap: 6px;
+  padding-left: 42px !important;
+  background: transparent !important;
+}
+.john-profile-riam-style .snapshot {
+  box-sizing: border-box;
+  width: min(60%, 155px);
+  margin: 10px 0 10px 4%;
+  position: relative;
+  padding: 7px 7px 5px;
+  background: #FFFDF8;
+  box-shadow: 3px 3px 0 #1E3A8A;
+  transform: rotate(-3deg);
+}
+.john-profile-riam-style .snapshot img {
+  display: block;
+  width: 100%;
+}
+.john-profile-riam-style .snapshot figcaption {
+  text-align: center;
+  font: 500 0.9rem/1.1 'Patrick Hand', cursive;
+  margin-top: 4px;
+  color: #1E3A8A;
+}
+.john-profile-riam-style .snapshot::before,
+.john-profile-riam-style .snapshot::after {
+  content: '';
+  position: absolute;
+  width: 36%;
+  height: 13px;
+  top: -5px;
+  background: repeating-linear-gradient(90deg, #93C5FDbd 0 3px, #60A5FAb8 3px 4px);
+}
+.john-profile-riam-style .snapshot::before { left: -9%; transform: rotate(-29deg); }
+.john-profile-riam-style .snapshot::after  { right: -9%; transform: rotate(24deg); }
+
+.john-profile-riam-style .signed-name {
+  position: relative;
+  align-self: flex-start;
+  margin: 2px 0 .4em;
+  font: 400 clamp(1.3rem, 2.8vw, 2.1rem)/1 'Gochi Hand', cursive;
+  color: #1E3A8A !important;
+}
+.john-profile-riam-style .signed-name svg {
+  position: absolute;
+  left: 0;
+  bottom: -.22em;
+  width: 100%;
+  height: .25em;
+}
+.john-profile-riam-style .section-callout {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border: 2.5px solid #1E40AF;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 0.95rem !important;
+  color: #1E3A8A !important;
+  margin-top: 2px;
+}
+.john-profile-riam-style .page-title {
+  display: block;
+  font: 400 2rem/1.1 'Gochi Hand', cursive !important;
+  color: #1E40AF !important;
+  -webkit-text-stroke: 1.5px #1E3A8A;
+  paint-order: stroke fill;
+  border: 0 !important;
+  margin-bottom: 2px !important;
+}
+.john-profile-riam-style .page-category-tag {
+  font-family: var(--font-mono) !important;
+  font-size: 0.72rem !important;
+  color: #2563EB !important;
+}
+/* Blue arrow pointing to photo on John's profile page */
+.john-profile-arrow {
+  position: absolute;
+  top: 26%;
+  right: 14%;
+  width: 10%;
+  color: #2563EB;
+  pointer-events: none;
+}
+.theme-long-folder .margin-doodle.john-blue-doodle {
+  position: absolute;
+  right: 4%;
+  top: 4%;
+  width: min(10%, 36px);
+  pointer-events: none;
+}
+.theme-long-folder .margin-doodle.john-blue-doodle svg {
+  width: 100%;
+  display: block;
+}
+
+
+/* John's motto on Profile page - clean text style without box or line */
+.john-plain-quote {
+  align-self: flex-start;
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 1.18rem !important;
+  color: #1E3A8A !important;
+  margin: 12px 0 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  line-height: 1.4 !important;
+}
+
+/* John's left page doodle & lined notebook style */
+.john-sheet-back.lined-notebook-left {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at right 14px top 50%, #94A3B8 0 4px, #CBD5E1 5px, transparent 6px) right top / 28px 30% repeat-y,
+    linear-gradient(270deg, transparent 32px, #93C5FD 32px 34px, transparent 34px),
+    repeating-linear-gradient(#F8FAFC 0 25px, #DBEAFE 25px 26px) !important;
+  border: 3px solid #1E40AF !important;
+  overflow: hidden;
+}
+.theme-long-folder .john-sheet-back .leaf-doodle {
+  position: absolute;
+  pointer-events: none;
+  transform: rotate(var(--tilt, -8deg));
+  filter: drop-shadow(2px 2px 0 rgba(30, 58, 138, 0.15));
+}
+.theme-long-folder .john-sheet-back .leaf-doodle svg {
+  width: 100%;
+  display: block;
+}
+
+/* Highlights for handwritten text */
+.theme-long-folder .page-text p:first-child .ink-word:nth-child(3),
+.theme-long-folder .highlight-blue {
+  background: linear-gradient(transparent 55%, rgba(147, 197, 253, 0.6) 55%);
+}
+
+/* Inline <div> code display */
+.inline-code {
+  font-family: 'Cascadia Mono', 'Courier New', monospace !important;
+  background: #DBEAFE;
+  border: 1px solid #93C5FD;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.88em !important;
+  color: #1E40AF !important;
+  white-space: nowrap;
+}
+
+/* John's compact projects list */
+.john-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.john-proj {
+  padding: 6px 0;
+  border-bottom: 1px dashed #BFDBFE;
+}
+.john-proj:last-child {
+  border-bottom: none;
+}
+.john-proj .project-ext-link {
+  font-family: 'Gochi Hand', cursive !important;
+  font-size: 1.08rem !important;
+  color: #1D4ED8 !important;
+  text-decoration: underline !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  display: block;
+  margin-bottom: 2px;
+}
+.john-proj .project-ext-link:hover {
+  color: #1E40AF !important;
+  text-decoration: underline wavy !important;
+}
+.john-proj p {
+  font-family: 'Patrick Hand', cursive !important;
+  font-size: 0.82rem !important;
+  color: #334155 !important;
+  margin: 0 !important;
+  line-height: 1.3 !important;
+}
+
+/* FLAMES notebook: ensure everything fits on page, compact sizing */
+.john-flames-notebook {
+  font-family: 'Patrick Hand', cursive !important;
+  color: #1E3A8A !important;
+  margin-top: 0px;
+  padding: 0;
+  line-height: 1;
+}
+.flames-header-word {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #BFDBFE;
+}
+.flames-letter {
+  position: relative;
+  font-family: 'Gochi Hand', cursive !important;
+  font-size: 1.6rem !important;
+  color: #1E3A8A !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  line-height: 1;
+}
+.flames-match-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.char {
+  position: relative;
+  font-family: 'Gochi Hand', cursive !important;
+  font-size: 1.05rem !important;
+  color: #1E3A8A !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  line-height: 1;
+}
+.name-row { margin-bottom: 4px; }
+.remaining-badge { font-size: 0.65rem !important; }
+.count-circle { width: 30px; height: 30px; font-size: 0.95rem !important; }
+.flames-bottom-result { padding-top: 6px; }
+.flames-ballpen-text { font-size: 0.95rem !important; margin: 0 0 2px !important; }
+.flames-ballpen-desc { font-size: 0.78rem !important; margin: 0 !important; }
+.affection-label { font-size: 0.62rem !important; top: -48px; right: -78px; }
+.affection-pointer-arrow { top: -32px; right: -40px; width: 45px; height: 36px; }

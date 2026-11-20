@@ -4,7 +4,7 @@
  * back cover, realistic slow & smooth double-sided page flips, and easy easter eggs.
  */
 
-const CLEARBOOK_BUILD = 'spiral-cover-v2';
+const CLEARBOOK_BUILD = 'spiral-cover-v3-john-vernie';
 
 class ClearBook {
   constructor(options = {}) {
@@ -238,6 +238,41 @@ class ClearBook {
     return entry.pages;
   }
 
+  johnDivider(member) {
+    const dividerEl = document.createElement('div');
+    dividerEl.className = 'john-cloud-divider';
+    dividerEl.innerHTML = `
+      <div class="cloud-binder-top">
+        <div class="binder-rings-row">
+          ${'<i></i>'.repeat(16)}
+        </div>
+      </div>
+      <div class="cloud-header-banner">
+        <div class="clouds-backdrop">
+          <svg viewBox="0 0 500 180" preserveAspectRatio="none" class="clouds-svg">
+            <!-- Sky fluffy clouds with blue outline and shadows -->
+            <path d="M 30,120 Q 30,70 80,70 Q 110,30 160,50 Q 210,15 270,45 Q 330,10 390,40 Q 440,25 470,75 Q 490,110 470,140 Q 430,170 380,160 Q 310,175 250,155 Q 180,175 110,155 Q 40,165 30,120 Z" fill="#EFF6FF" stroke="#1E40AF" stroke-width="4"/>
+            <path d="M 60,110 Q 90,65 140,75 Q 190,45 240,65 Q 300,35 360,60 Q 420,50 440,100" fill="none" stroke="#93C5FD" stroke-width="3"/>
+            <!-- Cute doodle stars like in 3rd attached photo -->
+            <polygon points="120,40 124,48 132,49 126,55 128,63 120,59 112,63 114,55 108,49 116,48" fill="#FBBF24" stroke="#1E40AF" stroke-width="2"/>
+            <polygon points="380,30 383,37 391,38 385,43 387,51 380,47 373,51 375,43 369,38 377,37" fill="#FBBF24" stroke="#1E40AF" stroke-width="2"/>
+            <polygon points="70,130 73,137 81,138 75,143 77,151 70,147 63,151 65,143 59,138 67,137" fill="#FBBF24" stroke="#1E40AF" stroke-width="2"/>
+            <polygon points="420,135 423,141 430,142 425,147 427,154 420,150 413,154 415,147 410,142 417,141" fill="#FBBF24" stroke="#1E40AF" stroke-width="2"/>
+            <polygon points="260,25 262,30 268,31 264,35 265,41 260,38 255,41 256,35 252,31 258,30" fill="#FBBF24" stroke="#1E40AF" stroke-width="2"/>
+          </svg>
+        </div>
+        <h2 class="cloud-banner-title">Welcome to my Portfolio!</h2>
+        <div class="cloud-author-watermark">JOHN VERNIE DELA CRUZ</div>
+      </div>
+      <div class="cloud-lined-notepad">
+        <div class="notepad-lines">
+          ${'<div class="notepad-line"></div>'.repeat(10)}
+        </div>
+      </div>
+    `;
+    return dividerEl;
+  }
+
   johnProfile(member) {
     const spread=document.createElement('div');spread.className='john-profile-spread';
     const blank=document.createElement('div');blank.className='john-blank-page';blank.setAttribute('aria-label','Blank left page');
@@ -296,19 +331,25 @@ class ClearBook {
     }
 
     // Pages 1 to 6 from JSON
-    const titles = ['About Me', 'Hobbies', 'Skills', 'Projects', 'Fun Facts', 'Contact/Goals'];
+    const titles = ['Profile', 'About Me', 'Hobbies', 'Skills', 'Projects', 'F.L.A.M.E.S Game'];
+    if (isJohn) {
+      // 3rd attached photo: divider sheet inserted right before John's inner pages
+      pageConfigs.push({
+        type: 'john-divider',
+        title: 'Welcome'
+      });
+    }
     for (let i = 0; i < 6; i++) {
       const pageData = (member.pages && member.pages[i]) ? member.pages[i] : {
-        title: titles[i],
-        content: `Content for ${titles[i]} will be added soon.`,
+        title: titles[i] || `Section ${i + 1}`,
+        content: `Content for ${titles[i] || 'section'} will be added soon.`,
         border: 'wavy-pink.svg'
       };
       pageConfigs.push({
-        type: isJohn && i===0 ? 'john-profile' : 'inside',
-        title: isJohn && i===0 ? 'Profile' : undefined,
+        type: 'inside',
         index: i + 1,
         pageData: pageData,
-        skills: (i === 2) ? member.skills : null
+        skills: (i === 3) ? member.skills : null
       });
     }
 
@@ -425,7 +466,7 @@ class ClearBook {
           extraHTML = '<ol class="themebook-skills">' + cfg.skills.map(skill =>
             `<li>${skill.name}</li>`
           ).join('') + '</ol>';
-        } else if (cfg.skills && cfg.skills.length > 0) {
+        } else if (cfg.skills && cfg.skills.length > 0 && !isJohn) {
           extraHTML += `<div class="skills-container">`;
           cfg.skills.forEach(s => {
             extraHTML += `
@@ -443,7 +484,7 @@ class ClearBook {
           extraHTML += `</div>`;
         }
 
-        if (cfg.index === 5) {
+        if (cfg.index === 5 && !isJohn) {
           extraHTML += `
             <div style="margin-top: 14px; text-align: center;">
               <button class="page-action-btn" id="roastMeBtn" style="display:inline-flex; align-items:center; justify-content:center; gap:6px;">
@@ -455,7 +496,7 @@ class ClearBook {
           `;
         }
 
-        if (cfg.index === 6) {
+        if (cfg.index === 6 && !isJohn) {
           extraHTML += `
             <div style="margin-top: 14px; text-align: center;">
               <button class="book-guestbook-trigger" id="openGuestbookFromBookBtn" style="display:inline-flex; align-items:center; justify-content:center; gap:6px;">
@@ -464,21 +505,111 @@ class ClearBook {
               </button>
             </div>
           `;
+        } else if (cfg.index === 6 && isJohn) {
+          extraHTML += `
+            <div class="john-flames-notebook">
+              <div class="flames-header-word">
+                <span class="flames-letter crossed">F<svg class="strike-x" viewBox="0 0 30 30"><path d="M5 5 L25 25 M25 5 L5 25" stroke="#1E3A8A" stroke-width="3.5" stroke-linecap="round"/></svg></span>
+                <span class="flames-letter crossed">L<svg class="strike-x" viewBox="0 0 30 30"><path d="M5 5 L25 25 M25 5 L5 25" stroke="#1E3A8A" stroke-width="3.5" stroke-linecap="round"/></svg></span>
+                <span class="flames-letter active-a">
+                  A
+                  <svg class="circle-scribble" viewBox="0 0 70 70">
+                    <circle cx="35" cy="35" r="28" fill="none" stroke="#1E3A8A" stroke-width="2.5" stroke-dasharray="160" transform="rotate(-15 35 35)"/>
+                    <circle cx="34" cy="36" r="25" fill="none" stroke="#2563EB" stroke-width="2" stroke-dasharray="150" transform="rotate(25 34 36)"/>
+                  </svg>
+                  <svg class="affection-pointer-arrow" viewBox="0 0 60 50">
+                    <path d="M10 40 Q 25 15, 50 10 M40 8 L52 10 L48 22" fill="none" stroke="#1E3A8A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="affection-label">Affection ♡</span>
+                </span>
+                <span class="flames-letter crossed">M<svg class="strike-x" viewBox="0 0 30 30"><path d="M5 5 L25 25 M25 5 L5 25" stroke="#1E3A8A" stroke-width="3.5" stroke-linecap="round"/></svg></span>
+                <span class="flames-letter crossed">E<svg class="strike-x" viewBox="0 0 30 30"><path d="M5 5 L25 25 M25 5 L5 25" stroke="#1E3A8A" stroke-width="3.5" stroke-linecap="round"/></svg></span>
+                <span class="flames-letter crossed">S<svg class="strike-x" viewBox="0 0 30 30"><path d="M5 5 L25 25 M25 5 L5 25" stroke="#1E3A8A" stroke-width="3.5" stroke-linecap="round"/></svg></span>
+              </div>
+
+              <div class="flames-match-section">
+                <div class="flames-names-tally">
+                  <div class="name-row bongbong-row">
+                    <span class="char crossed-char">B<svg class="char-cross" viewBox="0 0 20 20"><path d="M4 4 L16 16 M16 4 L4 16" stroke="#1E3A8A" stroke-width="2.5" stroke-linecap="round"/></svg></span>
+                    <span class="char crossed-char">O<svg class="char-cross" viewBox="0 0 20 20"><path d="M4 4 L16 16 M16 4 L4 16" stroke="#1E3A8A" stroke-width="2.5" stroke-linecap="round"/></svg></span>
+                    <span class="char crossed-char">N<svg class="char-cross" viewBox="0 0 20 20"><path d="M4 4 L16 16 M16 4 L4 16" stroke="#1E3A8A" stroke-width="2.5" stroke-linecap="round"/></svg></span>
+                    <span class="char crossed-char">G<svg class="char-cross" viewBox="0 0 20 20"><path d="M4 4 L16 16 M16 4 L4 16" stroke="#1E3A8A" stroke-width="2.5" stroke-linecap="round"/></svg></span>
+                    <span class="char">B</span>
+                    <span class="char">O</span>
+                    <span class="char">N</span>
+                    <span class="char">G</span>
+                  </div>
+                  <div class="name-row sarah-row">
+                    <span class="char">S</span>
+                    <span class="char">A</span>
+                    <span class="char">R</span>
+                    <span class="char">A</span>
+                    <span class="char">H</span>
+                  </div>
+                </div>
+
+                <div class="flames-tally-side">
+                  <div class="remaining-badge">13 remaining</div>
+                  <div class="count-circle">
+                    <span>(13)</span>
+                    <svg class="strike-tally" viewBox="0 0 50 30">
+                      <line x1="5" y1="25" x2="45" y2="5" stroke="#1E3A8A" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flames-bottom-result">
+                <p class="flames-ballpen-text">Result: <strong>"A"</strong> — <em>Affection</em></p>
+                <p class="flames-ballpen-desc">Bongbong and Sarah share a genuine bond of mutual respect and quiet affection.</p>
+              </div>
+
+              <div style="margin-top: 14px; text-align: center;">
+                <button class="book-guestbook-trigger" id="openGuestbookFromBookBtn" style="display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+                  <svg class="uicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                  Leave a Sticky Note for John Vernie
+                </button>
+              </div>
+            </div>
+          `;
         }
 
-        frontHTML = `
-          <div class="page-inner">
-            <img class="page-svg-border" src="${borderSrc}" alt="Page Border">
-            <div class="page-body-content">
-              ${folderSheets ? `<header class="folder-letterhead"><span>${member.name}</span><span>${member.section}</span></header>` : ''}
-              <span class="page-category-tag">Page ${isSpiral ? cfg.index + 1 : cfg.index} of ${isSpiral ? 7 : 6}</span>
-              <h3 class="page-title">${isSpiral ? write(cfg.pageData.title) : cfg.pageData.title}</h3>
-              <div class="page-text">${isSpiral ? cfg.pageData.content.split(/\n\s*\n/).map(paragraph => `<p>${write(paragraph)}</p>`).join('') : cfg.pageData.content}</div>
-              ${extraHTML}
-              ${folderSheets && cfg.index === 6 ? '<span class="folder-stamp">APPROVED</span>' : ''}
+        if (isJohn && cfg.index === 1) {
+          frontHTML = `
+            <div class="page-inner">
+              <div class="page-body-content spiral-profile john-profile-riam-style">
+                <span class="page-category-tag">Page 1 of 6</span>
+                <h3 class="page-title">Profile</h3>
+                <figure class="snapshot">
+                  <img src="${member.photo}" alt="Portrait of ${member.name}">
+                  <figcaption>${member.subject || 'Advanced Emerging Technologies'}</figcaption>
+                </figure>
+                <h4 class="signed-name">
+                  ${member.name}
+                  <svg aria-hidden="true" viewBox="0 0 150 10" preserveAspectRatio="none">
+                    <path d="M2 7Q28 3 50 5T94 4T148 3" fill="none" stroke="#1E40AF" stroke-width="3" stroke-linecap="round"/>
+                  </svg>
+                </h4>
+                <span class="section-callout">${member.section}</span>
+                <p class="page-text john-plain-quote">“You only fail when you stop trying” — Albert Einstein</p>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        } else {
+          frontHTML = `
+            <div class="page-inner">
+              <img class="page-svg-border" src="${borderSrc}" alt="Page Border">
+              <div class="page-body-content">
+                ${folderSheets ? `<header class="folder-letterhead"><span>${member.name}</span><span>${member.section}</span></header>` : ''}
+                <span class="page-category-tag">Page ${isSpiral ? cfg.index + 1 : cfg.index} of ${isSpiral ? 7 : 6}</span>
+                <h3 class="page-title">${isSpiral ? write(cfg.pageData.title) : cfg.pageData.title}</h3>
+                <div class="page-text">${isSpiral ? cfg.pageData.content.split(/\n\s*\n/).map(paragraph => `<p>${write(paragraph)}</p>`).join('') : cfg.pageData.content}</div>
+                ${extraHTML}
+                ${folderSheets && cfg.index === 6 ? '<span class="folder-stamp">APPROVED</span>' : ''}
+              </div>
+            </div>
+          `;
+        }
 
         setTimeout(() => {
           const roastBtn = pageEl.querySelector('#roastMeBtn');
@@ -549,8 +680,25 @@ class ClearBook {
           frontHTML += `<div class="margin-doodle" aria-hidden="true">${Sketches.get(mark)}</div>`;
           if (cfg.type === 'profile') frontHTML += '<svg class="profile-arrow" aria-hidden="true" viewBox="0 0 40 48"><path d="M32 3Q44 28 8 37m8-9-9 10 13 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
         }
+      } else if (isJohn) {
+        pageEl.style.setProperty('--pen', '#1E3A8A');
+        pageEl.style.setProperty('--ink-opacity', 0.95);
+        if (cfg.type === 'inside') {
+          const blueDoodles = ['laptop', 'stars', 'controller', 'keyboard', 'rocket', 'hearts'];
+          const mark = (cfg.index === 1) ? 'stars' : blueDoodles[(idx - 1) % blueDoodles.length] || 'stars';
+          frontHTML += `<div class="margin-doodle john-blue-doodle" aria-hidden="true">${Sketches.get(mark, '#93C5FD')}</div>`;
+          if (cfg.index === 1) {
+            frontHTML += '<svg class="profile-arrow john-profile-arrow" aria-hidden="true" viewBox="0 0 40 48"><path d="M32 3Q44 28 8 37m8-9-9 10 13 2" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/></svg>';
+          }
+        }
       }
-      if (looseSheets) backHTML = '<div class="folder-sheet-back"></div>';
+      if (looseSheets && !isJohn) backHTML = '<div class="folder-sheet-back"></div>';
+      else if (isJohn) {
+        const leftPageDoodles = (Sketches.SKETCH_LAYOUT[idx + 1] || []).map(({ name, x, y, size, rot }) =>
+          `<div class="leaf-doodle" aria-hidden="true" style="left:${x}%;top:${y}%;width:${size}%;--tilt:${rot}deg">${Sketches.get(name, '#93C5FD')}</div>`
+        ).join('');
+        backHTML = `<div class="john-sheet-back lined-notebook-left">${leftPageDoodles}</div>`;
+      }
 
       // Assemble double-sided page with dynamic bending shadow
       pageEl.innerHTML = `
@@ -562,6 +710,9 @@ class ClearBook {
       if(isJohn && cfg.type==='cover') {
         const front=pageEl.querySelector('.page-front');front.classList.add('john-collage-cover');
         front.replaceChildren(JohnFolderArt.get(member).canvas);
+      } else if(cfg.type==='john-divider') {
+        const front=pageEl.querySelector('.page-front');front.classList.add('john-divider-cover');
+        front.replaceChildren(this.johnDivider(member));
       } else if(cfg.type==='john-profile') {
         pageEl.querySelector('.page-front').replaceChildren(this.johnProfile(member));
       }
@@ -584,7 +735,7 @@ class ClearBook {
 
       const dot = document.createElement('div');
       dot.className = 'page-dot';
-      dot.title = isSpiral ? (cfg.title || cfg.pageData.title) : isJohn ? (cfg.title || cfg.pageData?.title || 'Profile') : looseSheets ? cfg.pageData.title : (idx === 0) ? 'Cover' : (idx === totalPages - 1) ? 'Back Cover' : `Page ${idx}`;
+      dot.title = (isJohn && cfg.type === 'john-divider') ? 'Welcome' : isSpiral ? (cfg.title || cfg.pageData.title) : isJohn ? (cfg.title || cfg.pageData?.title || 'Profile') : looseSheets ? cfg.pageData.title : (idx === 0) ? 'Cover' : (idx === totalPages - 1) ? 'Back Cover' : `Page ${idx}`;
       dot.addEventListener('click', () => {
         if (!this.isFlipping) this.goToPage(idx);
       });
@@ -595,7 +746,7 @@ class ClearBook {
   }
 
   updatePageStates() {
-    this.bookContainer.classList.toggle('john-first-spread',this.currentMember?.id===2 && this.currentPageIndex===1 && this.overlayElement.classList.contains('theme-folder'));
+    this.bookContainer.classList.toggle('john-first-spread', false);
     this.bookContainer.classList.toggle('is-cover', this.isSpiral && this.currentPageIndex === 0);
     this.bookContainer.classList.toggle('is-back', this.isSpiral && this.currentPageIndex === this.totalPages - 1);
     this.pagesElements.forEach((pageEl, idx) => {
