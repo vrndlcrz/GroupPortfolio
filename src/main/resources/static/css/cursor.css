@@ -1,0 +1,16 @@
+/* Native image cursors stay responsive without a frame-by-frame DOM follower. */
+@media (pointer: fine) {
+  html, body, body * {
+    cursor: url('../assets/cursors/cartoon-arrow.svg') 5 3, auto !important;
+  }
+  button, button *, a, a *, [role="button"], [role="button"] *,
+  .page-dot, .phone-app, .whiteboard-swatch, #scene-container canvas {
+    cursor: url('../assets/cursors/cartoon-hand.svg') 20 6, pointer !important;
+  }
+  input, textarea, [contenteditable="true"] {
+    cursor: text !important;
+  }
+  button:disabled, button:disabled * {
+    cursor: url('../assets/cursors/cartoon-arrow.svg') 5 3, default !important;
+  }
+}

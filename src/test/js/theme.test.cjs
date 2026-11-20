@@ -2,11 +2,11 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const THREE = require('../../main/resources/static/js/lib/three.min.js');
+const THREE = require('../../main/resources/static/vendor/js/three.min.js');
 function theme(search = '') {
   const context = { THREE, URLSearchParams, location: { search }, document: { getElementById: () => null } };
   context.window=context;
-  vm.runInNewContext(fs.readFileSync('src/main/resources/static/js/theme.js','utf8'),context);
+  vm.runInNewContext(fs.readFileSync('src/main/resources/static/js/shared/theme.js','utf8'),context);
   return context.Theme;
 }
 test('absent and malformed golden settings use defaults', () => {

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1080" viewBox="0 0 1280 1080" role="img" aria-labelledby="title desc">
+<title id="title">Group Portfolio code layout</title><desc id="desc">Spring backend, browser features, configuration, runtime files, tests and documentation.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="4" orient="auto"><path d="M0 0 8 4 0 8" fill="none" stroke="#57757E" stroke-width="2"/></marker></defs>
+<rect width="1280" height="1080" fill="#F4F8F8"/>
+<style>text{font-family:Arial,sans-serif;fill:#173C49}.heading{font-size:22px;font-weight:bold}.body{font-size:17px}.small{font-size:15px;fill:#52717B}.mono{font-family:Consolas,monospace;font-size:16px}</style>
+<text x="40" y="49" class="small">GROUP PORTFOLIO</text>
+<text x="40" y="90" class="heading">Code layout and responsibilities</text>
+<rect x="450" y="120" width="380" height="85" rx="14" fill="white" stroke="#C8DADB" stroke-width="2"/>
+<rect x="450" y="120" width="8" height="85" rx="4" fill="#137C80"/>
+<text x="474" y="155" class="heading">GroupPortfolio</text>
+<text x="474" y="189" class="mono">pom.xml + Maven wrappers</text>
+<path d="M640 205V230H320V250M640 230H940V250" fill="none" stroke="#57757E" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="40" y="250" width="560" height="350" rx="14" fill="white" stroke="#C8DADB" stroke-width="2"/>
+<rect x="40" y="250" width="8" height="350" rx="4" fill="#137C80"/>
+<text x="64" y="285" class="heading">Spring Boot backend</text>
+<text x="64" y="319" class="mono">src/main/java/com/aet/portfolio/</text>
+<text x="64" y="348" class="body">PortfolioApplication - starts the server</text>
+<text x="64" y="377" class="body">config/ - validated classroom settings</text>
+<text x="64" y="406" class="body">controller/ - HTTP endpoints and JSON</text>
+<text x="64" y="435" class="body">service/ - content and visitor operations</text>
+<text x="64" y="464" class="body">storage/ - safe JSON file replacement</text>
+<text x="64" y="493" class="body">model/ - member, page, skill and note data</text>
+<text x="64" y="522" class="body">Spring serves the browser files and API</text>
+<rect x="640" y="250" width="600" height="350" rx="14" fill="white" stroke="#C8DADB" stroke-width="2"/>
+<rect x="640" y="250" width="8" height="350" rx="4" fill="#D88A2D"/>
+<text x="664" y="285" class="heading">Browser application</text>
+<text x="664" y="319" class="mono">src/main/resources/static/</text>
+<text x="664" y="348" class="body">js/core/ - startup, API client and navigation</text>
+<text x="664" y="377" class="body">js/classroom/ - scene, Zero-G and experiences</text>
+<text x="664" y="406" class="body">js/portfolio/ - books, cover art and music</text>
+<text x="664" y="435" class="body">js/phone/ - SpotiBai and Labibi</text>
+<text x="664" y="464" class="body">js/intro/ + js/shared/ - intro, theme and humor</text>
+<text x="664" y="493" class="body">css/ + assets/ - styles, media, fonts and cursors</text>
+<text x="664" y="522" class="body">vendor/ + dev/ - libraries and preview pages</text>
+<path d="M640 435H601" stroke="#57757E" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="40" y="630" width="560" height="177" rx="14" fill="white" stroke="#C8DADB" stroke-width="2"/>
+<rect x="40" y="630" width="8" height="177" rx="4" fill="#137C80"/>
+<text x="64" y="665" class="heading">Configuration and content</text>
+<text x="64" y="699" class="mono">src/main/resources/</text>
+<text x="64" y="728" class="body">application.properties - server and data directory</text>
+<text x="64" y="757" class="body">application.yml - classroom settings</text>
+<text x="64" y="786" class="body">data/members.json - the four portfolios</text>
+<rect x="640" y="630" width="600" height="177" rx="14" fill="white" stroke="#C8DADB" stroke-width="2"/>
+<rect x="640" y="630" width="8" height="177" rx="4" fill="#137C80"/>
+<text x="664" y="665" class="heading">Runtime visitor data</text>
+<text x="664" y="699" class="mono">var/data/ (ignored by Git)</text>
+<text x="664" y="728" class="body">notes.json - persisted guestbook messages</text>
+<text x="664" y="757" class="body">counter.json - persisted visitor count</text>
+<text x="664" y="786" class="body">DATA_DIRECTORY can select another location</text>
+<rect x="40" y="837" width="560" height="170" rx="14" fill="white" stroke="#C8DADB" stroke-width="2"/>
+<rect x="40" y="837" width="8" height="170" rx="4" fill="#137C80"/>
+<text x="64" y="872" class="heading">Tests and checks</text>
+<text x="64" y="906" class="mono">src/test/ + scripts/verification/</text>
+<text x="64" y="935" class="body">Java tests - APIs, validation and failed writes</text>
+<text x="64" y="964" class="body">Node tests - theme, audio and Zero-G restoration</text>
+<text x="64" y="993" class="body">Asset checks + Playwright browser smoke checks</text>
+<rect x="640" y="837" width="600" height="170" rx="14" fill="white" stroke="#C8DADB" stroke-width="2"/>
+<rect x="640" y="837" width="8" height="170" rx="4" fill="#137C80"/>
+<text x="664" y="872" class="heading">Documentation and generated output</text>
+<text x="664" y="906" class="mono">docs/architecture/ + docs/design/</text>
+<text x="664" y="935" class="body">docs/history/ - original planning records</text>
+<text x="664" y="964" class="body">target/ - generated Maven build output</text>
+<text x="664" y="993" class="body">.verification/ - generated screenshots and results</text>
+<text x="40" y="1046" class="small">Read order: root setup &gt; Spring or browser feature &gt; data/settings &gt; tests.</text>
+</svg>

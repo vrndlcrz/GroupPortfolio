@@ -6,6 +6,10 @@ target/
 # Project specific data files (auto-generated)
 notes.json
 counter.json
+var/data/
+
+# Avoid accidentally nesting a second working copy.
+/GroupPortfolio/
 
 # IDE and Editor files
 .idea/

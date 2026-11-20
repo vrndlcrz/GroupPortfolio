@@ -205,69 +205,78 @@
   },
   {
     "id": 4,
+    "themeSong": {
+      "provider": "file",
+      "src": "assets/audio/nicole-theme.opus",
+      "title": "Awit ng Paghahangad (Piano Instrumental)",
+      "credit": ""
+    },
     "name": "Nicole De Guzman",
+    "titleText": "Nicole Leigh G. De Guzman",
     "section": "BSIT 3-1",
     "subject": "Application and Emerging Technologies",
-    "tagline": "My code works, but nobody knows why (especially me)",
-    "folderLabel": "secret_thesis_do_not_delete",
-    "photo": "assets/photos/member4.svg",
-    "coverColor": "#059669",
+    "objective": "To be able to contribute and work on practical, yet meaningful projects where I can grow and continuously improve my skills in both design and development, while genuinely helping people.",
+    "tagline": "Powered by careful planning and a fear of redoing work.",
+    "folderLabel": "sta_john_gi_notebook",
+    "photo": "assets/photos/nicole-portrait.jpg",
+    "coverColor": "#2E7D32",
     "pages": [
       {
         "title": "About Me",
-        "content": "Hi! I am Nicole De Guzman, backend architect and data enthusiast in BSIT 3-1. I love making robust RESTful APIs, clean data architectures, and bulletproof validations so systems never fail even under chaos.\n\nOpen the cover and follow the pages in order, or skip ahead to the projects. Each section shows a different side of the person behind this little corner of the desk.",
+        "content": "Hi! I am Nicole Leigh G. De Guzman, a BSIT 3-1 student. I focus on practical design and clean code.\n\nObjective\nTo be able to contribute and work on practical, yet meaningful projects where I can grow and continuously improve my skills in both design and development, while genuinely helping people.\n\nI build prototypes in Figma and write object-oriented Java programs. I care about making software that is easy to use and works properly.",
         "border": "wavy-pink.svg"
       },
       {
-        "title": "Hobbies",
-        "content": "• Solving algorithmic puzzles on LeetCode\n• Baking sourdough bread and measuring grams precisely\n• Urban gardening & plant propagation\n• Board game strategy nights with friends\n\nThere is a pattern in this list: curiosity usually wins over a perfectly sensible bedtime. Pick one of these topics for the guestbook and see where the conversation goes. A good recommendation is always worth saving for the next study break.",
+        "title": "Software and Skills",
+        "content": "My coursework and daily tools cover both interface design and programming.\n\nDesign and Prototyping\nAffinity Designer, Figma, and Canva\n\nVisual Presentation\nClean documentation and clear layouts\n\nProgramming\nObject-Oriented Programming (OOP) Basics in Java\n\nI like creating clean interfaces in Figma, then turning those layouts into well-structured code.",
         "border": "blobs-orange.svg"
       },
       {
-        "title": "Skills & Superpowers",
-        "content": "Experienced with REST design, JSON serialization, security sanitization, and concurrent operations. Superpower: can spot an SQL injection vulnerability or unescaped HTML tag from a mile away.\n\nThe real test comes when a teammate asks for help. Start with the smallest example, talk through what should happen, and change one thing at a time. Sometimes explaining the problem out loud is enough to spot the answer.",
+        "title": "Interests",
+        "content": "Outside of schoolwork, I spend my free time on a few personal hobbies.\n\nStationery and Pens\nI collect quality pens, especially 0.38mm fine-nib pens and smooth notebook paper.\n\nSkincare and Fragrance\nI like researching skincare ingredients and trying different scents like green tea, cedarwood, and jasmine.\n\nNotebook Layouts\nI enjoy keeping neat notes with clean margins and green accents.",
         "border": "vines-flowers.svg"
       },
       {
-        "title": "Projects",
-        "content": "• Thread-safe Guestbook & Visit Counter API\n• Student Grade Predictor using regression\n• Encrypted note-taking app with AES\n\nThese ideas fit on one page, but getting a working demo takes more than a catchy title. The fun part is turning a rough sketch into something another person can actually open, try, and give feedback on.",
-        "border": "dripping-paint.svg"
-      },
-      {
-        "title": "Fun Facts & Roast Me",
-        "content": "Commented 'Do not delete this comment, it makes the code run' in a production file once. Takes notes in Markdown even when writing a grocery shopping list. Has 14 houseplants named after HTTP status codes.\n\nThe desk has a guestbook for exactly this kind of confession. If any of that sounds familiar, leave a note with your own most questionable study habit. The rubber duck has heard worse.",
+        "title": "Core Values",
+        "content": "I always choose quality over quantity, and it genuinely bothers me if I leave something unfinished or slightly off.\n\nWhether I am drawing a layout in Figma or writing a Java class, I take the time to fix uneven margins and check my work before moving on.",
         "border": "bows-stars.svg"
       },
       {
-        "title": "Contact & Goals",
-        "content": "Architect scalable cloud microservices that withstand Black Friday traffic surges without flinching.\n\nLeave a message in the desk guestbook to share a project idea or ask about one of the pages. A specific question makes a great conversation starter. Mention the part that caught your eye, or suggest something you would like to see in a future version.",
+        "title": "Projects",
+        "content": "TechCare\nA Web-Based Telepsychiatry Consultation Scheduling System\n\nErmel's Glass and Aluminum Works\nA Web-Based Order Management and Service Reservation System with Predictive Analytics for Ermel's Glass and Aluminum Works\n\nDiaBeates\nWeb-Based Diabetes Complication Risk Assessment System Using Rule-Based Scoring and Calibrated Machine Learning Models",
+        "border": "bows-stars.svg"
+      },
+      {
+        "title": "Contact",
+        "content": "Feel free to reach out about design, class projects, or stationery recommendations.\n\nEmail\nnicoleleighgdeguzman@gmail.com\n\nSection\nBSIT 3-1, Advanced Emerging Technologies\n\nYou can also leave a note on the desk guestbook.",
         "border": "dotted-frame.svg"
       }
     ],
     "skills": [
       {
-        "name": "REST APIs",
-        "level": 91,
-        "funnyLabel": "200 OK is my spiritual state of mind"
+        "name": "Design and Prototyping",
+        "level": 96,
+        "funnyLabel": "Figma, Affinity Designer, and Canva"
       },
       {
-        "name": "Input Sanitization",
-        "level": 95,
-        "funnyLabel": "Little Bobby Tables was stopped here"
+        "name": "Visual Documentation",
+        "level": 94,
+        "funnyLabel": "Clean documentation and slide layouts"
       },
       {
-        "name": "Documentation",
-        "level": 84,
-        "funnyLabel": "Writes comments future me will understand"
-      },
-      {
-        "name": "Debugging",
+        "name": "Java OOP Basics",
         "level": 88,
-        "funnyLabel": "Follows stack traces like a detective"
+        "funnyLabel": "Classes, objects, and clean methods"
+      },
+      {
+        "name": "Quality Focus",
+        "level": 99,
+        "funnyLabel": "Takes the time to finish details properly"
       }
     ],
     "deskItem": "intermediate-pad",
-    "school": "",
-    "grade": ""
+    "school": "Sta. John Gi Academy",
+    "grade": "BSIT 3-1",
+    "teacher": "Sir Sean Dyogi"
   }
 ]

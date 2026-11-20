@@ -1,0 +1,2351 @@
+[
+  {
+    "title": "UI features, explained through source code",
+    "subtitle": "Bullet-point study guide | Spring Boot integration | Reviewed 21 November 2026",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "What this document covers"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Purpose:",
+          "Explain what the visitor sees, which functions implement it, where the data comes from, and how to describe the feature during a code review or class presentation."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Reviewed project:",
+          "C:\\workspace\\GroupPortfolio. This edition documents the reorganized root src folder. The older nested clone was preserved outside the repository."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Snapshot:",
+          "Branch UpdatedPortfolio, based on commit 594d786 plus the current uncommitted reorganization and UI updates. Function line numbers are recalculated from the current files when generating this PDF."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Evidence:",
+          "Source review plus the checks completed during this session: 31 Java tests, 13 JavaScript tests, asset checks, and successful browser smoke checks. A final executable JAR was not verified because the local Maven plugin cache is incomplete."
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "How to read the references"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "js/ means:",
+          "src/main/resources/static/js/. Example: js/portfolio/book.js is the browser portfolio engine."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "java/ means:",
+          "src/main/java/com/aet/portfolio/. Example: java/controller/MemberController.java is a Spring REST controller."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "resources/ means:",
+          "src/main/resources/. L158 means line 158; a function name lets you find the implementation even if lines change."
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Reading order"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Visual overview:",
+          "Start with the illustrated folder map, Spring request flow, notebook pipeline, and guestbook save flow. The contents page provides the current page numbers."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Feature-by-feature:",
+          "Continue feature by feature: intro, classroom, member portfolios, page turns, notes, whiteboard, phone, teacher performance, props, Zero-G, theme, and Back navigation."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Review references:",
+          "Finish with the endpoint list, source-maintenance guide, and short presentation bullets. New visual pages explain the phone status bar, TMA timing, notice card, and full-room floating."
+        ]
+      }
+    ]
+  },
+  {
+    "title": "01 / How Spring is integrated",
+    "subtitle": "Spring handles application startup, HTTP, data, configuration, and persistence.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Startup and dependency injection"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Entry point:",
+          "PortfolioApplication.main() calls SpringApplication.run(). @SpringBootApplication enables application configuration, auto-configuration, and component scanning beneath com.aet.portfolio."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/PortfolioApplication.java",
+          "main"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Dependencies:",
+          "pom.xml uses Spring Boot 3.3.4 and Java 17. starter-web supplies Spring MVC, JSON handling, and an embedded web server; starter-validation supports configuration constraints; starter-test supplies the test stack."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Managed objects:",
+          "@Service registers MemberService, NoteService, and CounterService. Controllers receive these services through their constructors. Spring also injects ObjectMapper for JSON conversion; the application does not manually construct the services."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Startup loading:",
+          "@PostConstruct runs service init() methods after dependency injection. MemberService loads packaged member JSON; NoteService and CounterService restore writable runtime files."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/service/MemberService.java",
+          "init",
+          "loadMembers"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "HTTP and configuration"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "REST controllers:",
+          "@RestController makes return values HTTP response bodies. @GetMapping and @PostMapping select routes; @PathVariable reads a member ID; @RequestBody reads posted JSON. ResponseEntity controls status codes such as 201, 400, and 404."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Configuration binding:",
+          "ClassroomController enables SiteProperties. @ConfigurationProperties(\"site\") binds application.yml into nested Java records. @Validated and @Valid activate constraints such as nonblank titles, bounded theme intensity, and valid student seats."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Static website:",
+          "application.properties points static resources to classpath:/static/. Spring serves index.html, CSS, JavaScript, photos, audio, and local libraries alongside the API. There is no template engine or frontend build pipeline declared in pom.xml."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Same origin:",
+          "API.baseUrl is empty, so fetch(\"/api/...\") targets the same server that supplied the page. The normal app flow needs no separate frontend server or cross-origin API setup."
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Say it simply"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"Spring Boot is our application server. It serves the UI and exposes Java services as JSON APIs. JavaScript uses that JSON to build the interactive classroom.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "02 / What happens when the site loads",
+    "subtitle": "The server supplies content; main.js connects the browser components.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "The actual startup sequence"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "1. Load the page:",
+          "Spring serves static/index.html. The page loads Three.js and GSAP locally, then the application scripts. main.js listens for DOMContentLoaded."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "2. Request classroom settings:",
+          "API.getClassroom() caches one request promise. loadClassroom() fetches /api/site/classroom, checks required text arrays, and merges safe classroom defaults. Theme.configure() receives the returned theme."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/core/api.js",
+          "fetchWithTimeout",
+          "getClassroom",
+          "loadClassroom"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "3. Request initial data:",
+          "main.js runs API.getMembers(), API.getAllNotes(), and API.recordVisit() together with Promise.all(). Their results populate the member objects, sticky notes, and visitor count."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/core/api.js",
+          "getMembers",
+          "getAllNotes",
+          "recordVisit"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "4. Build UI controllers:",
+          "main.js constructs ClearBook, DeskScene, WhiteboardDrawing, PortfolioPhone, and ClassroomExperiences. Callbacks connect folder selection to ClearBook.open(), and book close to DeskScene.returnToDesk()."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "5. Prepare expensive work:",
+          "prepareNextBook() prepares portfolio pages during idle time. Fonts are warmed before scene construction; music availability is checked before the scene is ready for clicks."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/core/main.js",
+          "prepareNextBook"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Important implementation detail"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Portfolio clicks reuse loaded data:",
+          "The main classroom loads complete member objects through GET /api/members at startup. buildFolders() stores each member on the clickable mesh. Selecting an item passes that existing object into ClearBook.open(); it does not fetch /api/members/{id} on every click."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Single-member endpoint:",
+          "API.getMember() exists, and dev/book.html directly fetches /api/members/{id} for its standalone tester. That tester follows a different data-loading path from the main classroom."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Fallback limits:",
+          "Most API requests time out after 3 seconds. Missing notes become an empty list; visit failure produces a sample count of 42; member loading fails visibly. Scene fallback objects do not replace the full server-provided portfolios."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"We load the member data once, keep it on the desk items, and reuse it when opening the portfolios. Spring supplies the content; browser code controls the interaction.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "03 / Intro screen and control guide",
+    "subtitle": "Visible feature: the title sequence before entering the classroom.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Implementation by function"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "HTML and CSS:",
+          "index.html contains #intro, the title/subtitle, keyboard illustration, and mouse guide. css/intro.css controls the overlay and transitions."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Intro.start():",
+          "Accepts the classroom request, captures input while the intro is active, and builds a GSAP timeline. The normal sequence shows the title, then control instructions, then fades into the classroom."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/intro/intro.js",
+          "start"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "capture() and skip():",
+          "Consume clicks, touches, and keys before they reach the 3D scene. Skipping waits for a completed pointer gesture so the same click cannot accidentally activate a classroom object."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/intro/intro.js",
+          "capture",
+          "skip"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "finish():",
+          "Removes the overlay and capture listeners, kills animations, and restores scene input. A 12-second watchdog provides an exit if the sequence fails. Held skip keys are consumed until release."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/intro/intro.js",
+          "finish"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Sound and accessibility:",
+          "IntroSound.resume() and play() synthesize short Web Audio cues. Reduced-motion preferences shorten the animations; coarse-pointer devices get touch wording. ?intro=off skips the intro for local review."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/intro/introSound.js",
+          "resume",
+          "play"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Where Spring participates"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Configuration source:",
+          "application.yml defines site.intro.enabled, title, subtitle, and sound-enabled. SiteProperties.Intro binds these values, with defaults and a nonblank title constraint."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "API bridge:",
+          "ClassroomController.classroom() includes intro in its JSON response. main.js passes that response promise to Intro.start(). This lets Java configuration change the opening text and behavior without editing the animation functions."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/ClassroomController.java",
+          "classroom"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "What stays in the browser:",
+          "The timeline, input capture, skip behavior, and synthesized sound execute in JavaScript. Spring delivers the files and settings."
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Explain it during review"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"The intro is a JavaScript animation whose title and options come from Spring configuration. We temporarily block classroom input and restore it when the intro finishes.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "04 / Classroom, seats, and camera",
+    "subtitle": "Visible feature: look around the classroom, then click the front desk.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Scene construction and picking"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "DeskScene.init():",
+          "Checks WebGL, creates the Three.js scene, renderer, camera rig, lighting, room, portfolios, props, and sticky notes. It registers raycasting and starts the animation loop."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "init",
+          "buildSurroundingRoom",
+          "buildDesk",
+          "buildFolders"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "CameraRig:",
+          "bindKeyboardLook() maps WASD to looking, Shift to faster looking, and R to reset orientation. updateKeyboardLook() adjusts yaw/pitch; applyLook() rotates the camera. WASD does not move the viewer through the room."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "bindKeyboardLook",
+          "updateKeyboardLook",
+          "applyLook"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Seat versus desk:",
+          "enterDeskView() stores the seated camera pose and calls glideTo(). backToSeat() restores that pose. glideTo() temporarily sets view=\"gliding\", animates the camera with GSAP, then restores the correct input state."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "enterDeskView",
+          "backToSeat",
+          "glideTo"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Click detection:",
+          "onClick() rejects meaningful drags, raycasts registered hitboxes, then uses pickInteraction() and handleObjectClick(). Invisible layer-1 hitboxes make objects easier to select while the camera renders normal geometry."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "onClick",
+          "pickInteraction",
+          "handleObjectClick"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Students and Spring configuration"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Named students:",
+          "buildStudents() uses classroom.students to place characters. buildStudent() builds their appearance from reusable geometry; showStudentBubble() shows their configured names and lines."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "buildStudents",
+          "buildStudent",
+          "showStudentBubble"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Seat rules:",
+          "SiteProperties.Student constrains row/column to 1-4. isStudentSeatingValid() rejects duplicate named seats and reserves row 4. Classroom.absentName is nonblank. These are server startup validation rules."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/config/SiteProperties.java",
+          "isStudentSeatingValid"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Extras and bags:",
+          "buildExtras() fills eligible seats, skips figures that would block important sightlines, and batches still characters. buildStudentBags() and buildAbsentSeat() add classroom details. These generated meshes are browser-side."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "buildExtras",
+          "buildStudentBags",
+          "buildAbsentSeat"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"Spring gives us the classroom roster and text. Three.js turns those settings into a room, characters, and clickable objects.\""
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Noticeboard update:",
+          "buildSurroundingRoom() draws a higher-resolution noticeboard texture. The former PAALALA card is now Rules ni Boy Bestfriend, with the four supplied rules wrapped by measured text width. The class-officer and schedule cards retain their content."
+        ]
+      }
+    ]
+  },
+  {
+    "title": "05 / Riam's spiral notebook",
+    "subtitle": "Visible feature: a personalized notebook, divider, handwritten pages, and photos.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "From desk object to notebook overlay"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Data selection:",
+          "Member 1 in resources/data/members.json has deskItem=\"spiral-notebook\". It contains seven content sections, including About Me, interests, learning, projects, Dream., and My pictures."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "3D representation:",
+          "buildFolders() selects createSpiralNotebook(member). That function builds the notebook object and cover texture. userData.member retains the complete member data on its selection hitbox."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "createSpiralNotebook",
+          "buildFolders"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Opening:",
+          "selectFolder() invokes the callbacks defined in main.js. prepareMusic() requests music from the user click, then ClearBook.open() activates spiral theme classes and inserts prepared pages into the overlay."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "selectFolder"
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "prepareMusic",
+          "open",
+          "isNotebook"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Page construction:",
+          "renderPages() adds a cover, a 1st Semester divider, a profile, all seven JSON content pages, and a back cover for this notebook. Its page count comes from the assembled configuration rather than a fixed six-page assumption."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "renderPages"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Handmade appearance:",
+          "Handwriting.handwrite() uses seeded character variation; Sketches.get() supplies SVG doodles. notebookPhotos() creates hidden photo slots; open() loads only filenames advertised as available by the classroom API. coolSDoodles() decorates a reverse page."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/handwriting.js",
+          "handwrite"
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "notebookPhotos",
+          "coolSDoodles"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Spring integration and music"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Member content:",
+          "MemberService.loadMembers() reads members.json with ObjectMapper. MemberController.getAllMembers() serializes the data that the notebook receives. Member, PageContent, Skill, and ThemeSong model the content."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Optional files:",
+          "ClassroomResponse.notebookPhotos() includes only existing approved photo filenames. NotebookAudioController.notebookTheme() serves audio/mpeg when the track exists and HTTP 204 with no-store when it is absent."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/NotebookAudioController.java",
+          "notebookTheme"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Playback:",
+          "ThemeSong.prepare() checks the configured audio URL with HEAD and a 3-second timeout. start() requires an active user gesture; stop() pauses/resets with a 400 ms fade when GSAP is available. Active playback errors disable retries; obsolete callbacks cannot disable newer playback."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/themesong.js",
+          "prepare",
+          "start",
+          "stop"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"The notebook is a Three.js desk object that opens a reusable HTML book. Spring supplies its member data and optional media; JavaScript creates the pages and page-turn effect.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "06 / The other three portfolios",
+    "subtitle": "Visible feature: each member has a different school-material identity.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Vernie: long folder"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Desk model:",
+          "Member 2 uses deskItem=\"long-folder\". createLongFolder() constructs the desk object. JohnFolderArt.get() draws and caches the collage-style cover shared with the open portfolio."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/folder-art.js",
+          "get"
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "createLongFolder"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Inner pages:",
+          "ClearBook.renderPages() detects member.id===2 with the folder theme. It adds the collage cover and johnDivider(), then six inside sections. The current profile branch is built inline in renderPages(); F.L.A.M.E.S is a drawn, fixed result layout rather than an input-driven matching algorithm."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "renderPages",
+          "johnDivider"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Review distinction:",
+          "johnProfile() exists as a helper, but the current page configuration does not enqueue a john-profile page. Its presence alone does not mean the visible profile uses that helper."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "johnProfile"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Charella: theme book"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Desk and overlay:",
+          "Member 3 uses deskItem=\"theme-book\". createThemeBook() creates the 3D book; ClearBook.open() activates theme-book classes. renderPages() builds a cover, six content pages, and back cover, including themed skill-list styling."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "createThemeBook"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Nicole: intermediate pad"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Desk and overlay:",
+          "Member 4 uses deskItem=\"intermediate-pad\". createIntermediatePad() builds stacked paper. The loose-sheet branch in renderPages() produces six inside pages without the standard front/back cover pair. css/book.css supplies the pad presentation."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "createIntermediatePad"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Shared Spring data pipeline"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "One data source:",
+          "All four records come from resources/data/members.json through MemberService and MemberController. The deskItem value selects a renderer; pages supplies titles/content/borders; photo and coverColor personalize the display."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Optional profile fields:",
+          "MemberController loads titleText, ageLine, and objective separately and merges them through withProfile(). MemberProfileFieldsTest checks their API exposure. Their availability in JSON does not guarantee every renderer displays them."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/MemberController.java",
+          "withProfile",
+          "getAllMembers",
+          "getMemberById"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"All four portfolios reuse one book engine. Their deskItem values and member-specific branches give each one a different physical style.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "07 / Pages, navigation, and small book actions",
+    "subtitle": "Visible feature: flip, swipe, jump pages, roast animation, and note shortcut.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Page engine by function"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "initDOM():",
+          "Creates the book overlay, spine, page deck, header, close button, previous/next controls, page dots, and keyboard hints. The UI is ordinary DOM layered over the 3D scene."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "initDOM"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "preparePages():",
+          "Caches rendered page nodes per member in a WeakMap, with the selected theme. Reopening reuses those nodes. main.js can warm this cache during idle time."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "preparePages"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "updatePageStates():",
+          "Sets flipped/active/next CSS classes, stacking order, active page dots, and disabled navigation buttons. currentPageIndex is the source of the visible page state."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "updatePageStates"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "nextPage(), prevPage(), goToPage():",
+          "Apply boundary checks and prevent overlapping flips. Standard pages use CSS transitions and a 1350 ms lock; spiral pages delegate to turnSpiral()."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "nextPage",
+          "prevPage",
+          "goToPage"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "turnSpiral():",
+          "Uses GSAP to rotate a double-sided leaf, adjust book offset, and animate a moving shadow. Reduced-motion mode or missing GSAP completes the state change without the full motion."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "turnSpiral"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Keyboard and gestures:",
+          "bindGlobalKeys() handles arrows, PageUp/PageDown, space, and Escape. Mouse/touch handlers compare horizontal movement against a 50 px threshold. Page-edge clicks navigate while buttons and links are excluded."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/portfolio/book.js",
+          "bindGlobalKeys",
+          "handleDragEnd",
+          "handleTouchEnd"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Small actions inside the book"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Roast Me:",
+          "renderPages() wires a button on eligible fifth content pages. It appends a classroom-fire element and plays a sound. The visual is CSS animation, not a Spring calculation."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Leave a note:",
+          "The final standard inside section includes a guestbook trigger. It closes the book and calls onOpenGuestbook(member.id), allowing the form to preselect that member. Eligible cover portraits also count clicks for the spin easter egg."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Spring boundary:",
+          "Spring supplies the content and assets. Page indices, animation locks, swipe handling, and temporary UI effects live in the browser; page turns do not send an API request."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"The book is a reusable component with double-sided HTML pages. JavaScript manages which page is active, and CSS plus GSAP handle the turn.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "08 / Guestbook and sticky notes",
+    "subtitle": "Visible feature: submit a message, read it on the desk, or throw its visual note.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Complete browser-to-Spring path"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Open and type:",
+          "main.js openGuestbookModal() opens the form and optionally selects a member. setupGuestbook() updates the character counter, rejects empty/overlong text, and handles the sudo joke locally."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/core/main.js",
+          "openGuestbookModal",
+          "setupGuestbook"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Send JSON:",
+          "API.postNote(memberId,text,author) posts {text,author} with Content-Type: application/json to /api/members/{id}/notes. It reads server error messages when the response is unsuccessful."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/core/api.js",
+          "postNote"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Controller checks:",
+          "NoteController.addNote() checks the member exists and the payload contains text. It delegates to NoteService and returns 201 for success, 400 for invalid content, 404 for an unknown member, or 500 if saving fails."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/NoteController.java",
+          "addNote"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Service rules:",
+          "NoteService.addNote() trims text, enforces a nonempty 120-character maximum, escapes HTML, defaults a blank author to Anonymous, truncates the author to 40 characters, and generates a UUID and timestamp."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/service/NoteService.java",
+          "addNote"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Persistence:",
+          "Under a synchronized lock, NoteService first asks JsonFileStore to save the proposed updated list. Only after a successful write does it add the note to the cache. The default destination is var/data/notes.json; a failed write leaves the previous cache intact."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Immediate UI update:",
+          "After receiving the saved Note JSON, main.js calls addStickyNoteToDesk(). The new note appears without a reload. GET /api/notes restores all saved notes at startup; member-specific GET returns filtered notes."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "buildStickyNotes",
+          "addStickyNoteToDesk",
+          "viewStickyNote",
+          "openNoteViewerModal"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Throwing is a visual action"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Read and throw:",
+          "The note viewer shows the author, text, and dedication. Its Throw note button calls ClassroomExperiences.throwNote(), which animates the mesh away and starts the cleanup character sequence."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "throwNote",
+          "cleanScrap"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Persistence boundary:",
+          "There is no DELETE note endpoint. Throwing or cleaning a note changes this scene, but leaves the saved record in notes.json; the note can return after reloading."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"The guestbook is our clearest full-stack feature: a browser form sends JSON to a Spring controller, a Java service validates and saves it, and the response becomes a 3D sticky note.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "09 / Drawable whiteboard",
+    "subtitle": "Visible feature: open the board, choose a marker, erase, clear, and keep a drawing.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Browser drawing functions"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Construction:",
+          "WhiteboardDrawing receives DeskScene and uses the whiteboard dialog/canvas declared in index.html. It creates a separate snapshot canvas and passes it to scene.attachWhiteboardDrawing() for a Three.js texture."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/whiteboard.js",
+          "constructor"
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "attachWhiteboardDrawing"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Open and close:",
+          "open() checks that the viewer is seated and interactions are available, remembers focus/input settings, displays the dialog, and disables camera input. close() finishes the stroke, saves if needed, republishes the texture, and restores input/focus."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/whiteboard.js",
+          "open",
+          "close"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Tools:",
+          "selectTool() selects marker color or eraser. The eraser uses destination-out compositing, so it removes only the visitor drawing layer. The original classroom board lettering is separate."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/whiteboard.js",
+          "selectTool"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Pointer handling:",
+          "point() converts screen coordinates to canvas coordinates. startStroke() captures the pointer; moveStroke() uses quadratic curves for smoother lines; finishStroke() finishes the line and schedules a save after 300 ms."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/whiteboard.js",
+          "point",
+          "startStroke",
+          "moveStroke",
+          "finishStroke"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Saving:",
+          "save() stores a PNG data URL under localStorage key gp.whiteboard.v1. restore() loads that image next time. clear() removes the local drawing; publish() copies pixels to the texture and marks it needsUpdate."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/whiteboard.js",
+          "save",
+          "restore",
+          "clear",
+          "publish"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Where Spring participates"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Board content:",
+          "ClassroomController.classroom() supplies configured board names and other classroom text through SiteProperties. Spring also serves whiteboard.js, whiteboard.css, and the page that contains the editor."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Drawing storage:",
+          "Drawing pixels never go to a Spring endpoint. They are stored per browser/origin in localStorage. Another browser or device will not automatically receive the drawing."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Review check:",
+          "Draw, close, and reopen the board; then reload to verify local restore. Clear should remove your marks while preserving the original classroom names."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"The board has two layers: server-configured classroom lettering and a visitor drawing canvas. Only the visitor drawing is saved locally in the browser.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "10 / Phone, SpotiBai, TV, and Labibi",
+    "subtitle": "Visible feature: open the phone with C or the toolbar button.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Phone shell and app routing"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "PortfolioPhone:",
+          "The constructor registers the button and C shortcut, ignoring text fields and modified keys. offerShortcutHint() shows Use C to see Phone for 10 seconds once opening is permitted."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/phone/phone.js",
+          "offerShortcutHint",
+          "open",
+          "close"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Lazy UI:",
+          "build() creates the phone only when needed. The phone screen contains a persistent status bar, an app header, and a replaceable phone-content area. showHome() hides the Phone heading; app titles such as SpotiBai remain visible. goBack() returns home, then closes the phone."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/phone/phone.js",
+          "build",
+          "showHome",
+          "goBack"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Music and television"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "SpotiBai:",
+          "showSpotiBai() builds track cards from classroom.phone.tracks. Buttons are disabled when audioAvailable is false. Connect to TV appears only for a track with videoAvailable."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/phone/phone.js",
+          "showSpotiBai"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Playback:",
+          "ClassroomExperiences.playTrack() stops competing media, creates Audio, and seeks using SPOTIBAI_START_SECONDS. TMA now begins at 30 seconds; Preso begins at 20 seconds. TMA triggers the Tubo dance. stopTrack() pauses audio and restores the student."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "playTrack",
+          "stopTrack",
+          "startTubo",
+          "updateTubo"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "TV:",
+          "playTV() maps a muted video onto the 3D television using THREE.VideoTexture and optionally plays a separate audio file. It corrects drift beyond 0.4 seconds. stopTV() disposes the video texture and restores the DVD screen."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "playTV",
+          "stopTV"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Labibi and Spring configuration"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Labibi:",
+          "showLabibi() randomly selects one of four local LABIBI_ROLLS. Keep calls placeLabibi() to put a modeled toy on Sir Sean's desk and zoomLabibi() for a close-up. The roll is browser-side and has no database record."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/phone/phone.js",
+          "showLabibi"
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "placeLabibi",
+          "zoomLabibi"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Spring bridge:",
+          "SiteProperties.Phone binds site.phone in application.yml. Track.audioAvailable() and videoAvailable() inspect classpath files; ClassroomController includes those booleans in JSON. Media paths are constrained to local asset patterns."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Implemented but not exposed:",
+          "showTiktik() implements a lazy video feed, local likes, and adjacent-video preloading. The current home screen has no Tiktik launcher and application.yml has videos: []; do not present it as an accessible populated app."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/phone/phone.js",
+          "showTiktik",
+          "loadVideo",
+          "setVisible"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"Spring publishes the playlist and tells us which files exist. The browser builds the phone and plays those local assets.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "11 / Sir Sean and the performance",
+    "subtitle": "Visible feature: teacher hover text and a click-triggered musical stage.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Teacher interaction"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Build and hover:",
+          "buildTeacher() constructs the teacher. showSean() displays a speech bubble with a line and Click Sir Sean hint. onSeanClick() calls ClassroomExperiences.startConcert()."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "buildTeacher",
+          "showSean",
+          "onSeanClick"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Text-source nuance:",
+          "ClassroomExperiences now takes teacherLines from the Spring-supplied classroom object. showSean() uses those configured lines, so application.yml is the source for the teacher hover dialogue."
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Performance functions"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "prepareMedia():",
+          "Creates Audio for /assets/audio/nadarang.mp3 and fetches /assets/audio/nadarang.lrc. It parses timestamp tags and optional offset metadata into ordered lyric cues. concertStart is 97.06 seconds (1:37.06)."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "prepareMedia"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "startConcert():",
+          "Rejects conflicting states and toggles an active performance off. Normally plays a fire-transition video before beginning; reduced-motion mode begins directly. Transition failure also falls through to the performance."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "startConcert",
+          "clearConcertTransition"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "beginConcert():",
+          "Stops competing media, closes the phone, resets Zero-G, stores teacher transforms and lighting, then changes the scene into a stage. prepareStage() supplies smoke, spotlight, and beam; showStadium() builds the audience setting."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "beginConcert",
+          "prepareStage",
+          "showStadium"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "update():",
+          "Uses audio.currentTime to animate teacher movement, limbs, crowd, smoke, spotlight, and the current lyric bubble. The audio clock keeps these changes synchronized with playback."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "update",
+          "updateCrowd"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "stopConcert():",
+          "Cancels the transition, pauses music, restores saved teacher transforms and lights, restores the background/fog, and hides temporary stage/crowd objects. The Back/Escape route can stop the performance."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "stopConcert"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Spring role"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Asset delivery:",
+          "Spring serves the JavaScript, MP3, LRC, and transition video from static assets. The concert is not a Java controller operation: cue parsing, animation, and restoration all happen in the browser."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"Clicking Sir Sean starts a browser-controlled performance. We use the audio playback time as the clock for lyrics and animation, while Spring supplies the media files.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "12 / Classroom events and surprises",
+    "subtitle": "Visible feature: characters react to doors, basketball, paper, and the window.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Shared event dispatch"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "ClassroomExperiences.handleClick():",
+          "Checks object.userData.type and routes TV, basketball, Labibi, floor-scrap, and exit-door interactions. It consumes conflicting clicks during a concert, cleaning sequence, or note throw."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "handleClick"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Door character:",
+          "registerDoor() creates an exit-door hitbox. showKim() builds/reuses the Kim character, plays a short audio cue, shows a bubble, and animates entry. stopKim() hides the actor and clears the cue."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "registerDoor",
+          "showKim",
+          "stopKim"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Basketball character:",
+          "buildBasketball() adds the trigger. showRin() animates a character through the classroom and door, with an entry cue. stopRin() cancels the sequence and restores the door rotation."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "buildBasketball",
+          "showRin",
+          "stopRin"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Wrapper and cleanup:",
+          "buildScraps() creates floor scraps. openScrap() shows a wrapper dialog. tossScrap() animates a throw; cleanScrap() introduces Jeo with a broom; collectScrap() removes the mesh/hitbox; finishCleanup() restores the camera and input."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "buildScraps",
+          "openScrap",
+          "tossScrap",
+          "cleanScrap",
+          "collectScrap",
+          "finishCleanup"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Curtain:",
+          "DeskScene.toggleCurtain() animates curtain position and width while scaling sunlight, glow, dust, and shadow fade. When an opening finishes, onCurtainOpened() creates the Titan once and leaves it visible."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "toggleCurtain"
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "onCurtainOpened",
+          "buildTitan"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Close-up state:",
+          "lockFocus() stores camera/input settings for a close-up. updateFocus() keeps the camera aligned; releaseFocus() restores the saved state. The universal Back route can leave a close-up or finish cleanup."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "lockFocus",
+          "updateFocus",
+          "releaseFocus"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Spring participation"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Optional audio:",
+          "SiteProperties.Audio exposes kimEntry(), jeoEntry(), and rinEntry() only when the matching classpath files exist. playCue() obtains those URLs from the classroom response. Actor geometry, dialogue, and timelines are mostly in experiences.js."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "playCue",
+          "stopCue"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Scene-only state:",
+          "Collected wrappers, character visibility, and Titan visibility are not saved through a backend endpoint. These experiences restart with a new page load."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"We route clicks by object type, reuse character models, and save the camera state before close-ups. Spring mainly supplies optional audio and the classroom setup.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "13 / Props, Zero-G, sound, and visit count",
+    "subtitle": "Visible feature: playful desk objects plus a persistent server-side counter.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Desk prop functions"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Coffee:",
+          "handleCoffeeInteraction() chooses spill or cleanup. triggerCoffeeSpill() tilts the cup and expands a puddle using GSAP. cleanAndRecreateCoffee() restores the prop. This visual state is temporary."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "handleCoffeeInteraction",
+          "triggerCoffeeSpill",
+          "cleanAndRecreateCoffee"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Do not touch note:",
+          "handleStickyNoteClick() shakes a nearby folder on a click; a second click within 450 ms toggles Zero-G. triggerShakeNearestFolder() performs the folder animation."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "handleStickyNoteClick",
+          "triggerShakeNearestFolder"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Laptop and small props:",
+          "handleObjectClick() opens PortfolioHumor.showLaptopErrorDialog() for the laptop; the calendar and rubber duck show toast jokes. humor.js also contains robot-verification and motivation-restart dialog behavior."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/shared/humor.js",
+          "showLaptopErrorDialog",
+          "showRobotCaptcha",
+          "restartMotivation"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Zero-G and shared sound"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Triggers:",
+          "The toolbar, E/G/F, and Konami sequence call toggleAntiGravity(). getFloatingObjects() gathers people, chairs, teacher, fixtures, curtains, fans, bags, wrappers, basketball, banner, and desk. Grouped artwork/hitboxes move together; the building shell stays fixed."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/shared/humor.js",
+          "initEasterEggs"
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "toggleAntiGravity",
+          "snapshotAntiGravityHomes",
+          "triggerAntiGravity",
+          "stopAntiGravity",
+          "finishAntiGravityReset"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Sound:",
+          "PortfolioHumor.playSound() synthesizes effects with Web Audio. AudioMaster.toggle() stores the master mute choice in sessionStorage and notifies listeners. Notebook music and experience media subscribe to that shared state."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/shared/humor.js",
+          "playSound"
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/core/main.js",
+          "toggle",
+          "onChange"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Visitor counter: the Spring-backed part"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Request:",
+          "API.recordVisit() posts /api/visit on page startup. VisitController.recordVisit() calls CounterService.incrementAndGet() and getVisitorJoke(), returning {count,message}. GET /api/visit reads without incrementing."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/VisitController.java",
+          "recordVisit",
+          "getVisit"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Storage:",
+          "CounterService.init() restores var/data/counter.json. incrementAndGet() saves the proposed next value through JsonFileStore before changing the in-memory count. A failed write returns HTTP 500 and preserves the previous count."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/service/CounterService.java",
+          "init",
+          "incrementAndGet",
+          "persistCount"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Visibility nuance:",
+          "main.js looks for #visitorCountBadge before updating it, but the current index.html does not contain that element. The API still records a visit even though the badge is not rendered in the main UI."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"Most desk jokes are browser effects. The visitor count is different: Spring updates a shared server-side JSON file.\""
+        ]
+      }
+    ]
+  },
+  {
+    "title": "14 / Visual theme, dark mode, and Back",
+    "subtitle": "Visible feature: handmade styling, a black screen toggle, and consistent navigation.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Appearance and performance"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Theme functions:",
+          "Theme.toon() creates cartoon materials; addOutline() adds bold contours; woodTexture() draws procedural wood; applyScene() restyles scene meshes. windowTextures() prepares a sky/horizon with optional artwork."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/shared/theme.js",
+          "toon",
+          "addOutline",
+          "woodTexture",
+          "applyScene",
+          "windowTextures"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "CSS responsibilities:",
+          "style.css positions the HUD/dialogs; book.css styles physical portfolio variants and page turns; theme.css supplies the shared cartoon treatment. phone.css, whiteboard.css, experiences.css, intro.css, and fonts.css serve their specific UI layers."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Spring theme settings:",
+          "site.theme.golden-intensity and sky-drift bind to SiteProperties.Theme, with intensity limited to 0-1. ClassroomController includes theme in JSON; main.js calls Theme.configure(). windowSunset() returns image/jpeg or 204 for an absent optional background photo."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/shared/theme.js",
+          "configure"
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/ClassroomController.java",
+          "windowSunset"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Render cost:",
+          "DeskScene.init() caps pixel ratio at 1.5. animate() throttles shadow updates to about 15 Hz and slows covered scene rendering to about 4 Hz. Cached page nodes, material/texture reuse, and instanced extras reduce repeated work."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "animate",
+          "cachedDetailTexture"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Dark mode"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "enterDark():",
+          "Adds a plain black overlay, remembers keyboard input and focus, updates the button state, and disables look input. animate() returns early while dark mode is active."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "leaveDark():",
+          "Hides the overlay and restores input/focus. Clicking the black screen or pressing Escape exits. This feature is separate from the curtain animation."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/experiences.js",
+          "enterDark",
+          "leaveDark"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Universal Back navigation"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "setupBackNavigation():",
+          "Chooses the highest-priority active UI to close: verification, dark mode, wrapper, phone, guestbook, laptop, note, placard, portfolio, whiteboard, focus, performance, then desk-to-seat."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/core/main.js",
+          "setupBackNavigation"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "State updates:",
+          "A MutationObserver and portfolio-navigation events refresh Back visibility and its accessible label. Escape uses the same route, so multiple open UI states are not all dismissed by one key press."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Fallback scope:",
+          "DeskScene.initFallback2D() creates member cards when WebGL is unavailable. It retains portfolio access for loaded members; it does not provide the full 3D classroom experience."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/resources/static/js/classroom/scene.js",
+          "initFallback2D"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Talking point:",
+          "\"The visual theme is shared across the scene and HTML overlays. One Back route closes the current interaction and restores the previous view.\""
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Cartoon pointer:",
+          "css/cursor.css selects large native SVG cursors from assets/cursors: a 48 px arrow and 52 px glove. Native cursors avoid a JavaScript follower; text fields keep a text caret."
+        ]
+      }
+    ]
+  },
+  {
+    "title": "15 / Spring endpoint reference",
+    "subtitle": "Use these exact routes when tracing a feature in a code review.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Classroom and member content"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "GET /api/site/classroom:",
+          "ClassroomController.classroom() returns board text, TV slides, teacher lines, mission/vision, theme, audio, intro, students, phone settings, absentName, and available notebook photos. These settings feed multiple UI features."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/ClassroomController.java",
+          "classroom"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "GET /api/members:",
+          "MemberController.getAllMembers() returns the complete member representations plus optional profile fields. The main classroom uses this result to build all desk objects and portfolio pages."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "GET /api/members/{id}:",
+          "MemberController.getMemberById() returns a member or 404. The standalone book tester uses this route. withProfile() merges optional profile presentation fields."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/MemberController.java",
+          "getAllMembers",
+          "getMemberById",
+          "withProfile"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Guestbook"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "GET /api/notes:",
+          "NoteController.getAllNotes() returns all saved notes for initial desk rendering."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "GET /api/members/{id}/notes:",
+          "getNotesForMember() validates member existence and returns that member's notes; unknown members receive 404."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "POST /api/members/{id}/notes:",
+          "addNote() accepts {text,author}. Returns 201 and the saved note; missing/invalid text gets 400; unknown member gets 404; persistence failure gets 500."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/NoteController.java",
+          "getAllNotes",
+          "getNotesForMember",
+          "addNote"
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Counter and optional assets"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "POST /api/visit:",
+          "VisitController.recordVisit() increments the counter and returns a count/message object. GET /api/visit calls getVisit() and does not increment."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/VisitController.java",
+          "recordVisit",
+          "getVisit"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "GET /assets/audio/notebook-theme.mp3:",
+          "NotebookAudioController.notebookTheme() returns an audio resource or 204. ThemeSong.prepare() probes it using HEAD; Spring MVC supports HEAD handling for the mapped GET resource."
+        ]
+      },
+      {
+        "kind": "ref",
+        "args": [
+          "src/main/java/com/aet/portfolio/controller/NotebookAudioController.java",
+          "notebookTheme"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "GET /assets/textures/window-sunset.jpg:",
+          "ClassroomController.windowSunset() returns the optional image or 204. Other regular static assets use Spring resource handling rather than a custom controller."
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "What is not an API"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Browser-owned features:",
+          "Page flips, whiteboard drawing storage, phone toy rolls/likes, Zero-G, curtain state, dark mode, lyrics synchronization, and character animations have no dedicated backend endpoint in this source snapshot."
+        ]
+      }
+    ]
+  },
+  {
+    "title": "16 / Source files and content maintenance",
+    "subtitle": "Where to change a feature, and which changes require restarting Spring.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Backend and data owners"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Application/server:",
+          "pom.xml defines dependencies; PortfolioApplication.java boots Spring; application.properties sets PORT fallback 8080, static resource location, UTF-8, and disabled static caching."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Classroom content:",
+          "resources/application.yml is the source for students, phone tracks, intro, theme, board text, mission/vision, and absence label. SiteProperties.java describes and validates this configuration; ClassroomController.java exposes it."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Portfolio content:",
+          "resources/data/members.json supplies the four records. Member.java holds identity, deskItem, themeSong, photo, coverColor, pages, and skills. PageContent.java holds title/content/border; Skill.java holds name/level/funnyLabel; ThemeSong.java holds song metadata."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Persistent visitor data:",
+          "Note.java stores id, memberId, text, author, and timestamp. NoteService and CounterService use JsonFileStore under var/data by default. DATA_DIRECTORY or site.storage.directory can select another writable directory. There is no JPA/SQL repository layer."
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "UI owners"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Orchestration:",
+          "static/index.html defines the scene container, toolbar, note forms/viewer, whiteboard, and overlay roots. js/core/main.js connects data loading, components, callbacks, mute, and Back behavior. js/core/api.js centralizes HTTP calls."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "3D scene:",
+          "js/classroom/scene.js owns classroom geometry, camera, hitboxes, props, desk-item builders, and sticky notes. js/classroom/experiences.js owns performances, cleanup actors, media-to-TV, Labibi placement, and dark mode."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Portfolio:",
+          "js/portfolio/book.js owns page DOM and navigation; js/portfolio/themesong.js owns notebook audio; js/portfolio/handwriting.js and js/portfolio/sketches.js supply handmade text/doodles. css/book.css supplies each portfolio's physical look."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Other UI:",
+          "js/classroom/whiteboard.js owns drawing and local restore; js/phone/phone.js owns the phone shell/apps; js/intro/intro.js and introSound.js own the title sequence; js/shared/theme.js and humor.js provide shared visual/audio effects."
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Practical edit examples"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Change a notebook paragraph:",
+          "Edit the correct member.pages entry in members.json, restart Spring because MemberService loads it at startup, then reload. To change the turn effect, edit ClearBook.turnSpiral() and the corresponding book.css rules instead."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Add a phone track:",
+          "Add a site.phone.tracks entry in application.yml and place its local asset under static/assets/audio. Restart Spring for binding, reload, and confirm audioAvailable. A declared URL alone does not make the file exist."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Do not confuse data copies:",
+          "Edit src/main/resources, not generated target/classes. The current root README explains the new layout; docs/history and docs/verification/legacy-scripts retain older plans/checks. The older nested clone is outside this repo."
+        ]
+      }
+    ]
+  },
+  {
+    "title": "17 / Review and presentation checklist",
+    "subtitle": "A short explanation route, followed by source-grounded questions.",
+    "items": [
+      {
+        "kind": "sub",
+        "args": [
+          "Suggested presentation bullets"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Start with Spring:",
+          "\"Our backend is Spring Boot on Java 17. It serves both the website and REST endpoints, so the browser and API share one origin.\""
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Show the notebook:",
+          "\"Member JSON flows through MemberService and MemberController. The deskItem selects the 3D model, and ClearBook turns the same data into HTML pages with CSS and GSAP animations.\""
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Show the guestbook:",
+          "\"The form posts JSON to NoteController. NoteService validates, escapes, and saves it. We use the returned note immediately to add a mesh to the desk.\""
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Show the whiteboard and phone:",
+          "\"Drawings are local to this browser. The phone playlist comes from Spring configuration, while media playback and Labibi rolls run in JavaScript.\""
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Finish with ownership:",
+          "\"Spring owns server data, configuration, and HTTP delivery. Three.js, CSS, and JavaScript own the visible interactions.\""
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Useful reviewer questions and answers"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Why does a member edit need a restart?",
+          "MemberService reads members.json at initialization. The current source has no admin editing or hot-reload endpoint for that content."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Does throwing delete a saved note?",
+          "No. The action removes/animates its scene representation; there is no backend DELETE route. Reloading can bring the persisted note back."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Are file writes transactional?",
+          "There is no database transaction. JsonFileStore serializes to a temporary sibling file, then replaces the destination. Services change their caches only after saving succeeds. This protects previous data on serialization/write failure; locks coordinate one Java process, not multiple deployments."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Are all defined helpers visible features?",
+          "No. Tiktik has no home launcher; johnProfile() is not selected by the current page configuration; the visitor badge is absent from index.html. Review the call path as well as the function definition."
+        ]
+      },
+      {
+        "kind": "sub",
+        "args": [
+          "Validation and review limits"
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Existing automated coverage:",
+          "A fresh clean Java compile/test phase passed 31 tests, including storage-failure cases. All 13 JavaScript tests passed. Asset checking validated 87 references and parsed browser JS. Browser checks covered Zero-G/reset, four portfolios, drawing, phone, dark mode, previews, and fallback."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Manual review route:",
+          "Launch from the root with .\\mvnw.cmd spring-boot:run; open localhost:8080; review intro, desk entry, all four books, notes, drawing restore, phone/music/TV, Sir Sean, props, and Back/Escape. Use .\\mvnw.cmd test for a fresh backend check."
+        ]
+      },
+      {
+        "kind": "bullet",
+        "args": [
+          "Scope of assurance:",
+          "Browser smoke checks reported no page errors or failed HTTP responses. Targeted checks confirmed TMA at 0:30, status icons inside the screen, no home Phone heading, and all four notice rules fitting. Packaging stopped at a missing cached Maven plugin dependency; the executable JAR remains unverified."
+        ]
+      }
+    ]
+  }
+]

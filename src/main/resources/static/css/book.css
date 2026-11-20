@@ -791,7 +791,7 @@
 
 @font-face {
   font-family: 'Patrick Hand';
-  src: url('../fonts/PatrickHand-Regular.ttf') format('truetype');
+  src: url('../assets/fonts/PatrickHand-Regular.ttf') format('truetype');
   font-display: swap;
 }
 .theme-spiral {
@@ -817,7 +817,7 @@
 
 @font-face {
   font-family: 'Dancing Script';
-  src: url('../fonts/DancingScript.ttf') format('truetype');
+  src: url('../assets/fonts/DancingScript.ttf') format('truetype');
   font-weight: 400 700;
   font-display: swap;
 }
@@ -849,7 +849,7 @@
 
 @font-face {
   font-family: 'Plus Jakarta Sans';
-  src: url('../fonts/PlusJakartaSans.ttf') format('truetype');
+  src: url('../assets/fonts/PlusJakartaSans.ttf') format('truetype');
   font-weight: 200 800;
   font-display: swap;
 }
@@ -1015,8 +1015,8 @@
   .book-overlay.theme-spiral, .theme-spiral .book-container, .theme-spiral .page-dot { transition: none; }
 }
 
-@font-face { font-family: 'Gochi Hand'; src: url('../fonts/GochiHand-Regular.ttf') format('truetype'); font-display: swap; }
-@font-face { font-family: Caveat; src: url('../fonts/Caveat.ttf') format('truetype'); font-weight: 400 700; font-display: swap; }
+@font-face { font-family: 'Gochi Hand'; src: url('../assets/fonts/GochiHand-Regular.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: Caveat; src: url('../assets/fonts/Caveat.ttf') format('truetype'); font-weight: 400 700; font-display: swap; }
 
 .theme-spiral .ink-word {
   display: inline-block; max-width: 100%; font: inherit; letter-spacing: var(--spacing);
@@ -1846,3 +1846,2050 @@
 .theme-spiral .notebook-photos:has(.notebook-print:nth-child(5)) { gap:.55rem; }
 .theme-spiral .notebook-photos:has(.notebook-print:nth-child(5)) .notebook-print { width:min(29%,116px); margin:.25rem 0; padding:.25rem .25rem .5rem; }
 .theme-spiral .page-back .cool-s-doodles { position:absolute; inset:22% 5% auto; margin:0; }
+
+.cm-journal-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.cm-journal-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+
+.book-overlay.theme-themebook .cm-journal-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0;
+  overflow: hidden;
+}
+.book-overlay.theme-themebook .cm-journal-page img {
+  display: block;
+  width: 94%;
+  height: 100%;
+  max-width: 94%;
+  max-height: 100%;
+  object-fit: fill;
+  object-position: center;
+  margin: 0;
+  margin-left: 8%;
+}
+.book-overlay.theme-themebook .book-page {
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: none;
+  will-change: transform;
+}
+.book-overlay.theme-themebook .book-page.journal-turning {
+  z-index: 90 !important;
+  pointer-events: none;
+}
+.book-overlay.theme-themebook .page-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.book-overlay.theme-themebook .cm-journal-page,
+.book-overlay.theme-themebook .cm-journal-page img {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .book-overlay.theme-themebook .book-page { transition: none; }
+}
+
+.theme-nicole .music-credit { display: none !important; }
+#deskBackBtn[aria-hidden="true"] { visibility: hidden; }
+
+/* ==========================================================================
+   NICOLE LEIGH'S CREATIVE ZINE — MATCHA & WARM CREAM STATIONERY THEME
+   STA. JOHN GI ACADEMY OFFICIAL STUDENT NOTEBOOK
+   Crafted with Editorial 2-Page Spreads, Archival Tactile Styling & WCAG AAA Contrast
+   ========================================================================== */
+
+:root {
+  --nicole-matcha: #4F6D54;
+  --nicole-matcha-dark: #203A24;
+  --nicole-matcha-light: #C2D5C4;
+  --nicole-matcha-soft: #EAEFEA;
+  --nicole-cream-bg: #FAF7EF;
+  --nicole-cream-warm: #F4EEDF;
+  --nicole-grid: rgba(79, 109, 84, 0.08);
+  --nicole-gold: #B88E36;
+  --nicole-gold-dark: #8F691C;
+  --nicole-ink: #1B291D;
+  --nicole-ink-muted: #384F3B;
+  --nicole-terracotta: #C85A48;
+}
+
+/* Book Container Overrides for Nicole */
+.theme-nicole .book-container {
+  background: var(--nicole-matcha) !important;
+  border: 3px solid var(--nicole-matcha-dark) !important;
+  box-shadow: 6px 6px 0 var(--nicole-matcha-dark), 0 20px 45px rgba(0, 0, 0, 0.35) !important;
+  border-radius: 6px !important;
+  transition: transform 0.85s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+/* Hide outer clear-book spine strip on Nicole's cover & back cover to prevent duplicate spine */
+.theme-nicole .book-container.is-cover .book-spine,
+.is-nicole.is-cover .book-spine,
+.theme-nicole .book-container.is-back .book-spine,
+.is-nicole.is-back .book-spine {
+  display: none !important;
+}
+
+/* Open Spread: Center the spine gutter directly across the 2-page hinge */
+.theme-nicole .book-container.is-open-spread .book-spine,
+.is-nicole.is-open-spread .book-spine {
+  display: block !important;
+  left: 0 !important;
+  transform: translateX(-50%) !important;
+  width: var(--book-spine-width, 38px) !important;
+  border-radius: 0 !important;
+  border-left: 1.5px solid rgba(0, 0, 0, 0.35) !important;
+  border-right: 1.5px solid rgba(0, 0, 0, 0.35) !important;
+  box-shadow: -3px 0 8px rgba(0, 0, 0, 0.2), 3px 0 8px rgba(0, 0, 0, 0.2) !important;
+  background: linear-gradient(90deg, #134720 0%, #1E6532 25%, #2A8C46 50%, #1E6532 75%, #134720 100%) !important;
+  z-index: 100 !important;
+}
+
+.theme-nicole .book-container.is-open-spread .book-spine-stitching,
+.is-nicole.is-open-spread .book-spine-stitching {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.theme-nicole .book-container.is-open-spread .book-spine::after,
+.is-nicole.is-open-spread .book-spine::after {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Centering Nicole's notebook when opened as a 2-page spread */
+@media (min-width: 769px) {
+  .theme-nicole .book-container.is-cover {
+    transform: translateX(0) !important;
+  }
+
+  .theme-nicole .book-container.is-open-spread {
+    transform: translateX(50%) !important;
+  }
+
+  .theme-nicole .book-container.is-back {
+    transform: translateX(100%) !important;
+  }
+}
+
+/* Symmetrical Open Notebook Cover Backing & Borders */
+.theme-nicole .book-container.is-open-spread,
+.is-nicole.is-open-spread {
+  border-left: none !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-top-right-radius: 6px !important;
+  border-bottom-right-radius: 6px !important;
+}
+
+/* Horizontal 3D Page Turning (Sketchbook / Journal Style) */
+.theme-nicole .book-page {
+  transform-origin: left center !important;
+  transition: transform 1.15s cubic-bezier(0.25, 1, 0.5, 1), z-index 0s !important;
+  animation: none !important;
+  visibility: visible !important;
+  border-radius: 4px !important;
+}
+
+.theme-nicole .book-page.flipped {
+  visibility: visible !important;
+  pointer-events: none;
+  transform: rotateY(-180deg) !important;
+}
+
+.theme-nicole .book-page.flipped.visible-verso {
+  pointer-events: auto !important;
+}
+
+.theme-nicole .book-container.is-open-spread .book-page.flipped.visible-verso .page-face.page-back,
+.is-nicole.is-open-spread .book-page.flipped.visible-verso .page-face.page-back {
+  border-top: 3px solid var(--nicole-matcha-dark) !important;
+  border-left: 3px solid var(--nicole-matcha-dark) !important;
+  border-bottom: 3px solid var(--nicole-matcha-dark) !important;
+  border-right: none !important;
+  border-top-left-radius: 6px !important;
+  border-bottom-left-radius: 6px !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  box-shadow: -6px 6px 0 var(--nicole-matcha-dark), 0 20px 45px rgba(0, 0, 0, 0.35) !important;
+  box-sizing: border-box !important;
+}
+
+.theme-nicole .book-page.turning {
+  animation: none !important;
+}
+
+.theme-nicole .book-page.turning .page-front {
+  animation: none !important;
+}
+
+.theme-nicole .page-svg-border {
+  display: none !important;
+}
+
+/* Page Face & Verso Overrides for Nicole: Eliminate default 40px padding, white borders & sheens */
+.theme-nicole .page-face,
+.is-nicole .page-face {
+  box-shadow: none !important;
+  background: var(--nicole-cream-bg) !important;
+  border-radius: 4px !important;
+}
+
+.theme-nicole .page-face::after,
+.is-nicole .page-face::after {
+  display: none !important;
+}
+
+.theme-nicole .page-face.page-back,
+.is-nicole .page-face.page-back {
+  padding: 0 !important;
+  background: var(--nicole-cream-bg) !important;
+  border: none !important;
+  display: block !important;
+  color: var(--nicole-ink) !important;
+  text-align: left !important;
+}
+
+.theme-nicole .page-face.page-front,
+.is-nicole .page-face.page-front {
+  padding: 0 !important;
+  background: var(--nicole-cream-bg) !important;
+  border: none !important;
+}
+
+/* ==========================================================================
+   SPREAD ARCHITECTURE: VERSO (LEFT) & RECTO (RIGHT) CONTAINERS
+   ========================================================================== */
+
+/* Recto (Right Page) Container - Spine is on the Left */
+.nicole-page-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: var(--nicole-cream-bg);
+  background-image:
+    linear-gradient(to right, var(--nicole-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--nicole-grid) 1px, transparent 1px);
+  background-size: 18px 18px;
+  padding: 22px 24px 18px calc(var(--book-spine-width, 38px) / 2 + 15px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--nicole-ink);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  box-shadow: inset 14px 0 16px -10px rgba(0, 0, 0, 0.12);
+  border-left: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Verso (Left Page) Container - Spine is on the Right */
+.nicole-verso-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: var(--nicole-cream-bg);
+  background-image:
+    linear-gradient(to right, var(--nicole-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--nicole-grid) 1px, transparent 1px);
+  background-size: 18px 18px;
+  padding: 22px calc(var(--book-spine-width, 38px) / 2 + 15px) 18px 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--nicole-ink);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  box-shadow: inset -14px 0 16px -10px rgba(0, 0, 0, 0.12);
+  border-right: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Legacy fallback sheet back */
+.nicole-sheet-back {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: var(--nicole-cream-warm);
+  background-image:
+    linear-gradient(to right, rgba(79, 109, 84, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(79, 109, 84, 0.07) 1px, transparent 1px);
+  background-size: 18px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nicole-back-stamp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 20px;
+  border: 2px dashed var(--nicole-matcha-light);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  transform: rotate(-2deg);
+}
+
+.nicole-back-stamp .back-brand {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--nicole-matcha);
+}
+
+.nicole-back-stamp .back-author {
+  font-family: 'Caveat', 'Patrick Hand', cursive;
+  font-size: 1.15rem;
+  color: var(--nicole-ink);
+}
+
+/* Washi Tape Accents */
+.nicole-washi-tape {
+  position: absolute;
+  z-index: 20;
+  height: 24px;
+  width: 95px;
+  background-color: #8EAF92;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.35) 0 6px, transparent 6px 12px),
+    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.35) 0 6px, transparent 6px 12px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+  opacity: 0.94;
+}
+
+.washi-top-left {
+  top: -6px;
+  left: 24px;
+  transform: rotate(-5deg);
+}
+
+.washi-top-right {
+  top: -6px;
+  right: 24px;
+  transform: rotate(4deg);
+}
+
+.washi-bottom-left {
+  bottom: 12px;
+  left: 20px;
+  transform: rotate(3deg);
+}
+
+.washi-bottom-right {
+  bottom: 12px;
+  right: 20px;
+  transform: rotate(-4deg);
+}
+
+.nicole-washi-strip {
+  align-self: flex-start;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  padding: 4px 14px;
+  border-radius: 2px;
+  margin-bottom: 6px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.08);
+  text-transform: uppercase;
+}
+
+.washi-matcha {
+  background: var(--nicole-matcha-light);
+  color: var(--nicole-matcha-dark);
+  transform: rotate(-1deg);
+}
+
+.washi-cream {
+  background: var(--nicole-cream-warm);
+  color: var(--nicole-matcha-dark);
+  border: 1px dashed var(--nicole-matcha-light);
+  transform: rotate(0.8deg);
+}
+
+/* Page Header Structure */
+.nicole-page-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  border-bottom: 2px solid var(--nicole-matcha-light);
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+}
+
+.nicole-page-num {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--nicole-matcha);
+  letter-spacing: 1px;
+}
+
+.nicole-section-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+/* Brass Paperclip Effect */
+.nicole-brass-clip {
+  position: absolute;
+  top: -12px;
+  right: 18px;
+  width: 14px;
+  height: 38px;
+  border: 2.8px solid var(--nicole-gold);
+  border-radius: 7px 7px 0 0;
+  border-bottom: none;
+  background: transparent;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+  z-index: 25;
+  pointer-events: none;
+}
+
+.nicole-brass-clip::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 2px;
+  width: 6px;
+  height: 24px;
+  border: 2.4px solid var(--nicole-gold-dark);
+  border-radius: 4px 4px 0 0;
+  border-bottom: none;
+}
+
+/* ==========================================================================
+   STA. JOHN GI ACADEMY — INSTITUTIONAL SCHOOL NOTEBOOK COVER
+   ========================================================================== */
+
+.nicole-school-cover {
+  background-color: #FAF9F5 !important;
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px) !important;
+  background-size: 20px 20px !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  height: 100%;
+}
+
+.school-spine-band {
+  width: 38px;
+  flex-shrink: 0;
+  background: linear-gradient(to right, #134720 0%, #1E6532 25%, #2A8C46 55%, #1B5E20 100%);
+  border-right: 2px solid #0F3818;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 10px 0;
+  box-shadow: inset -4px 0 8px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+}
+
+.school-spine-stitch {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 8px;
+  width: 0;
+  border-right: 1.8px dashed rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+}
+
+.school-spine-eyelet {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #FAF7EF 30%, #B88E36 75%, #0F3818 100%);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6), 0 1px 1px rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.school-cover-face,
+.school-cover-body {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 24px 20px 24px;
+  justify-content: space-between;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.school-cover-header,
+.school-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.school-emblem-badge,
+.school-crest-wrap {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.school-seal-svg,
+.school-crest-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+}
+
+.school-title-text-wrap {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.school-institution-name {
+  font-family: 'Lilita One', 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.6px;
+  color: #1E6532;
+  margin: 0;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.school-institution-sub {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  color: #2E7D32;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+
+.school-portrait-centerpiece {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 6px 0;
+  flex-shrink: 0;
+}
+
+.school-portrait-frame {
+  width: 180px;
+  height: 210px;
+  border: 2px solid #1E6532;
+  padding: 3px;
+  background: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(30, 101, 50, 0.15);
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+.school-portrait-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.school-notebook-form {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 4px 0 2px 0;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.school-form-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+}
+
+.school-field-label {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1E6532;
+  letter-spacing: 0.8px;
+  flex-shrink: 0;
+  width: 95px;
+}
+
+.school-field-line {
+  flex-grow: 1;
+  border-bottom: 1.6px solid #1E6532;
+  padding-bottom: 2px;
+  display: flex;
+  align-items: baseline;
+}
+
+.student-handwriting {
+  font-family: 'Patrick Hand', 'Caveat', cursive;
+  font-size: 1.25rem;
+  color: #174092;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  transform: translateY(-2px);
+  display: inline-block;
+}
+
+/* ==========================================================================
+   SPREAD 1: STUDENT PROFILE & MEET NICOLE
+   Left: Inside Cover Dossier | Right: Editorial Introduction
+   ========================================================================== */
+
+.nicole-dossier-card {
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 14px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.06), 0 4px 10px rgba(27, 41, 29, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dossier-photo-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.nicole-mini-polaroid {
+  position: relative;
+  background: #FFFDF7;
+  padding: 6px 6px 8px 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transform: rotate(-2deg);
+  border-radius: 2px;
+  text-align: center;
+}
+
+.nicole-mini-polaroid img {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 2px;
+  object-fit: cover;
+  object-position: center 38%;
+  display: block;
+}
+
+.nicole-mini-polaroid .mini-caption {
+  font-family: 'Caveat', cursive;
+  font-size: 0.92rem;
+  color: var(--nicole-ink);
+  display: block;
+  margin-top: 3px;
+  font-weight: 600;
+}
+
+.dossier-id-badge {
+  background: var(--nicole-cream-warm);
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.id-badge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1.5px solid var(--nicole-matcha-light);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+
+.id-badge-title {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--nicole-matcha-dark);
+}
+
+.id-badge-code {
+  font-family: 'Cascadia Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--nicole-matcha);
+}
+
+.id-badge-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.id-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.7rem;
+}
+
+.id-label {
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  font-size: 0.64rem;
+}
+
+.id-value {
+  font-weight: 600;
+  color: var(--nicole-ink);
+}
+
+.dossier-seal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed var(--nicole-matcha-light);
+  padding-top: 8px;
+}
+
+.dossier-seal-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.64rem;
+  font-weight: 800;
+  color: #1E6532;
+  letter-spacing: 0.5px;
+}
+
+.dossier-seal-icon {
+  width: 16px;
+  height: 16px;
+  color: #1E6532;
+}
+
+.dossier-stamp-date {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--nicole-terracotta);
+  border: 1.5px dashed var(--nicole-terracotta);
+  padding: 2px 6px;
+  border-radius: 3px;
+  transform: rotate(-3deg);
+}
+
+/* Right Page: Editorial Introduction */
+.nicole-meet-editorial {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nicole-intro-note {
+  background: #FFFDF7;
+  border-left: 3.5px solid var(--nicole-matcha);
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--nicole-ink);
+  border-radius: 0 6px 6px 0;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+}
+
+.nicole-intro-note p {
+  margin: 0 0 8px 0;
+}
+
+.nicole-intro-note p:last-child {
+  margin-bottom: 0;
+}
+
+.nicole-highlight-card {
+  background: var(--nicole-matcha-soft);
+  border: 1px dashed var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+
+.highlight-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: var(--nicole-matcha-dark);
+  margin-bottom: 4px;
+}
+
+.nicole-highlight-card p {
+  font-family: 'Caveat', cursive;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  color: var(--nicole-ink);
+  margin: 0;
+}
+
+.nicole-sticky-objective {
+  position: relative;
+  background: #FEF3C7;
+  border-radius: 4px;
+  padding: 12px 14px;
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.09);
+  transform: rotate(0.8deg);
+  color: #451A03;
+}
+
+.sticky-pushpin {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  background: var(--nicole-terracotta);
+  border: 2px solid #7F1D1D;
+  border-radius: 50%;
+  box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.25);
+}
+
+.sticky-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #92400E;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.objective-text {
+  font-family: 'Patrick Hand', 'Caveat', cursive;
+  font-size: 0.98rem;
+  line-height: 1.35;
+  margin: 0;
+  color: #451A03;
+}
+
+/* ==========================================================================
+   SPREAD 2: CREATIVE ARSENAL & ENGINEERING
+   Left: Visual Craft & Systems | Right: Engineering & Skills
+   ========================================================================== */
+
+.nicole-tools-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tool-card {
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.tool-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--nicole-matcha);
+}
+
+.tool-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.tool-logo-box {
+  width: 34px;
+  height: 34px;
+  background: #FAF9F5;
+  border: 1.5px solid rgba(79, 109, 84, 0.2);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.tool-title-wrap h3 {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  margin: 0;
+}
+
+.tool-role {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--nicole-ink-muted);
+}
+
+.tool-desc {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--nicole-ink-muted);
+  margin: 0;
+}
+
+/* Right Page: Engineering & Skills */
+.nicole-engineering-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.nicole-eng-card {
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+}
+
+.eng-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.eng-icon-box {
+  color: var(--nicole-matcha);
+  display: flex;
+  align-items: center;
+}
+
+.eng-card-header h3 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  margin: 0;
+}
+
+.software-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.pill {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--nicole-matcha-soft);
+  color: var(--nicole-matcha-dark);
+  border: 1px solid var(--nicole-matcha-light);
+}
+
+.eng-desc {
+  font-size: 0.71rem;
+  line-height: 1.4;
+  color: var(--nicole-ink-muted);
+  margin: 0;
+}
+
+.nicole-skill-meters {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+}
+
+.nicole-meter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meter-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.72rem;
+}
+
+.meter-name {
+  font-weight: 700;
+  color: var(--nicole-ink);
+}
+
+.meter-funny {
+  font-family: 'Caveat', cursive;
+  font-size: 0.88rem;
+  color: var(--nicole-matcha);
+}
+
+.meter-percent {
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+}
+
+.meter-track {
+  width: 100%;
+  height: 6px;
+  background: var(--nicole-matcha-soft);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  background: var(--nicole-matcha);
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   SPREAD 3: ANALOG RITUALS & SENSORY SCIENCE
+   Left: Stationery & Fine Nibs | Right: Skincare & Fragrance
+   ========================================================================== */
+
+.stationery-feature-card {
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+}
+
+.stationery-lead p {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--nicole-ink);
+  margin: 0;
+}
+
+.nib-diagram-box {
+  background: var(--nicole-cream-warm);
+  border: 1px dashed var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.nib-diagram-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.nib-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--nicole-matcha-soft);
+  color: var(--nicole-matcha);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nib-diagram-header h4 {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  margin: 0;
+}
+
+.nib-sub {
+  font-size: 0.65rem;
+  color: var(--nicole-ink-muted);
+}
+
+.nib-spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.nib-spec-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.spec-label {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: var(--nicole-matcha);
+  letter-spacing: 0.5px;
+}
+
+.spec-val {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--nicole-ink);
+}
+
+.stationery-quote-tape {
+  background: #FFF8E7;
+  border-left: 3px solid var(--nicole-gold);
+  padding: 8px 12px;
+  border-radius: 0 4px 4px 0;
+}
+
+.stationery-quote-tape p {
+  font-family: 'Caveat', cursive;
+  font-size: 1.05rem;
+  color: var(--nicole-ink);
+  margin: 0;
+}
+
+/* Right Page: Skincare & Fragrance */
+.sensory-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sensory-card {
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+}
+
+.sensory-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.sensory-icon-box {
+  color: var(--nicole-matcha);
+  display: flex;
+  align-items: center;
+}
+
+.sensory-card-header h3 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  margin: 0;
+}
+
+.sensory-sub {
+  font-size: 0.65rem;
+  color: var(--nicole-ink-muted);
+}
+
+.sensory-desc {
+  font-size: 0.73rem;
+  line-height: 1.45;
+  color: var(--nicole-ink-muted);
+  margin: 0 0 8px 0;
+}
+
+.sensory-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tag-pill {
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: var(--nicole-matcha-soft);
+  color: var(--nicole-matcha-dark);
+  border: 1px solid var(--nicole-matcha-light);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.olfactory-pyramid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--nicole-cream-warm);
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+
+.pyr-tier {
+  display: flex;
+  gap: 8px;
+  font-size: 0.7rem;
+}
+
+.tier-label {
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  width: 44px;
+  flex-shrink: 0;
+}
+
+.tier-notes {
+  color: var(--nicole-ink);
+}
+
+/* ==========================================================================
+   SPREAD 4: EMPATHY IN CODE & HEALTHCARE TECH
+   Left: Human-Centered Design | Right: Healthcare Mission
+   ========================================================================== */
+
+.clinical-pillars-card {
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+}
+
+.clinical-lead {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--nicole-ink);
+  margin: 0;
+}
+
+.pillars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pillar-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.pillar-bullet {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--nicole-matcha);
+  color: #FFFDF7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.pillar-row h4 {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  margin: 0 0 2px 0;
+}
+
+.pillar-row p {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--nicole-ink-muted);
+  margin: 0;
+}
+
+/* Right Page: Healthcare × Tech */
+.nicole-vision-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vision-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #FFFDF7;
+  border: 2px solid var(--nicole-matcha);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+}
+
+.vision-icon-duo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.med-svg,
+.tech-svg {
+  color: var(--nicole-matcha);
+}
+
+.bridge-plus {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--nicole-terracotta);
+}
+
+.vision-headline h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  margin: 0 0 2px 0;
+}
+
+.vision-headline p {
+  font-size: 0.78rem;
+  color: var(--nicole-ink-muted);
+  margin: 0;
+}
+
+.vision-col {
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+}
+
+.col-ribbon {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--nicole-matcha-dark);
+  background: var(--nicole-matcha-soft);
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 2px;
+  margin-bottom: 6px;
+}
+
+.vision-col h4 {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--nicole-ink);
+  margin: 0 0 4px 0;
+}
+
+.vision-col p {
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--nicole-ink-muted);
+  margin: 0;
+}
+
+.vision-quote-card {
+  background: var(--nicole-cream-warm);
+  border-left: 3px solid var(--nicole-terracotta);
+  border-radius: 0 6px 6px 0;
+  padding: 8px 14px;
+}
+
+.vision-quote-card p {
+  font-family: 'Caveat', cursive;
+  font-size: 1.05rem;
+  color: var(--nicole-ink);
+  margin: 0;
+}
+
+/* ==========================================================================
+   SPREAD 5: MANIFESTO & INTERACTIVE INK STUDIO
+   Left: The Perfectionist Manifesto | Right: Ink Swatch Tester
+   ========================================================================== */
+
+.manifesto-card {
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+}
+
+.manifesto-quote-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--nicole-gold-dark);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.manifesto-pullquote {
+  font-family: 'Lilita One', 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.18rem;
+  line-height: 1.35;
+  color: var(--nicole-matcha-dark);
+  margin: 0;
+  padding-left: 12px;
+  border-left: 3.5px solid var(--nicole-gold);
+}
+
+.manifesto-body {
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--nicole-ink-muted);
+  margin: 0;
+}
+
+.manifesto-seal {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.seal-ring {
+  border: 1.8px dashed var(--nicole-gold);
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--nicole-gold-dark);
+  transform: rotate(-2deg);
+}
+
+/* ==========================================================================
+   SPREAD 5: PROJECT OVERVIEW & ACADEMIC PROJECTS
+   Left: System Overview Card | Right: Project Cards Stack
+   ========================================================================== */
+
+/* Left Page: Overview Card */
+.project-overview-card {
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.overview-lead-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.overview-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--nicole-cream-warm);
+  border: 1.5px solid var(--nicole-matcha);
+  color: var(--nicole-matcha-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.overview-lead-box h4 {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.overview-sub {
+  font-size: 0.65rem;
+  color: var(--nicole-ink-muted);
+}
+
+.overview-intro {
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--nicole-ink);
+  margin: 0;
+}
+
+.overview-pillar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.pillar-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--nicole-cream-bg);
+  border: 1px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.pillar-bullet {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  background: var(--nicole-cream-warm);
+  border: 1px solid var(--nicole-matcha-light);
+  border-radius: 4px;
+  padding: 1px 5px;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.pillar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pillar-content strong {
+  font-size: 0.72rem;
+  color: var(--nicole-matcha-dark);
+}
+
+.pillar-content span {
+  font-size: 0.65rem;
+  color: var(--nicole-ink-muted);
+  line-height: 1.35;
+}
+
+.overview-stamp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px dashed var(--nicole-matcha-light);
+}
+
+.overview-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #1E6532;
+  border: 1.5px solid #1E6532;
+  border-radius: 4px;
+  padding: 2px 8px;
+  background: rgba(30, 101, 50, 0.04);
+}
+
+.overview-term-stamp {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: var(--nicole-ink-muted);
+}
+
+/* Right Page: Project Cards Stack */
+.nicole-projects-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+.nicole-project-card {
+  background: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nicole-project-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--nicole-matcha);
+  box-shadow: 0 3px 8px rgba(27, 41, 29, 0.08);
+}
+
+.project-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.project-card-badge {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: var(--nicole-matcha-dark);
+  background: var(--nicole-cream-warm);
+  border: 1px solid var(--nicole-matcha-light);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.project-card-year {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--nicole-ink-muted);
+}
+
+.project-card-title {
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.project-card-subtitle {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #436548;
+  line-height: 1.3;
+}
+
+.project-card-desc {
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: var(--nicole-ink);
+  margin: 2px 0 3px 0;
+}
+
+.project-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.project-tag {
+  font-size: 0.58rem;
+  font-weight: 700;
+  background: var(--nicole-cream-bg);
+  border: 1px solid var(--nicole-matcha-light);
+  color: var(--nicole-matcha-dark);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   SPREAD 6: MEMORANDUM & LETTERHEAD CONTACT
+   Left: Official Academy Memo | Right: Letterhead & Copy Contact
+   ========================================================================== */
+
+.academy-memo-card {
+  background: #FFFDF7;
+  border: 2px solid var(--nicole-matcha);
+  border-radius: 6px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+}
+
+.memo-header-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.72rem;
+}
+
+.memo-row {
+  display: flex;
+  gap: 8px;
+}
+
+.memo-label {
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  width: 75px;
+  flex-shrink: 0;
+  font-size: 0.65rem;
+}
+
+.memo-val {
+  font-weight: 600;
+  color: var(--nicole-ink);
+  font-size: 0.7rem;
+}
+
+.memo-divider {
+  height: 2px;
+  background: repeating-linear-gradient(to right, var(--nicole-matcha-light) 0 8px, transparent 8px 12px);
+  margin: 2px 0;
+}
+
+.memo-body {
+  font-size: 0.74rem;
+  line-height: 1.45;
+  color: var(--nicole-ink);
+  margin: 0;
+}
+
+.memo-sign-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--nicole-matcha-light);
+}
+
+.student-handwriting-sig {
+  font-family: 'Patrick Hand', 'Caveat', cursive;
+  font-size: 1.3rem;
+  color: #174092;
+  display: block;
+  line-height: 1;
+}
+
+.sign-caption {
+  font-size: 0.62rem;
+  color: var(--nicole-ink-muted);
+}
+
+.memo-verified-stamp {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #1E6532;
+  border: 1.5px solid #1E6532;
+  padding: 2px 8px;
+  border-radius: 3px;
+  transform: rotate(2deg);
+}
+
+/* Right Page: Letterhead & Contact */
+.nicole-letterhead-card {
+  background: #FFFDF7;
+  border: 2px solid var(--nicole-matcha);
+  border-radius: 8px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(27, 41, 29, 0.05);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.letterhead-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.letterhead-brand h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: var(--nicole-matcha-dark);
+  margin: 0;
+}
+
+.letterhead-sub {
+  font-size: 0.65rem;
+  color: var(--nicole-ink-muted);
+}
+
+.letterhead-seal {
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 3px 6px;
+  border: 1.5px solid var(--nicole-gold);
+  border-radius: 50px;
+  color: var(--nicole-gold-dark);
+}
+
+.letterhead-divider {
+  height: 2px;
+  background: repeating-linear-gradient(to right, var(--nicole-matcha-light) 0 8px, transparent 8px 12px);
+  margin: 10px 0 12px 0;
+}
+
+.letterhead-body {
+  flex-grow: 1;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--nicole-ink);
+}
+
+.letterhead-body p {
+  margin: 0 0 8px 0;
+}
+
+.email-action-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--nicole-cream-warm);
+  border: 1.5px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 12px 0;
+}
+
+.email-svg-icon {
+  color: var(--nicole-matcha);
+  flex-shrink: 0;
+}
+
+.email-address {
+  font-family: 'Cascadia Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--nicole-ink);
+  flex-grow: 1;
+}
+
+.nicole-copy-email-btn {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 8px 14px;
+  min-height: 44px;
+  border-radius: 4px;
+  background: var(--nicole-matcha);
+  color: #FFFDF7;
+  border: 1.5px solid var(--nicole-matcha-dark);
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.nicole-copy-email-btn:hover {
+  transform: scale(1.04);
+  background: var(--nicole-matcha-dark);
+}
+
+.letterhead-desk-prompt {
+  text-align: center;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--nicole-matcha-light);
+}
+
+.letterhead-desk-prompt p {
+  font-size: 0.72rem;
+  color: var(--nicole-ink-muted);
+  margin: 0 0 8px 0;
+}
+
+.nicole-guestbook-btn {
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 8px 18px;
+  min-height: 44px;
+  border-radius: 5px;
+  background: var(--nicole-terracotta);
+  color: #FFFDF7;
+  border: 2px solid #7F1D1D;
+  box-shadow: 2px 2px 0 #7F1D1D;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.nicole-guestbook-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 #7F1D1D;
+}
+
+/* ==========================================================================
+   SPREAD 7 / INSIDE BACK COVER & BACK COVER
+   ========================================================================== */
+
+.nicole-endpaper-page {
+  background: var(--nicole-cream-warm) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.academy-circulation-pocket {
+  width: 100%;
+  background: #FFFDF7;
+  border: 2px solid var(--nicole-matcha-light);
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.pocket-top-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+  letter-spacing: 1.5px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.pocket-card {
+  background: var(--nicole-cream-bg);
+  border: 1px dashed var(--nicole-matcha-light);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.pocket-card-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--nicole-matcha-dark);
+  border-bottom: 1.5px solid var(--nicole-matcha-light);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.pocket-card-meta {
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--nicole-ink);
+  margin-bottom: 10px;
+}
+
+.pocket-table {
+  border-top: 1px dashed var(--nicole-matcha-light);
+  padding-top: 8px;
+}
+
+.pocket-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  padding: 3px 0;
+}
+
+.pocket-head {
+  font-weight: 800;
+  color: var(--nicole-matcha-dark);
+}
+
+.stamp-approved {
+  color: #1E6532;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.stamp-truthers {
+  color: var(--nicole-terracotta);
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+/* Back Cover */
+.nicole-back-cover {
+  background-color: var(--nicole-matcha) !important;
+  color: #FFFDF7 !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px 24px;
+}
+
+.back-cover-emblem {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--nicole-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--nicole-gold);
+  margin-bottom: 12px;
+}
+
+.back-cover-title {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 2px;
+  color: #FFFDF7;
+  margin: 0 0 4px 0;
+}
+
+.back-cover-subtitle {
+  font-size: 0.78rem;
+  color: var(--nicole-matcha-light);
+  margin-bottom: 20px;
+}
+
+.nicole-credits-card {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  padding: 14px 18px;
+  max-width: 80%;
+  margin-bottom: 18px;
+}
+
+.nicole-credits-card h4 {
+  font-size: 0.88rem;
+  font-weight: 800;
+  margin: 0 0 4px 0;
+  color: #FFFDF7;
+}
+
+.nicole-credits-card p {
+  font-size: 0.72rem;
+  margin: 0 0 4px 0;
+  opacity: 0.9;
+}
+
+.nicole-credits-card .craft-note {
+  font-family: 'Caveat', cursive;
+  font-size: 0.95rem;
+  color: #FFFDF7;
+  margin-top: 6px;
+}
+
+.back-cover-motto {
+  font-family: 'Caveat', cursive;
+  font-size: 1.15rem;
+  color: var(--nicole-matcha-light);
+}
+
+/* Accessible Focus Outlines */
+.ink-bottle:focus-visible,
+.nicole-copy-email-btn:focus-visible,
+.nicole-guestbook-btn:focus-visible,
+.software-logo-badge:focus-visible {
+  outline: 2.5px solid #1E6532 !important;
+  outline-offset: 2px !important;
+}

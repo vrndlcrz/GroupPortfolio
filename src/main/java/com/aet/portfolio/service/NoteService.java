@@ -1,6 +1,7 @@
 package com.aet.portfolio.service;
 
 import com.aet.portfolio.model.Note;
+import com.aet.portfolio.storage.JsonFileStore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -21,20 +22,22 @@ public class NoteService {
     private static final Logger logger = LoggerFactory.getLogger(NoteService.class);
     private static final String NOTES_FILE = "notes.json";
     private final ObjectMapper objectMapper;
+    private final JsonFileStore store;
     private final Object fileLock = new Object();
     private final List<Note> notesCache = new ArrayList<>();
 
-    public NoteService(ObjectMapper objectMapper) {
+    public NoteService(ObjectMapper objectMapper, JsonFileStore store) {
         this.objectMapper = objectMapper;
+        this.store = store;
     }
 
     @PostConstruct
     public void init() {
         synchronized (fileLock) {
-            File file = new File(NOTES_FILE);
+            File file = store.file(NOTES_FILE).toFile();
             if (!file.exists()) {
                 try {
-                    objectMapper.writeValue(file, new ArrayList<Note>());
+                    store.write(NOTES_FILE, new ArrayList<Note>());
                     logger.info("Initialized empty notes.json at {}", file.getAbsolutePath());
                 } catch (IOException e) {
                     logger.error("Could not create notes.json", e);
@@ -100,10 +103,11 @@ public class NoteService {
         );
 
         synchronized (fileLock) {
-            notesCache.add(note);
             try {
-                File file = new File(NOTES_FILE);
-                objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, notesCache);
+                List<Note> updated = new ArrayList<>(notesCache);
+                updated.add(note);
+                store.write(NOTES_FILE, updated);
+                notesCache.add(note);
             } catch (IOException e) {
                 logger.error("Failed to persist note to notes.json", e);
                 throw new RuntimeException("Could not persist note", e);

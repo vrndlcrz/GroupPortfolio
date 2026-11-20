@@ -1,6 +1,7 @@
 package com.aet.portfolio.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.aet.portfolio.storage.JsonFileStore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -18,20 +19,22 @@ public class CounterService {
     private static final Logger logger = LoggerFactory.getLogger(CounterService.class);
     private static final String COUNTER_FILE = "counter.json";
     private final ObjectMapper objectMapper;
+    private final JsonFileStore store;
     private final Object fileLock = new Object();
     private int count = 0;
 
-    public CounterService(ObjectMapper objectMapper) {
+    public CounterService(ObjectMapper objectMapper, JsonFileStore store) {
         this.objectMapper = objectMapper;
+        this.store = store;
     }
 
     @PostConstruct
     public void init() {
         synchronized (fileLock) {
-            File file = new File(COUNTER_FILE);
+            File file = store.file(COUNTER_FILE).toFile();
             if (!file.exists()) {
                 count = 0;
-                persistCount();
+                persistCount(0);
                 logger.info("Initialized counter.json with count=0 at {}", file.getAbsolutePath());
             } else {
                 try {
@@ -56,20 +59,21 @@ public class CounterService {
 
     public int incrementAndGet() {
         synchronized (fileLock) {
-            count++;
-            persistCount();
+            int nextCount = Math.addExact(count, 1);
+            persistCount(nextCount);
+            count = nextCount;
             return count;
         }
     }
 
-    private void persistCount() {
+    private void persistCount(int value) {
         try {
-            File file = new File(COUNTER_FILE);
             Map<String, Object> data = new HashMap<>();
-            data.put("count", count);
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+            data.put("count", value);
+            store.write(COUNTER_FILE, data);
         } catch (IOException e) {
             logger.error("Failed to write to counter.json", e);
+            throw new IllegalStateException("Could not persist visitor count", e);
         }
     }
 

@@ -18,7 +18,7 @@ function setup({status=200,rejectPlay=false,pending=false,source}={}) {
     fetch:(url,options)=>{requests.push({url,options});return pending?new Promise(r=>finishHead=r):Promise.resolve({ok:status<400,status,headers:new Map()});},
     gsap:{killTweensOf(){},to:(target,options)=>{tweens.push(options);return {};}}};
   context.window=context;vm.createContext(context);
-  vm.runInContext(fs.readFileSync('src/main/resources/static/js/themesong.js','utf8')+'\nglobalThis.Song=ThemeSong;',context);
+  vm.runInContext(fs.readFileSync('src/main/resources/static/js/portfolio/themesong.js','utf8')+'\nglobalThis.Song=ThemeSong;',context);
   const song=new context.Song(button,credit,source);
   return {song,button,credit,context,instances,tweens,storage,requests,finishHead:()=>finishHead({ok:true,status:200,headers:new Map()})};
 }

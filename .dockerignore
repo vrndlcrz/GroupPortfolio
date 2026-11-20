@@ -8,3 +8,7 @@ mvnw.cmd
 .idea/
 .vscode/
 *.log
+GroupPortfolio/
+var/
+docs/
+scripts/
