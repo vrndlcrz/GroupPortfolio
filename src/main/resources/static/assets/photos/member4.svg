@@ -1,20 +1,100 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
   <defs>
-    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#059669" />
-      <stop offset="100%" stop-color="#047857" />
+    <radialGradient id="matchaBg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#E8EFE9" />
+      <stop offset="65%" stop-color="#C5D7C7" />
+      <stop offset="100%" stop-color="#9EBAA1" />
+    </radialGradient>
+    <linearGradient id="warmHair" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D211C" />
+      <stop offset="100%" stop-color="#1A1310" />
     </linearGradient>
+    <linearGradient id="matchaKnit" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#55755A" />
+      <stop offset="100%" stop-color="#3C5441" />
+    </linearGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#243326" flood-opacity="0.15" />
+    </filter>
   </defs>
-  <circle cx="100" cy="100" r="100" fill="url(#grad4)" />
-  <circle cx="100" cy="78" r="38" fill="#ECFDF5" />
-  <path d="M48 175 C55 130 145 130 152 175 Z" fill="#064E3B" />
-  <!-- Stylish hair + glasses -->
-  <path d="M62 70 Q100 40 138 70 Q100 50 62 70 Z" fill="#064E3B" />
-  <circle cx="86" cy="76" r="8" fill="none" stroke="#064E3B" stroke-width="2.5" />
-  <circle cx="114" cy="76" r="8" fill="none" stroke="#064E3B" stroke-width="2.5" />
-  <line x1="94" y1="76" x2="106" y2="76" stroke="#064E3B" stroke-width="2.5" />
-  <circle cx="86" cy="76" r="3" fill="#064E3B" />
-  <circle cx="114" cy="76" r="3" fill="#064E3B" />
-  <path d="M92 95 Q100 101 108 95" fill="none" stroke="#064E3B" stroke-width="3" stroke-linecap="round" />
-  <text x="100" y="192" font-family="sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">MEMBER 4</text>
+
+  <!-- Circular Base with Matcha Halo -->
+  <circle cx="120" cy="120" r="114" fill="#FBF8F1" stroke="#4F6D54" stroke-width="4" />
+  <circle cx="120" cy="120" r="106" fill="url(#matchaBg)" />
+
+  <!-- Botanical Leaf Accent at Top Left -->
+  <path d="M42 62 Q36 44 54 48 Q44 60 42 62 Z" fill="#4F6D54" opacity="0.85" />
+  <path d="M52 50 Q66 40 68 56 Q56 56 52 50 Z" fill="#6B8E71" opacity="0.85" />
+  <circle cx="38" cy="46" r="3" fill="#CBB26B" />
+
+  <!-- Soft Shadows -->
+  <ellipse cx="120" cy="208" rx="64" ry="12" fill="#243326" opacity="0.12" />
+
+  <!-- Cozy Knit Matcha Sweater -->
+  <path d="M68 214 C74 165 166 165 172 214 Z" fill="url(#matchaKnit)" />
+  <!-- Cream Scarf / Collar -->
+  <path d="M100 162 C108 174 132 174 140 162 C146 172 134 186 120 186 C106 186 94 172 100 162 Z" fill="#FFFDF7" stroke="#3C5441" stroke-width="1.5" />
+
+  <!-- Neck -->
+  <path d="M110 142 L130 142 L130 164 L110 164 Z" fill="#F8DFC8" />
+  <ellipse cx="120" cy="160" rx="10" ry="4" fill="#E8C3AA" opacity="0.4" />
+
+  <!-- Back Hair -->
+  <path d="M72 110 C62 145 68 185 80 200 C86 200 90 190 88 170 C88 140 92 115 92 110 Z" fill="url(#warmHair)" />
+  <path d="M168 110 C178 145 172 185 160 200 C154 200 150 190 152 170 C152 140 148 115 148 110 Z" fill="url(#warmHair)" />
+
+  <!-- Face -->
+  <ellipse cx="120" cy="116" rx="36" ry="42" fill="#FDEFE2" />
+
+  <!-- Cheeks Blush -->
+  <circle cx="98" cy="126" r="8" fill="#F5A396" opacity="0.45" />
+  <circle cx="142" cy="126" r="8" fill="#F5A396" opacity="0.45" />
+
+  <!-- Eyes -->
+  <ellipse cx="104" cy="114" rx="4" ry="5.5" fill="#241B16" />
+  <ellipse cx="136" cy="114" rx="4" ry="5.5" fill="#241B16" />
+  <!-- Eye Sparkles -->
+  <circle cx="102.5" cy="112" r="1.6" fill="#FFFFFF" />
+  <circle cx="134.5" cy="112" r="1.6" fill="#FFFFFF" />
+
+  <!-- Eyebrows -->
+  <path d="M96 103 Q105 101 113 104" fill="none" stroke="#241B16" stroke-width="2" stroke-linecap="round" />
+  <path d="M127 104 Q135 101 144 103" fill="none" stroke="#241B16" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Nose -->
+  <path d="M119 119 Q122 124 118 125" fill="none" stroke="#DCAE96" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Warm Smile -->
+  <path d="M113 133 Q120 139 127 133" fill="none" stroke="#B85950" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Aesthetic Glasses (Gold / Tortoiseshell Frame) -->
+  <!-- Left Rim -->
+  <circle cx="104" cy="115" r="15" fill="none" stroke="#CBB26B" stroke-width="2.4" filter="url(#softGlow)" />
+  <circle cx="104" cy="115" r="14.2" fill="#FFFFFF" opacity="0.12" />
+  <!-- Right Rim -->
+  <circle cx="136" cy="115" r="15" fill="none" stroke="#CBB26B" stroke-width="2.4" filter="url(#softGlow)" />
+  <circle cx="136" cy="115" r="14.2" fill="#FFFFFF" opacity="0.12" />
+  <!-- Bridge -->
+  <path d="M119 113 Q120 110 121 113" fill="none" stroke="#CBB26B" stroke-width="2.4" stroke-linecap="round" />
+  <!-- Temples -->
+  <path d="M89 114 L78 111" fill="none" stroke="#CBB26B" stroke-width="2" stroke-linecap="round" />
+  <path d="M151 114 L162 111" fill="none" stroke="#CBB26B" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Front Hair & Bangs -->
+  <path d="M84 105 C80 82 96 68 120 68 C144 68 160 82 156 105 C152 90 144 80 120 80 C96 80 88 90 84 105 Z" fill="url(#warmHair)" />
+  <!-- Soft side-swept bangs -->
+  <path d="M90 88 Q110 82 124 94 Q116 84 102 82 Z" fill="url(#warmHair)" />
+  <path d="M150 88 Q130 82 118 94 Q124 84 138 82 Z" fill="url(#warmHair)" />
+  <!-- Side strands framing face -->
+  <path d="M82 105 C80 124 84 148 90 156 C86 142 84 120 86 105 Z" fill="url(#warmHair)" />
+  <path d="M158 105 C160 124 156 148 150 156 C154 142 156 120 154 105 Z" fill="url(#warmHair)" />
+
+  <!-- Cute Gold Hairclip on Left -->
+  <rect x="76" y="92" width="14" height="4" rx="2" fill="#CBB26B" transform="rotate(-18 76 92)" />
+
+  <!-- Aesthetic Stationery Badge at Bottom -->
+  <g transform="translate(48, 202)">
+    <rect x="0" y="0" width="144" height="24" rx="12" fill="#4F6D54" />
+    <text x="72" y="16" font-family="'Plus Jakarta Sans', sans-serif" font-size="10.5" font-weight="700" fill="#FFFDF7" text-anchor="middle" letter-spacing="1.2">NICOLE LEIGH</text>
+  </g>
 </svg>

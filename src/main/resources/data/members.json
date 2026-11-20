@@ -17,31 +17,31 @@
     "pages": [
       {
         "title": "About Me",
-        "content": "Nickname: RJ\nAge: 17 😛\nObjective in Life: Makita si Zhang Linghe\nFavorite hobby: Watch Chinese dramas",
+        "content": "Nickname: RJ\nAge: 17 \ud83d\ude1b\nObjective in Life: Makita si Zhang Linghe\nFavorite hobby: Watch Chinese dramas",
         "border": "wavy-pink.svg"
       },
       {
         "title": "Some interests I can think of",
-        "content": "• Baking!\n• Reading manhwas/mangas\n• Tingnan si Zhang Linghe hehehe\n• Photography!",
+        "content": "\u2022 Baking!\n\u2022 Reading manhwas/mangas\n\u2022 Tingnan si Zhang Linghe hehehe\n\u2022 Photography!",
         "border": "blobs-orange.svg"
       },
       {
-        "title": "If I were…",
-        "content": "If I were not in IT rn….\nI’d probably be studying a health-allied field.\n\nIf I were not being practical..\nI would’ve loved to pursue film : ))\n\nIf I were not born in the Philippines….\nI would’ve been happy charot",
+        "title": "If I were\u2026",
+        "content": "If I were not in IT rn\u2026.\nI\u2019d probably be studying a health-allied field.\n\nIf I were not being practical..\nI would\u2019ve loved to pursue film : ))\n\nIf I were not born in the Philippines\u2026.\nI would\u2019ve been happy charot",
         "border": "vines-flowers.svg"
       },
       {
         "title": "What I learned",
-        "content": "Favorite lessons that Sir Sean taught\nThe foundation of course, and I really enjoyed doing the activities he prepared\n\nSkills I got since 1st year:\n• Social skills + networking\n• Slight programming skills\n• Time management",
+        "content": "Favorite lessons that Sir Sean taught\nThe foundation of course, and I really enjoyed doing the activities he prepared\n\nSkills I got since 1st year:\n\u2022 Social skills + networking\n\u2022 Slight programming skills\n\u2022 Time management",
         "border": "dripping-paint.svg"
       },
       {
         "title": "Projects",
-        "content": "Academic-Based:\n• HealthWatch\n• Brgy Management System\n• PLM UHS Appointment System\n\nPersonal\n• MedFund",
+        "content": "Academic-Based:\n\u2022 HealthWatch\n\u2022 Brgy Management System\n\u2022 PLM UHS Appointment System\n\nPersonal\n\u2022 MedFund",
         "border": "bows-stars.svg"
       },
       {
-        "title": "Dream…",
+        "title": "Dream\u2026",
         "content": "Destination: Switzerland!\nCountry to Live in: England\nCareer: Program Manager\n\nTop Music Right now\nWaiian - WEYAAT (Mingyu-inspired)",
         "border": "dotted-frame.svg"
       },
@@ -90,7 +90,7 @@
     "pages": [
       {
         "title": "Profile",
-        "content": "• Name: John Vernie Dela Cruz\n• Section: BSIT 3-1\n• Application and Emerging Technologies",
+        "content": "\u2022 Name: John Vernie Dela Cruz\n\u2022 Section: BSIT 3-1\n\u2022 Application and Emerging Technologies",
         "border": "wavy-pink.svg"
       },
       {
@@ -100,17 +100,17 @@
       },
       {
         "title": "Hobbies",
-        "content": "• Building web apps and predictive dashboards that actually compile\n• Fixing laptops and desktop components while questioning every life choice that led to cable management\n• Playing OPM acoustic mashups with a capo on the first fret\n• Watching movies with chicken and mango shake",
+        "content": "\u2022 Building web apps and predictive dashboards that actually compile\n\u2022 Fixing laptops and desktop components while questioning every life choice that led to cable management\n\u2022 Playing OPM acoustic mashups with a capo on the first fret\n\u2022 Watching movies with chicken and mango shake",
         "border": "vines-flowers.svg"
       },
       {
         "title": "Skills",
-        "content": "• UI/UX design and prototyping (Figma, Canva)\n• Computer hardware diagnostics, assembly, and systems troubleshooting\n• Data preprocessing and time-series application logic",
+        "content": "\u2022 UI/UX design and prototyping (Figma, Canva)\n\u2022 Computer hardware diagnostics, assembly, and systems troubleshooting\n\u2022 Data preprocessing and time-series application logic",
         "border": "vines-flowers.svg"
       },
       {
         "title": "Projects",
-        "content": "<div class=\"john-projects-list\"><div class=\"john-proj\"><a href=\"https://healthwatch-ui.onrender.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">HEALTHWATCH</a><p>Regional dengue &amp; illness forecasting platform (React, FastAPI, Supabase, Prophet)</p></div><div class=\"john-proj\"><a href=\"https://vrndlcrz.github.io/ReadAble/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">ReadAble</a><p>Web reading platform for children with ASD — gamified modules, TTS, analytics (ages 4–10)</p></div><div class=\"john-proj\"><a href=\"https://vrndlcrz.github.io/EaseAccess/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">EaseAccess</a><p>Online document request system for Barangay 498, Sampaloc, Manila</p></div><div class=\"john-proj\"><a href=\"https://vrndlcrz.github.io/URL-Shortener/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">URL Shortener</a><p>Lightweight utility that transforms long URLs into clean, shareable short links</p></div></div>",
+        "content": "<div class=\"john-projects-list\"><div class=\"john-proj\"><a href=\"https://healthwatch-ui.onrender.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">HEALTHWATCH</a><p>Regional dengue &amp; illness forecasting platform (React, FastAPI, Supabase, Prophet)</p></div><div class=\"john-proj\"><a href=\"https://vrndlcrz.github.io/ReadAble/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">ReadAble</a><p>Web reading platform for children with ASD \u2014 gamified modules, TTS, analytics (ages 4\u201310)</p></div><div class=\"john-proj\"><a href=\"https://vrndlcrz.github.io/EaseAccess/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">EaseAccess</a><p>Online document request system for Barangay 498, Sampaloc, Manila</p></div><div class=\"john-proj\"><a href=\"https://vrndlcrz.github.io/URL-Shortener/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"project-ext-link\">URL Shortener</a><p>Lightweight utility that transforms long URLs into clean, shareable short links</p></div></div>",
         "border": "dripping-paint.svg"
       },
       {
@@ -206,68 +206,71 @@
   {
     "id": 4,
     "name": "Nicole De Guzman",
+    "titleText": "Nicole Leigh G. De Guzman",
     "section": "BSIT 3-1",
-    "subject": "Application and Emerging Technologies",
-    "tagline": "My code works, but nobody knows why (especially me)",
-    "folderLabel": "secret_thesis_do_not_delete",
+    "subject": "Advanced Emerging Technologies",
+    "objective": "To be able to contribute and work on practical, yet meaningful projects where I can grow and continuously improve my skills in both design and development, while genuinely helping people.",
+    "tagline": "Quality over quantity. Designing practical tech that helps people.",
+    "folderLabel": "sta_john_gi_notebook",
     "photo": "assets/photos/member4.svg",
-    "coverColor": "#059669",
+    "coverColor": "#2E7D32",
     "pages": [
       {
         "title": "About Me",
-        "content": "Hi! I am Nicole De Guzman, backend architect and data enthusiast in BSIT 3-1. I love making robust RESTful APIs, clean data architectures, and bulletproof validations so systems never fail even under chaos.\n\nOpen the cover and follow the pages in order, or skip ahead to the projects. Each section shows a different side of the person behind this little corner of the desk.",
+        "content": "Hi! I am Nicole Leigh G. De Guzman, a BSIT 3-1 student. I focus on practical design and clean code.\n\nObjective\nTo be able to contribute and work on practical, yet meaningful projects where I can grow and continuously improve my skills in both design and development, while genuinely helping people.\n\nI build prototypes in Figma and write object-oriented Java programs. I care about making software that is easy to use and works properly.",
         "border": "wavy-pink.svg"
       },
       {
-        "title": "Hobbies",
-        "content": "• Solving algorithmic puzzles on LeetCode\n• Baking sourdough bread and measuring grams precisely\n• Urban gardening & plant propagation\n• Board game strategy nights with friends\n\nThere is a pattern in this list: curiosity usually wins over a perfectly sensible bedtime. Pick one of these topics for the guestbook and see where the conversation goes. A good recommendation is always worth saving for the next study break.",
+        "title": "Software and Skills",
+        "content": "My coursework and daily tools cover both interface design and programming.\n\nDesign and Prototyping\nAffinity Designer, Figma, and Canva\n\nVisual Presentation\nClean documentation and clear layouts\n\nProgramming\nObject-Oriented Programming (OOP) Basics in Java\n\nI like creating clean interfaces in Figma, then turning those layouts into well-structured code.",
         "border": "blobs-orange.svg"
       },
       {
-        "title": "Skills & Superpowers",
-        "content": "Experienced with REST design, JSON serialization, security sanitization, and concurrent operations. Superpower: can spot an SQL injection vulnerability or unescaped HTML tag from a mile away.\n\nThe real test comes when a teammate asks for help. Start with the smallest example, talk through what should happen, and change one thing at a time. Sometimes explaining the problem out loud is enough to spot the answer.",
+        "title": "Interests",
+        "content": "Outside of schoolwork, I spend my free time on a few personal hobbies.\n\nStationery and Pens\nI collect quality pens, especially 0.38mm fine-nib pens and smooth notebook paper.\n\nSkincare and Fragrance\nI like researching skincare ingredients and trying different scents like green tea, cedarwood, and jasmine.\n\nNotebook Layouts\nI enjoy keeping neat notes with clean margins and green accents.",
         "border": "vines-flowers.svg"
       },
       {
-        "title": "Projects",
-        "content": "• Thread-safe Guestbook & Visit Counter API\n• Student Grade Predictor using regression\n• Encrypted note-taking app with AES\n\nThese ideas fit on one page, but getting a working demo takes more than a catchy title. The fun part is turning a rough sketch into something another person can actually open, try, and give feedback on.",
+        "title": "Career Goal",
+        "content": "My dream is to become a doctor, or to work in healthcare technology.\n\nI want to help build software that hospitals and clinics can rely on every day. That includes patient records and simple tools that make clinic visits smoother.\n\nHealthcare software needs clear text and dependable inputs so people get the right care without confusion.",
         "border": "dripping-paint.svg"
       },
       {
-        "title": "Fun Facts & Roast Me",
-        "content": "Commented 'Do not delete this comment, it makes the code run' in a production file once. Takes notes in Markdown even when writing a grocery shopping list. Has 14 houseplants named after HTTP status codes.\n\nThe desk has a guestbook for exactly this kind of confession. If any of that sounds familiar, leave a note with your own most questionable study habit. The rubber duck has heard worse.",
+        "title": "Values",
+        "content": "I always choose quality over quantity, and it genuinely bothers me if I leave something unfinished or slightly off.\n\nWhether I am drawing a layout in Figma or writing a Java class, I take the time to fix uneven margins and check my work before moving on.",
         "border": "bows-stars.svg"
       },
       {
-        "title": "Contact & Goals",
-        "content": "Architect scalable cloud microservices that withstand Black Friday traffic surges without flinching.\n\nLeave a message in the desk guestbook to share a project idea or ask about one of the pages. A specific question makes a great conversation starter. Mention the part that caught your eye, or suggest something you would like to see in a future version.",
+        "title": "Contact",
+        "content": "Feel free to reach out about design, class projects, or stationery recommendations.\n\nEmail\nnicoleleighgdeguzman@gmail.com\n\nSection\nBSIT 3-1, Advanced Emerging Technologies\n\nYou can also leave a note on the desk guestbook.",
         "border": "dotted-frame.svg"
       }
     ],
     "skills": [
       {
-        "name": "REST APIs",
-        "level": 91,
-        "funnyLabel": "200 OK is my spiritual state of mind"
+        "name": "Design and Prototyping",
+        "level": 96,
+        "funnyLabel": "Figma, Affinity Designer, and Canva"
       },
       {
-        "name": "Input Sanitization",
-        "level": 95,
-        "funnyLabel": "Little Bobby Tables was stopped here"
+        "name": "Visual Documentation",
+        "level": 94,
+        "funnyLabel": "Clean documentation and slide layouts"
       },
       {
-        "name": "Documentation",
-        "level": 84,
-        "funnyLabel": "Writes comments future me will understand"
-      },
-      {
-        "name": "Debugging",
+        "name": "Java OOP Basics",
         "level": 88,
-        "funnyLabel": "Follows stack traces like a detective"
+        "funnyLabel": "Classes, objects, and clean methods"
+      },
+      {
+        "name": "Quality Focus",
+        "level": 99,
+        "funnyLabel": "Takes the time to finish details properly"
       }
     ],
     "deskItem": "intermediate-pad",
-    "school": "",
-    "grade": ""
+    "school": "Sta. John Gi Academy",
+    "grade": "BSIT 3-1",
+    "teacher": "Sir Sean Dyogi"
   }
 ]

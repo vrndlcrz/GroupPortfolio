@@ -90,7 +90,7 @@
       <button class="member-select-btn" style="background:#FF7A00;" onclick="loadAndOpen(1)">1. Riam Jaye Santiago</button>
       <button class="member-select-btn" style="background:#8B5CF6;" onclick="loadAndOpen(2)">2. John Vernie Dela Cruz</button>
       <button class="member-select-btn" style="background:#0284C7;" onclick="loadAndOpen(3)">3. Charella Magalpoc</button>
-      <button class="member-select-btn" style="background:#059669;" onclick="loadAndOpen(4)">4. Nicole De Guzman</button>
+      <button class="member-select-btn" style="background:#4F6D54;" onclick="loadAndOpen(4)">4. Nicole Leigh G. De Guzman</button>
     </div>
 
     <div class="status-msg" id="statusMessage">Click a member button to open their clear-book</div>
@@ -135,9 +135,11 @@
       }
     }
 
-    // Auto-open Member 1 on page load for immediate testing
+    // Auto-open Member based on URL param (e.g. ?member=4) or default to 1
     window.addEventListener('DOMContentLoaded', () => {
-      loadAndOpen(1);
+      const params = new URLSearchParams(window.location.search);
+      const targetId = parseInt(params.get('member') || '1', 10);
+      loadAndOpen(targetId);
     });
   </script>
 </body>
