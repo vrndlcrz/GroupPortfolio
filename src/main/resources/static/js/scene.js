@@ -1,49 +1,38 @@
-// One shared, idle-painted canvas supplies John's 3D folder and opened cover.
+// One shared canvas supplies John's 3D folder and opened cover from the attached AET aesthetic image.
 const JohnFolderArt = (() => {
-  const cache=new Map();
-  return {get(member) {
-    const key=member.name+'|'+member.section;
-    if(cache.has(key))return cache.get(key);
-    const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=1536;
-    canvas.textContent='Portfolio IN Advanced Emerging Technologies. Name: '+member.name+'. Gr. & Sec: '+(member.section||'BSIT 3-1');
-    const ctx=canvas.getContext('2d');ctx.fillStyle='#1F3FBF';ctx.fillRect(0,0,1024,1536);
-    const texture=new THREE.CanvasTexture(canvas);texture.anisotropy=4;
-    const entry={canvas,texture};cache.set(key,entry);
-    entry.ready=Promise.all([document.fonts.load('190px "Dancing Script"'),document.fonts.load('72px "Lilita One"'),document.fonts.load('38px "Patrick Hand"')]).catch(()=>{}).then(()=>new Promise(resolve=>{
-      const paint=()=>{
-        let seed=26031;const random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);
-        function torn(x,y,w,h,color,tilt=0,grid=false){
-          ctx.save();ctx.translate(x,y);ctx.rotate(tilt);ctx.beginPath();
-          for(let edge=0;edge<4;edge++)for(let i=0;i<=16;i++){
-            const t=i/16,j=(random()-.5)*20;
-            const px=edge===0?t*w:edge===1?w+j:edge===2?(1-t)*w:j;
-            const py=edge===0?j:edge===1?t*h:edge===2?h+j:(1-t)*h;
-            if(!edge&&!i)ctx.moveTo(px,py);else ctx.lineTo(px,py);
-          }
-          ctx.closePath();ctx.fillStyle=color;ctx.fill();
-          if(grid){ctx.clip();ctx.strokeStyle='#78B8E8';ctx.lineWidth=1.5;ctx.beginPath();for(let a=0;a<w;a+=32){ctx.moveTo(a,0);ctx.lineTo(a,h)}for(let b=0;b<h;b+=32){ctx.moveTo(0,b);ctx.lineTo(w,b)}ctx.stroke()}
-          ctx.restore();
+  const cache = new Map();
+  return {
+    get(member) {
+      const key = member.name + '|' + member.section;
+      if (cache.has(key)) return cache.get(key);
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1536;
+      canvas.textContent = 'Advanced Emerging Technologies - John Vernie Dela Cruz';
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0F172A';
+      ctx.fillRect(0, 0, 1024, 1536);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.anisotropy = 4;
+      const entry = { canvas, texture };
+      cache.set(key, entry);
+
+      const coverImg = new Image();
+      coverImg.crossOrigin = 'anonymous';
+      const drawCover = () => {
+        if (coverImg.naturalWidth) {
+          ctx.drawImage(coverImg, 0, 0, 1024, 1536);
         }
-        const star=(x,y,r)=>{ctx.beginPath();for(let i=0;i<10;i++){const a=i*Math.PI/5-Math.PI/2,d=i%2?r*.43:r;ctx.lineTo(x+Math.cos(a)*d,y+Math.sin(a)*d)}ctx.closePath();ctx.fillStyle='#CCD3DE';ctx.fill();ctx.strokeStyle='#FFFFFF';ctx.lineWidth=3;ctx.stroke()};
-        const flower=(x,y,r)=>{ctx.save();ctx.translate(x,y);ctx.fillStyle='#1F3FBF';ctx.strokeStyle='#FFFFFF';ctx.lineWidth=7;for(let i=0;i<5;i++){ctx.save();ctx.rotate(i*Math.PI*2/5);ctx.beginPath();ctx.ellipse(0,-r*.55,r*.4,r*.6,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore()}ctx.fillStyle='#78B8E8';ctx.beginPath();ctx.arc(0,0,r*.25,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore()};
-        torn(15,0,730,510,'#FCFCF4',-.07,true);torn(660,20,440,510,'#1A1A22',.08);
-        torn(-35,575,470,790,'#C69B63',-.06);torn(230,230,800,410,'#78B8E8',-.07);
-        torn(70,805,915,310,'#1A1A22',.025);torn(650,1115,430,455,'#1A1A22',-.07);
-        for(const [x,y,r] of [[760,110,33],[915,260,46],[830,420,26],[925,1260,36],[780,1480,36]])star(x,y,r);
-        ctx.strokeStyle='#CCD3DE';ctx.lineWidth=6;for(const [x,y] of [[785,320],[820,1360]]){ctx.beginPath();for(let i=0;i<90;i++){const a=i*.17,r=i*.65;ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r)}ctx.stroke()}
-        flower(175,420,89);flower(866,1185,82);
-        ctx.save();ctx.rotate(-.055);ctx.font='190px "Dancing Script", cursive';ctx.lineJoin='round';ctx.lineWidth=16;ctx.strokeStyle='#FFFFFF';ctx.fillStyle='#78B8E8';ctx.strokeText('Portfolio',105,650,850);ctx.fillText('Portfolio',105,650,850);ctx.restore();
-        torn(390,668,222,128,'#FFFDF5',-.035,true);ctx.font='74px "Lilita One", sans-serif';ctx.fillStyle='#1F3FBF';ctx.textAlign='center';ctx.fillText('IN',499,756);
-        ctx.save();ctx.translate(520,958);ctx.rotate(.025);ctx.font='72px "Lilita One", sans-serif';ctx.lineWidth=7;ctx.strokeStyle='#FFFFFF';ctx.fillStyle='#78B8E8';for(const [line,y] of [['Advanced Emerging',0],['Technologies',90]]){ctx.strokeText(line,0,y,835);ctx.fillText(line,0,y,835)}ctx.restore();
-        torn(43,1230,745,220,'#FFFDF5',-.04,true);ctx.textAlign='left';ctx.fillStyle='#273C70';ctx.font='38px "Patrick Hand", cursive';ctx.fillText('Name: '+member.name,125,1300,625);ctx.fillText('Gr. & Sec: '+(member.section||'BSIT 3-1'),125,1370,625);
-        for(const [x,y] of [[60,100],[850,1360]]){ctx.save();ctx.translate(x,y);ctx.rotate(-.08);ctx.fillStyle='#E4D6B8';ctx.fillRect(0,0,120,142);ctx.strokeStyle='#1F3FBF';ctx.lineWidth=4;ctx.setLineDash([5,6]);ctx.strokeRect(6,6,108,130);ctx.setLineDash([]);ctx.strokeRect(21,23,78,90);star(60,66,24);ctx.restore()}
-        ctx.fillStyle='#D9C08B';for(const [x,y,a] of [[300,195,-.13],[650,1170,.12]]){ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.globalAlpha=.78;ctx.fillRect(0,0,180,49);ctx.restore()}
-        ctx.fillStyle='#1F3FBF';ctx.fillRect(981,452,43,190);ctx.strokeStyle='#78B8E8';ctx.lineWidth=7;ctx.strokeRect(988,460,30,173);
-        ctx.fillStyle='rgba(255,255,255,.10)';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(115,0);ctx.lineTo(840,1536);ctx.lineTo(660,1536);ctx.closePath();ctx.fill();texture.needsUpdate=true;resolve(entry);
+        texture.needsUpdate = true;
       };
-      if(window.requestIdleCallback)requestIdleCallback(paint,{timeout:800});else setTimeout(paint,0);
-    }));return entry;
-  }};
+      coverImg.onload = drawCover;
+      coverImg.src = 'assets/textures/john-cover.jpg';
+      if (coverImg.complete && coverImg.naturalWidth) drawCover();
+
+      entry.ready = Promise.resolve(entry);
+      return entry;
+    }
+  };
 })();
 
 /** Interactive group portfolio desk in a Philippine high school classroom. */
