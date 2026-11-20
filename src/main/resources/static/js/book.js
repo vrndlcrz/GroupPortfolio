@@ -204,7 +204,6 @@ class ClearBook {
     this.dotsElements = pages.dotsElements;
     this.totalPages = pages.totalPages;
     this.overlayElement.classList.add('active');
-    document.getElementById('deskBackBtn')?.setAttribute('aria-hidden', 'true');
     this.updatePageStates();
   }
 
@@ -233,7 +232,6 @@ class ClearBook {
     this.deckElement.querySelector('.spiral-shadow')?.removeAttribute('style');
     this.music.stop();
     this.overlayElement.classList.remove('active');
-    document.getElementById('deskBackBtn')?.removeAttribute('aria-hidden');
     if (typeof this.options.onClose === 'function') {
       this.options.onClose();
     }

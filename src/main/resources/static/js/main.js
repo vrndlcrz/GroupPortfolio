@@ -37,6 +37,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentVisitorCount = 0;
   let deskScene = null;
   let clearBook = null;
+  let phone;
+  let whiteboard;
 
   // UI Elements
   const visitorCountBadge = document.getElementById('visitorCountBadge');
@@ -50,6 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // CRITICAL: Setup navbar button listeners immediately
   // so buttons are clickable during and after loading — not blocked by async await
   setupHeaderControls();
+  setupBackNavigation();
 
   // 1. Fetch Initial Data from Backend
   try {
@@ -131,8 +134,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     onFolderSelect: member => clearBook.open(member)
   });
 
-  const whiteboard=deskScene.whiteboardFace?new WhiteboardDrawing(deskScene):null;
-  const phone=new PortfolioPhone({
+  whiteboard=deskScene.whiteboardFace?new WhiteboardDrawing(deskScene):null;
+  phone=new PortfolioPhone({
     button:document.getElementById('phoneToggleBtn'),config:classroom.phone||{},
     canOpen:()=>!intro?.active && !deskScene.experiences?.blocking && ['seat','desk'].includes(deskScene.view),
     stopNotebook:()=>{clearBook.music.stop(true);deskScene.experiences?.stopConcert()}
@@ -160,6 +163,56 @@ document.addEventListener('DOMContentLoaded', async () => {
   /* ========================================================================
      HELPER FUNCTIONS
      ======================================================================== */
+
+  function setupBackNavigation() {
+    const button=document.getElementById('deskBackBtn');
+    const route=()=>{
+      const experiences=deskScene?.experiences;
+      const captcha=document.querySelector('.robot-captcha[open]');
+      if (captcha) return ['Close robot verification',()=>captcha.close()];
+      if (experiences?.dark) return ['Exit Dark mode',()=>experiences.leaveDark()];
+      if (experiences?.scrapOpen) return ['Close wrapper',()=>experiences.closeScrap()];
+      if (phone?.opened) return [phone.app==='home'?'Close phone':'Back to phone home',()=>phone.goBack()];
+      if (guestbookModal.classList.contains('active')) return ['Close guestbook',closeGuestbookModal];
+      if (document.querySelector('#laptopErrorModal.active')) return ['Close laptop',()=>PortfolioHumor.closeLaptopError()];
+      if (document.querySelector('#noteViewModal.active')) return ['Close note',()=>deskScene.closeNoteViewerModal()];
+      if (deskScene?.closePlacard) return ['Close placard',deskScene.closePlacard];
+      if (clearBook?.isOpen()) return ['Close portfolio',()=>clearBook.close()];
+      if (whiteboard?.opened) return ['Close whiteboard',()=>whiteboard.close()];
+      if (experiences?.cameraFocus) {
+        return ['Back from '+({labibi:'Labibi',tv:'TV'}[experiences.cameraFocus.type]||'close-up'),
+          ()=>experiences.cleaning?experiences.finishCleanup():experiences.releaseFocus()];
+      }
+      if (experiences?.concertActive||experiences?.concertTransition) return ['Exit performance',()=>experiences.stopConcert()];
+      if (deskScene?.view==='desk'&&!deskScene.interactionBlocked()) return ['Back to seat',()=>deskScene.backToSeat()];
+      return null;
+    };
+    const refresh=()=>{
+      const target=route();
+      const hidden=!target;
+      if (button.hidden!==hidden) button.hidden=hidden;
+      const label=target?.[0]||'Back';
+      if (button.title!==label) {
+        button.title=label;
+        button.setAttribute('aria-label',label);
+      }
+    };
+    button.addEventListener('click',()=>{route()?.[1]();refresh();});
+    button.addEventListener('keydown',event=>{if (event.key!=='Escape') event.stopPropagation();});
+    window.addEventListener('keydown',event=>{
+      if (event.key!=='Escape') return;
+      const target=route();
+      if (!target) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      target[1]();refresh();
+    },true);
+    window.addEventListener('portfolio-navigation',refresh);
+    new MutationObserver(refresh).observe(document.body,{
+      childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden','open']
+    });
+    refresh();
+  }
 
   function setupHeaderControls() {
     // 1-Click Easter Egg Zero-G Button
@@ -237,12 +290,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    // Escape key closes modal
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
-        closeNote();
-      }
-    });
   }
 
   function closeGuestbookModal() {

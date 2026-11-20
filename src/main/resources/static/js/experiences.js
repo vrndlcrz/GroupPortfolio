@@ -12,11 +12,6 @@ class ClassroomExperiences {
     const enter=scene.enterDeskView.bind(scene);scene.enterDeskView=(...args)=>{this.stopConcert();return enter(...args)};
     window.addEventListener('keydown',event=>{
       if(this.dark){event.preventDefault();event.stopImmediatePropagation();if(event.key==='Escape')this.leaveDark();return;}
-      if(event.key!=='Escape')return;
-      if(this.concertTransition){event.preventDefault();event.stopImmediatePropagation();this.stopConcert();}
-      else if(this.cameraFocus){event.preventDefault();event.stopImmediatePropagation();if(this.cleaning)this.finishCleanup();else this.releaseFocus();}
-      else if(this.concertActive){event.preventDefault();event.stopImmediatePropagation();this.stopConcert();}
-      else if(this.scrapOpen){event.preventDefault();event.stopImmediatePropagation();this.closeScrap();}
     },true);
     window.AudioMaster?.onChange(muted=>{
       for (const media of [this.audio,this.trackAudio,this.tvAudio,this.cueAudio]) if (media) media.muted=muted;
@@ -74,7 +69,7 @@ class ClassroomExperiences {
     if(this.cleaning||this.throwingNote)return true;
     if(type==='classroom-tv'){if(this.s.view==='seat')this.zoomTV();return true}
     if(type==='basketball'){if(this.s.view==='seat')this.showRin();return true}
-    if(type==='labubu'){this.zoomLabubu();return true}
+    if(type==='labibi'){this.zoomLabibi();return true}
     if(type==='floor-scrap'){this.openScrap(object.userData.scrap);return true}
     if(type==='exit-door'){this.showKim();return true}
     return false;
@@ -317,32 +312,23 @@ class ClassroomExperiences {
     this.cameraFocus={type,pose:s.rig.capturePose(),input:s.rig.inputEnabled};
     s.isCameraZoomed=true;s.rig.setInputEnabled(false);s.pendingHover=null;s.resetHoverState();s.hideSean();
     s.isDraggingView=false;s.hasDraggedMeaningfully=false;
+    window.dispatchEvent(new Event('portfolio-navigation'));
     return true;
   }
 
   releaseFocus() {
     if (!this.cameraFocus) return;
     const s=this.s,{pose,input}=this.cameraFocus;
-    this.cameraFocus=null;this.focusBack?.remove();this.focusBack=null;
+    this.cameraFocus=null;
     this.hearts?.remove();this.hearts=null;s.isCameraZoomed=false;
     s.rig.applyPose(pose);
     if (this.dark) this.darkHome.input=input;
     s.rig.setInputEnabled(!this.dark&&input&&s.inputEnabled);
-  }
-
-  focusButton(label) {
-    const button=this.focusBack=document.createElement('button');
-    button.type='button';button.className='experience-focus-back';button.textContent=label;
-    button.addEventListener('click', event => {
-      event.stopPropagation();
-      this.releaseFocus();
-    });
-    document.body.append(button);button.focus({preventScroll:true});
+    window.dispatchEvent(new Event('portfolio-navigation'));
   }
 
   zoomTV() {
     if (!this.s.tvScreen || !this.lockFocus('tv')) return;
-    this.focusButton('Back from TV');
     this.updateFocus(performance.now()/1000);
   }
 
@@ -358,8 +344,9 @@ class ClassroomExperiences {
     this.s.tvScreen.material.map=texture;this.s.tvScreen.material.needsUpdate=true;
 
     const stop=this.tvStopButton=document.createElement('button');
-    stop.type='button';stop.className='experience-focus-back tv-stop-button';stop.textContent='Stop video';
-    stop.addEventListener('click',()=>{this.stopTV();this.focusBack?.focus({preventScroll:true});});
+    stop.type='button';stop.className='tv-stop-button';stop.textContent='Stop video';
+    stop.addEventListener('click',()=>{this.stopTV();
+      if (this.cameraFocus?.type==='tv') document.getElementById('deskBackBtn').focus({preventScroll:true});});
     document.body.append(stop);
 
     video.onended=video.onerror=()=>{if(this.tvVideo===video)this.stopTV();};
@@ -394,34 +381,46 @@ class ClassroomExperiences {
     this.s.tvDVD.dirty=true;
   }
 
-  placeLabubu({fur,color}) {
-    if (!this.labubu) {
-      const doll=this.labubu=new THREE.Group();this.s.deskGroup.add(doll);
+  placeLabibi(roll) {
+    if (!this.labibi) {
+      const doll=this.labibi=new THREE.Group();
+      this.s.deskGroup.add(doll);
       doll.position.set(-4.82,.44,1.67);doll.rotation.y=Math.PI;
-      const body=this.mesh(doll,'sphere',fur,0,.14,0,.27,.34,.21);
-      const head=this.mesh(doll,'sphere',fur,0,.53,0,.33,.33,.24);
+      const body=this.mesh(doll,'sphere',roll.fur,0,.14,0,.27,.34,.21);
+      const head=this.mesh(doll,'sphere',roll.fur,0,.53,0,.33,.33,.24);
       this.dollFur=[body,head];
+      this.dollTrim=[];
       for (const side of [-1,1]) {
-        const ear=this.mesh(doll,'sphere',fur,side*.16,.87,0,.091,.26,.07);
-        ear.rotation.z=-side*.24;this.dollFur.push(ear);
-        this.dollFur.push(this.mesh(doll,'sphere',fur,side*.24,.19,0,.12,.12,.14));
-        this.dollFur.push(this.mesh(doll,'sphere',fur,side*.14,-.12,.03,.14,.12,.15));
+        const ear=this.mesh(doll,'sphere',roll.fur,side*.16,.87,0,.091,.26,.07);
+        ear.rotation.z=-side*.24;
+        const innerEar=this.mesh(doll,'sphere',roll.trim,side*.164,.89,.052,.045,.17,.023,false);
+        innerEar.rotation.z=ear.rotation.z;
+        this.dollTrim.push(innerEar);
+        this.dollFur.push(ear,
+          this.mesh(doll,'sphere',roll.fur,side*.24,.19,0,.12,.12,.14),
+          this.mesh(doll,'sphere',roll.fur,side*.14,-.12,.03,.14,.12,.15));
       }
-      const photo=new THREE.TextureLoader().load('assets/photos/riam-labubu.png');
-      photo.encoding=THREE.sRGBEncoding;
-      photo.repeat.set(284/963,236/963);
-      photo.offset.set(340/963,1-548/963);
-      const face=new THREE.Mesh(new THREE.CircleGeometry(.225,32),new THREE.MeshBasicMaterial({map:photo}));
+      const face=this.dollFace=new THREE.Mesh(new THREE.CircleGeometry(.225,32),new THREE.MeshBasicMaterial());
       face.scale.y=.84;face.position.set(0,.54,.23);doll.add(face);
-      for (const hit of [head,body,face]) {hit.userData.type='labubu';this.s.interactiveObjects.push(hit);}
+      for (const hit of [head,body,face]) {hit.userData.type='labibi';this.s.interactiveObjects.push(hit);}
     }
-    this.labubu.name=color+' Riam Labubu';
-    this.dollFur.forEach(mesh=>mesh.material=this.paint(fur));
+    if (this.labibi.name===roll.name) return;
+    this.labibi.name=roll.name;
+    this.dollFur.forEach(mesh=>mesh.material=this.paint(roll.fur));
+    this.dollTrim.forEach(mesh=>mesh.material=this.paint(roll.trim));
+    const [left,top,width,height]=roll.face;
+    const photo=new THREE.TextureLoader().load('assets/photos/'+roll.photo);
+    photo.encoding=THREE.sRGBEncoding;
+    photo.repeat.set(width,height);
+    photo.offset.set(left,1-top-height);
+    const material=this.dollFace.material;
+    material.map?.dispose();
+    material.map=photo;
+    material.needsUpdate=true;
   }
 
-  zoomLabubu() {
-    if (!this.labubu || !this.lockFocus('labubu')) return;
-    this.focusButton('Back from Labubu');
+  zoomLabibi() {
+    if (!this.labibi || !this.lockFocus('labibi')) return;
     this.updateFocus(performance.now()/1000);
   }
 
@@ -433,8 +432,8 @@ class ClassroomExperiences {
       const tan=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
       const distance=Math.max(1.55,2.67/camera.aspect)/tan;
       camera.position.copy(this.point);camera.position.z+=distance;
-    } else if (type==='labubu') {
-      this.labubu.getWorldPosition(this.point);this.point.y+=.46;
+    } else if (type==='labibi') {
+      this.labibi.getWorldPosition(this.point);this.point.y+=.46;
       camera.position.copy(this.point).add(new THREE.Vector3(.32,.32,1.85));
     } else {
       const actor=this.actors.jeo;

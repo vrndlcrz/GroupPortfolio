@@ -1,4 +1,10 @@
 /* Lazy phone UI for the classroom apps. */
+const LABIBI_ROLLS = [
+  {name:'Riam Choco Labibi', photo:'labibi-riam.png', fur:'#674C41', trim:'#D8A781', face:[94/519, 240/870, 309/519, 259/870]},
+  {name:'Charella Berry Labibi', photo:'labibi-charella.png', fur:'#D987A7', trim:'#F4D4D4', face:[100/485, 226/831, 286/485, 239/831]},
+  {name:'Vernie The Black Dog Labibi', photo:'labibi-vernie.png', fur:'#4D5055', trim:'#DED1C6', face:[118/517, 424/964, 269/517, 203/964]},
+  {name:'Nicole Ube Labibi', photo:'labibi-nicole.png', fur:'#6BC9E1', trim:'#DCF1F0', face:[83/494, 385/979, 288/494, 241/979]}
+];
 class PortfolioPhone {
   constructor({button,config={},canOpen=()=>true,stopNotebook=()=>{}}) {
     Object.assign(this,{button,config:config||{},canOpen,stopNotebook});
@@ -27,7 +33,7 @@ class PortfolioPhone {
     svg.setAttribute('viewBox','0 0 64 64');svg.setAttribute('aria-hidden','true');
     const shapes=type==='spotibai'?
       [['circle',{cx:32,cy:32,r:27,fill:'#42B86B'}],['path',{d:'M28 40V20l18-4v21M28 24l18-4',fill:'none'}],['ellipse',{cx:23,cy:42,rx:6,ry:4,fill:'#FFF3D4'}],['ellipse',{cx:41,cy:39,rx:6,ry:4,fill:'#FFF3D4'}]]:
-      type==='heart'||type==='labubu'?[['path',{d:'M32 53 10 32C-4 12 20 3 32 20 44 3 68 12 54 32Z',fill:'none'}]]:
+      type==='heart'||type==='labibi'?[['path',{d:'M32 53 10 32C-4 12 20 3 32 20 44 3 68 12 54 32Z',fill:'none'}]]:
       [['path',{d:'m8 17 32-8 10 35-32 9Z',fill:'#47BEB3'}],['path',{d:'m23 13 30 9-10 33-30-9Z',fill:'#EC7298'}],['path',{d:'m29 26 13 8-15 7Z',fill:'#FFF3D4'}]];
     for(const [tag,attrs] of shapes){const node=document.createElementNS(ns,tag);for(const [key,value] of Object.entries(attrs))node.setAttribute(key,value);svg.append(node)}return svg;
   }
@@ -42,12 +48,10 @@ class PortfolioPhone {
     const signal=this.element('span','phone-signal');for(let i=0;i<3;i++)signal.append(this.element('i'));
     status.append(signal,this.element('span','phone-notch'),this.element('span','phone-battery'));
     const header=this.element('header','phone-header');
-    this.back=this.action('‹',()=>this.showHome(),'phone-back');this.back.setAttribute('aria-label','Phone home');
     this.title=this.element('h2','','Phone');this.title.id='phone-title';
-    this.closeButton=this.action('×',()=>this.close(),'phone-close');this.closeButton.setAttribute('aria-label','Close phone');header.append(this.back,this.title,this.closeButton);
+    header.append(this.title);
     this.screen=this.element('div','phone-screen');
-    const home=this.action('',()=>this.showHome(),'phone-home-bar');home.setAttribute('aria-label','Phone home');home.append(this.element('span'));
-    root.append(status,header,this.screen,home);document.body.append(root);
+    root.append(status,header,this.screen);document.body.append(root);
     for(const type of ['pointerdown','pointerup','pointermove','mousedown','mouseup','mousemove','click','dblclick','wheel','touchstart','touchmove','touchend'])
       root.addEventListener(type,event=>event.stopPropagation(),{passive:true});
     root.addEventListener('pointerdown',event=>{this.gesture ||= event.isTrusted});
@@ -59,12 +63,12 @@ class PortfolioPhone {
     });
     document.addEventListener('keydown',event=>{
       if(!this.opened)return;
-      if(event.key==='Escape'){event.preventDefault();event.stopImmediatePropagation();this.close();return}
       if(event.key!=='Tab')return;
-      const nodes=[...root.querySelectorAll('button,video[tabindex]')].filter(node=>!node.disabled&&node.getClientRects().length);
+      const nodes=[...root.querySelectorAll('button,video[tabindex]'),document.getElementById('deskBackBtn')]
+        .filter(node=>node&&!node.disabled&&node.getClientRects().length);
       const first=nodes[0],last=nodes[nodes.length-1],active=document.activeElement;
-      if(event.shiftKey&&(active===first||!root.contains(active))){event.preventDefault();last?.focus()}
-      else if(!event.shiftKey&&(active===last||!root.contains(active))){event.preventDefault();first?.focus()}
+      if(event.shiftKey&&(active===first||!nodes.includes(active))){event.preventDefault();last?.focus()}
+      else if(!event.shiftKey&&(active===last||!nodes.includes(active))){event.preventDefault();first?.focus()}
     },true);
     window.AudioMaster?.onChange(muted=>{for(const video of this.media.values())video.muted=muted});
     // Watch overlay roots, not frame-by-frame scene/bubble style changes. Discover lazy bag DOM too.
@@ -92,7 +96,7 @@ class PortfolioPhone {
     this.build();this.stopNotebook();this.opened=true;this.root.hidden=false;this.root.inert=false;
     this.root.style.pointerEvents='auto';this.button.setAttribute('aria-expanded','true');this.showHome();
     if(window.gsap){gsap.killTweensOf(this.root);gsap.fromTo(this.root,{yPercent:110},{yPercent:0,duration:.5,ease:'power2.out'})}
-    this.closeButton.focus();return true;
+    this.screen.querySelector('button')?.focus();return true;
   }
   close(immediate=false) {
     if(!this.root||!this.opened)return;
@@ -103,13 +107,18 @@ class PortfolioPhone {
     if(restore)this.button.focus();
   }
   showHome() {
-    this.stopMedia();this.app='home';this.title.textContent='Phone';this.back.hidden=true;
+    this.stopMedia();this.app='home';this.title.textContent='Phone';
     const home=this.element('div','phone-apps');
-    for(const [type,name,open] of [['spotibai','SpotiBai',()=>this.showSpotiBai()],['tiktik','Tiktik',()=>this.showTiktik()],['labubu','Labubu',()=>this.showLabubu()]]){
+    for(const [type,name,open] of [['spotibai','SpotiBai',()=>this.showSpotiBai()],['labibi','Labibi',()=>this.showLabibi()]]){
       const button=this.action('',open,'phone-app');
       button.append(this.icon(type),this.element('span','',name));home.append(button);
     }
     this.screen.replaceChildren(home);
+  }
+
+  goBack() {
+    if (this.app==='home') this.close(true);
+    else {this.showHome();this.screen.querySelector('button')?.focus();}
   }
   static localVideoPath(value) {
     try {
@@ -120,7 +129,7 @@ class PortfolioPhone {
     }catch{return null}
   }
   showSpotiBai() {
-    this.stopMedia();this.app='spotibai';this.title.textContent='SpotiBai';this.back.hidden=false;
+    this.stopMedia();this.app='spotibai';this.title.textContent='SpotiBai';
     const list=this.element('div','phone-playlists');
     const status=this.element('p','phone-placeholder');
     status.setAttribute('role','status');
@@ -159,33 +168,35 @@ class PortfolioPhone {
     this.screen.replaceChildren(list,status);
   }
 
-  showLabubu(rolled = this.rolledLabubu) {
-    this.stopMedia();this.app='labubu';this.title.textContent='Labubu';this.back.hidden=false;
-    const card=this.element('div','phone-labubu');
+  showLabibi(rolled = this.rolledLabibi) {
+    this.stopMedia();this.app='labibi';this.title.textContent='Labibi';
+    const card=this.element('div',rolled?'phone-labibi phone-labibi-rolled':'phone-labibi');
+    const controls=this.element('div','phone-labibi-controls');
     const ready=!!this.experiences?.s.deskGroup;
     if (ready && rolled) {
-      const toy=this.element('img','phone-labubu-preview');
-      toy.src='assets/photos/riam-labubu.png';toy.alt='Riam’s Labubu';
-      card.append(toy,this.element('strong','',rolled.color+' Riam Labubu'));
-      card.append(this.action('Keep and place on Sir Sean’s desk',()=>{
-        this.experiences.placeLabubu(rolled);
-        this.rolledLabubu=null;
+      const toy=this.element('img','phone-labibi-preview');
+      toy.src='assets/photos/'+rolled.photo;toy.alt=rolled.name;
+      card.append(toy,this.element('strong','',rolled.name));
+      const keep=this.action('Keep and place on Sir Sean’s desk',()=>{
+        this.experiences.placeLabibi(rolled);
+        this.rolledLabibi=null;
         this.close(true);
-        this.experiences.zoomLabubu();
-      }));
+        this.experiences.zoomLabibi();
+      });
+      keep.setAttribute('aria-label',keep.textContent);keep.textContent='Keep';
+      controls.append(keep);
     }
     const roll=this.action(rolled?'Roll again':'Roll',()=>{
-      const styles=[{color:'Cocoa',fur:'#695044'},{color:'Rose',fur:'#D68B9C'},{color:'Mint',fur:'#70AA92'}];
-      this.rolledLabubu=styles[Math.floor(Math.random()*styles.length)];
-      this.showLabubu(this.rolledLabubu);
+      this.rolledLabibi=LABIBI_ROLLS[Math.floor(Math.random()*LABIBI_ROLLS.length)];
+      this.showLabibi(this.rolledLabibi);
     });
     roll.disabled=!ready;
-    card.append(roll);
+    controls.append(roll);card.append(controls);
     this.screen.replaceChildren(card);
   }
 
   showTiktik() {
-    this.stopMedia();this.app='tiktik';this.title.textContent='Tiktik';this.back.hidden=true;
+    this.stopMedia();this.app='tiktik';this.title.textContent='Tiktik';
     this.entries=Array.isArray(this.config.videos)?this.config.videos:[];this.failed=new Set();this.visible=-1;
     const feed=this.feed=this.element('div','phone-video-feed');feed.setAttribute('aria-label','Group videos');feed.tabIndex=0;
     this.pages=[];this.mounts=[];

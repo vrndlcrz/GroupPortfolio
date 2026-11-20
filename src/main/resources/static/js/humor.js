@@ -346,15 +346,6 @@ const PortfolioHumor = (function() {
     }
   }
 
-  window.addEventListener('keydown', event => {
-    if (event.key !== 'Escape' || !document.getElementById('laptopErrorModal')?.classList.contains('active')) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    const captcha = document.querySelector('.robot-captcha[open]');
-    if (captcha) captcha.close();
-    else closeLaptopError();
-  }, true);
-
   function restartMotivation() {
     closeLaptopError();
     playSound('spill');
