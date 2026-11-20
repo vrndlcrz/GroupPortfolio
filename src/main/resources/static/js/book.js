@@ -175,7 +175,7 @@ class ClearBook {
           provider: 'file',
           src: 'assets/audio/nicole-theme.opus',
           title: 'Awit ng Paghahangad (Piano Instrumental)',
-          credit: 'Himig Heswita'
+          credit: ''
         };
       }
     }
@@ -240,7 +240,7 @@ class ClearBook {
         provider: 'file',
         src: 'assets/audio/nicole-theme.opus',
         title: 'Awit ng Paghahangad (Piano Instrumental)',
-        credit: 'Himig Heswita'
+        credit: ''
       } : null);
       this.music.start(song);
     } else {

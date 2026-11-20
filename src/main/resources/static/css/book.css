@@ -1543,6 +1543,10 @@
   text-align: center;
 }
 
+.theme-nicole .music-credit {
+  display: none !important;
+}
+
 /* Hard paper edges retain each stationery theme and its supplied cover artwork. */
 .book-overlay,
 .book-overlay * {

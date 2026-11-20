@@ -56,7 +56,7 @@ test('Nicole theme plays with correct source, title and credit without colons or
     provider: 'file',
     src: 'assets/audio/nicole-theme.opus',
     title: 'Awit ng Paghahangad (Piano Instrumental)',
-    credit: 'Himig Heswita'
+    credit: ''
   };
 
   x.song.start(nicoleSong);
@@ -66,8 +66,8 @@ test('Nicole theme plays with correct source, title and credit without colons or
   assert.equal(x.song.audio.calls, 1);
   assert.ok(x.song.audio.src.includes('nicole-theme.opus'));
   assert.equal(x.button.title, 'Awit ng Paghahangad (Piano Instrumental)');
-  assert.equal(x.credit.textContent, 'Music by Himig Heswita');
-  assert.equal(x.credit.hidden, false);
+  assert.equal(x.credit.textContent, '');
+  assert.equal(x.credit.hidden, true);
 
   // Validate no colons, semi-colons, em-dashes
   assert.ok(!x.credit.textContent.includes(':'), 'Credit must not contain colon');
@@ -104,7 +104,7 @@ test('members.json contains valid Nicole themeSong metadata', () => {
   assert.ok(nicole.themeSong, 'Nicole must have themeSong');
   assert.equal(nicole.themeSong.src, 'assets/audio/nicole-theme.opus');
   assert.equal(nicole.themeSong.title, 'Awit ng Paghahangad (Piano Instrumental)');
-  assert.equal(nicole.themeSong.credit, 'Himig Heswita');
+  assert.equal(nicole.themeSong.credit, '');
 
   // Content guidelines check on Nicole's visible strings
   for (const page of nicole.pages) {
