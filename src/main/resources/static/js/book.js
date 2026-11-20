@@ -169,11 +169,13 @@ class ClearBook {
       this.overlayElement.classList.toggle('theme-' + item, item === theme);
     }
     this.spiralTurn?.kill();
+    this.journalTurn?.kill();
     this.bookContainer.style.removeProperty('--book-offset');
     this.bookContainer.style.removeProperty('--left-opacity');
     this.isSpiral = this.overlayElement.classList.contains('theme-spiral');
-    // The standalone book tester loads ClearBook without the classroom's GSAP script.
-    if (this.isSpiral && !window.gsap && !document.querySelector('script[src$="/gsap.min.js"]')) {
+    this.isCharellaJournal = memberData.id === 3 && (theme === 'themebook' || theme === 'theme-book');
+    // The standalone book tester loads GSAP when a portfolio needs the page-turn animation.
+    if ((this.isSpiral || this.isCharellaJournal) && !window.gsap && !document.querySelector('script[src$="/gsap.min.js"]')) {
       const script = document.createElement('script');
       script.src = 'js/lib/gsap.min.js';
       document.head.appendChild(script);
@@ -220,6 +222,7 @@ class ClearBook {
   close() {
     if (!this.isOpen()) return;
     this.spiralTurn?.kill();
+    this.journalTurn?.kill();
     this.bookContainer.style.removeProperty('--book-offset');
     this.bookContainer.style.removeProperty('--left-opacity');
     this.isDragging = false;
@@ -716,26 +719,37 @@ class ClearBook {
         }, 0);
 
       } else if (cfg.type === 'back-cover') {
-        frontHTML = `
-          <div class="book-back-cover" style="background: linear-gradient(145deg, ${this.adjustColorBrightness(coverColor, -20)} 0%, ${this.adjustColorBrightness(coverColor, -55)} 100%);">
-            <div>
-              <span class="cover-badge">Course Finale</span>
-              <h2 class="back-cover-title">The End</h2>
-              <p class="back-cover-subtitle">(Please Clap)</p>
+        if (isCharellaJournal) {
+          frontHTML = `
+            <div class="cm-journal-page">
+              <img
+                src="/assets/textures/CM-back.jfif"
+                alt=""
+              >
             </div>
+          `;
+        } else {
+          frontHTML = `
+            <div class="book-back-cover" style="background: linear-gradient(145deg, ${this.adjustColorBrightness(coverColor, -20)} 0%, ${this.adjustColorBrightness(coverColor, -55)} 100%);">
+              <div>
+                <span class="cover-badge">Course Finale</span>
+                <h2 class="back-cover-title">The End</h2>
+                <p class="back-cover-subtitle">(Please Clap)</p>
+              </div>
 
-            <div class="team-credits-card">
-              <h4>AET Group Portfolio</h4>
-              <p>Subject: <strong>Application and Emerging Technologies</strong></p>
-              <p>Tech: Three.js • GSAP • Spring Boot 3</p>
-              <p style="margin-top: 6px; font-size: 0.75rem; opacity: 0.8;">Zero databases were harmed in the making of this portfolio.</p>
-            </div>
+              <div class="team-credits-card">
+                <h4>AET Group Portfolio</h4>
+                <p>Subject: <strong>Application and Emerging Technologies</strong></p>
+                <p>Tech: Three.js • GSAP • Spring Boot 3</p>
+                <p style="margin-top: 6px; font-size: 0.75rem; opacity: 0.8;">Zero databases were harmed in the making of this portfolio.</p>
+              </div>
 
-            <div style="font-size: 0.85rem; opacity: 0.9;">
-              Thank you for reviewing our clear-book!
+              <div style="font-size: 0.85rem; opacity: 0.9;">
+                Thank you for reviewing our clear-book!
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        }
       }
 
       if (isSpiral) {
@@ -848,6 +862,7 @@ class ClearBook {
     if (this.isFlipping || this.currentPageIndex >= this.totalPages - 1) return;
 
     if (this.isSpiral) return this.turnSpiral(this.currentPageIndex + 1);
+    if (this.isCharellaJournal) return this.turnJournal(this.currentPageIndex + 1);
     this.isFlipping = true;
     const flippingPage = this.pagesElements[this.currentPageIndex];
     flippingPage.classList.add('turning');
@@ -870,6 +885,7 @@ class ClearBook {
     if (this.isFlipping || this.currentPageIndex <= 0) return;
 
     if (this.isSpiral) return this.turnSpiral(this.currentPageIndex - 1);
+    if (this.isCharellaJournal) return this.turnJournal(this.currentPageIndex - 1);
     this.isFlipping = true;
     this.currentPageIndex--;
     const returningPage = this.pagesElements[this.currentPageIndex];
@@ -891,11 +907,45 @@ class ClearBook {
   goToPage(idx) {
     if (this.isFlipping || idx === this.currentPageIndex || idx < 0 || idx >= this.totalPages) return;
     if (this.isSpiral) return this.turnSpiral(idx);
+    if (this.isCharellaJournal) return this.turnJournal(idx);
     this.currentPageIndex = idx;
     this.updatePageStates();
     if (window.PortfolioHumor && typeof window.PortfolioHumor.playSound === 'function') {
       window.PortfolioHumor.playSound('pageFlipSlow');
     }
+  }
+
+  turnJournal(destination) {
+    const forward = destination > this.currentPageIndex;
+    const leaf = this.pagesElements[forward ? this.currentPageIndex : destination];
+    if (!leaf) return;
+
+    this.currentPageIndex = destination;
+    this.isFlipping = true;
+    this.updatePageStates();
+    leaf.classList.add('journal-turning');
+    leaf.style.zIndex = '90';
+
+    const finish = () => {
+      leaf.classList.remove('journal-turning');
+      leaf.style.removeProperty('transform');
+      leaf.style.removeProperty('z-index');
+      this.isFlipping = false;
+      this.journalTurn = null;
+      this.updatePageStates();
+    };
+
+    if (window.PortfolioHumor?.playSound) window.PortfolioHumor.playSound('pageFlipSlow');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.gsap) {
+      finish();
+      return;
+    }
+
+    this.journalTurn = window.gsap.timeline({ onComplete: finish });
+    this.journalTurn.fromTo(leaf,
+      { rotationY: forward ? 0 : -180, z: 0 },
+      { rotationY: forward ? -180 : 0, z: 8, duration: 1.35, ease: 'power2.inOut', force3D: true }
+    );
   }
 
   turnSpiral(destination) {

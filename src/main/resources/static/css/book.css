@@ -1861,3 +1861,48 @@
   height: 100%;
   object-fit: fill;
 }
+
+
+.book-overlay.theme-themebook .cm-journal-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0;
+  overflow: hidden;
+}
+.book-overlay.theme-themebook .cm-journal-page img {
+  display: block;
+  width: 94%;
+  height: 100%;
+  max-width: 94%;
+  max-height: 100%;
+  object-fit: fill;
+  object-position: center;
+  margin: 0;
+  margin-left: 8%;
+}
+.book-overlay.theme-themebook .book-page {
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: none;
+  will-change: transform;
+}
+.book-overlay.theme-themebook .book-page.journal-turning {
+  z-index: 90 !important;
+  pointer-events: none;
+}
+.book-overlay.theme-themebook .page-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.book-overlay.theme-themebook .cm-journal-page,
+.book-overlay.theme-themebook .cm-journal-page img {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .book-overlay.theme-themebook .book-page { transition: none; }
+}
