@@ -1785,8 +1785,9 @@ class DeskScene {
         "subject": "Advanced Emerging Technologies",
         "teacher": "Sir Sean Dyogi",
         "deskItem": "intermediate-pad",
-        "tagline": "Quality over quantity. Designing practical tech that helps people.",
+        "tagline": "Powered by careful planning and a fear of redoing work.",
         "folderLabel": "sta_john_gi_notebook",
+        "photo": "assets/photos/nicole-portrait.jpg",
         "coverColor": "#2E7D32"
       }
     ];

@@ -168,6 +168,9 @@ class ClearBook {
     this.overlayElement.classList.toggle('theme-nicole', memberData.id === 4);
     this.bookContainer.classList.toggle('is-nicole', memberData.id === 4);
     this.isNicole = memberData.id === 4;
+    if (this.isNicole) {
+      memberData.photo = 'assets/photos/nicole-portrait.jpg';
+    }
     for (const item of ['spiral-notebook', 'long-folder', 'theme-book', 'intermediate-pad']) {
       this.overlayElement.classList.toggle('theme-' + item, item === theme);
     }
@@ -241,6 +244,9 @@ class ClearBook {
   }
 
   preparePages(member, theme = member.deskItem) {
+    if (member && member.id === 4) {
+      member.photo = 'assets/photos/nicole-portrait.jpg';
+    }
     let entry = this.pageCache.get(member);
     if (!entry || entry.theme !== theme) {
       entry = { theme, pages: this.renderPages(member, theme) };
@@ -285,24 +291,25 @@ class ClearBook {
   }
 
   johnProfile(member) {
-    const spread=document.createElement('div');spread.className='john-profile-spread';
-    const blank=document.createElement('div');blank.className='john-blank-page';blank.setAttribute('aria-label','Blank left page');
-    const page=document.createElement('section');page.className='john-profile-page';
-    const pin=document.createElement('i');pin.className='john-pushpin';pin.setAttribute('aria-hidden','true');
-    const photo=document.createElement('figure');photo.className='john-photo';
-    const portrait=document.createElement('img');portrait.className='john-portrait';portrait.src=member.photo;
-    portrait.alt='Portrait of '+member.name;
+    const spread = document.createElement('div'); spread.className = 'john-profile-spread';
+    const blank = document.createElement('div'); blank.className = 'john-blank-page'; blank.setAttribute('aria-label', 'Blank left page');
+    const page = document.createElement('section'); page.className = 'john-profile-page';
+    const pin = document.createElement('i'); pin.className = 'john-pushpin'; pin.setAttribute('aria-hidden', 'true');
+    const photo = document.createElement('figure'); photo.className = 'john-photo';
+    const portrait = document.createElement('img'); portrait.className = 'john-portrait'; portrait.src = member.photo;
+    portrait.alt = 'Portrait of ' + member.name;
     photo.append(portrait);
-    const heading=document.createElement('h2');heading.className='john-angular-title';heading.textContent=member.titleText||'John Vernie';
-    const titleCanvas=document.createElement('canvas');titleCanvas.width=600;titleCanvas.height=240;titleCanvas.textContent=heading.textContent;
-    const ctx=titleCanvas.getContext('2d');
-    document.fonts.load('130px "Jolly Lodger"').catch(()=>{}).then(()=>{
-      const draw=()=>{ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='miter';ctx.miterLimit=2;
-        if(!document.fonts.check('130px "Jolly Lodger"')) {
-          const glyphs={J:[[4,0,4,5,3,6,1,6,0,5]],O:[[1,0,3,0,4,1,4,5,3,6,1,6,0,5,0,1,1,0]],H:[[0,0,0,6],[4,0,4,6],[0,3,4,3]],N:[[0,6,0,0,4,6,4,0]],V:[[0,0,2,6,4,0]],E:[[4,0,0,0,0,6,4,6],[0,3,3,3]],R:[[0,6,0,0,3,0,4,1,4,2,3,3,0,3],[2,3,4,6]],I:[[0,0,4,0],[2,0,2,6],[0,6,4,6]]};
-          ctx.beginPath();const text=titleCanvas.textContent.toUpperCase(),step=Math.min(48,540/text.length),start=(600-step*text.length)/2;
-          for(let i=0;i<text.length;i++)for(const path of glyphs[text[i]]||[]){ctx.moveTo(start+i*step+path[0]*step/5,65+path[1]*17);for(let n=2;n<path.length;n+=2)ctx.lineTo(start+i*step+path[n]*step/5,65+path[n+1]*17)}
-          ctx.strokeStyle='#4B1FA8';ctx.lineWidth=20;ctx.stroke();ctx.strokeStyle='#E4D2FF';ctx.lineWidth=13;ctx.stroke();ctx.strokeStyle='#9B6BEA';ctx.lineWidth=9;ctx.stroke();return;
+    const heading = document.createElement('h2'); heading.className = 'john-angular-title'; heading.textContent = member.titleText || 'John Vernie';
+    const titleCanvas = document.createElement('canvas'); titleCanvas.width = 600; titleCanvas.height = 240; titleCanvas.textContent = heading.textContent;
+    const ctx = titleCanvas.getContext('2d');
+    document.fonts.load('130px "Jolly Lodger"').catch(() => { }).then(() => {
+      const draw = () => {
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'miter'; ctx.miterLimit = 2;
+        if (!document.fonts.check('130px "Jolly Lodger"')) {
+          const glyphs = { J: [[4, 0, 4, 5, 3, 6, 1, 6, 0, 5]], O: [[1, 0, 3, 0, 4, 1, 4, 5, 3, 6, 1, 6, 0, 5, 0, 1, 1, 0]], H: [[0, 0, 0, 6], [4, 0, 4, 6], [0, 3, 4, 3]], N: [[0, 6, 0, 0, 4, 6, 4, 0]], V: [[0, 0, 2, 6, 4, 0]], E: [[4, 0, 0, 0, 0, 6, 4, 6], [0, 3, 3, 3]], R: [[0, 6, 0, 0, 3, 0, 4, 1, 4, 2, 3, 3, 0, 3], [2, 3, 4, 6]], I: [[0, 0, 4, 0], [2, 0, 2, 6], [0, 6, 4, 6]] };
+          ctx.beginPath(); const text = titleCanvas.textContent.toUpperCase(), step = Math.min(48, 540 / text.length), start = (600 - step * text.length) / 2;
+          for (let i = 0; i < text.length; i++)for (const path of glyphs[text[i]] || []) { ctx.moveTo(start + i * step + path[0] * step / 5, 65 + path[1] * 17); for (let n = 2; n < path.length; n += 2)ctx.lineTo(start + i * step + path[n] * step / 5, 65 + path[n + 1] * 17) }
+          ctx.strokeStyle = '#4B1FA8'; ctx.lineWidth = 20; ctx.stroke(); ctx.strokeStyle = '#E4D2FF'; ctx.lineWidth = 13; ctx.stroke(); ctx.strokeStyle = '#9B6BEA'; ctx.lineWidth = 9; ctx.stroke(); return;
         }
         ctx.font = '130px "Jolly Lodger", monospace'; ctx.strokeStyle = '#4B1FA8'; ctx.lineWidth = 14; ctx.strokeText(titleCanvas.textContent, 300, 120, 560);
         ctx.strokeStyle = '#E4D2FF'; ctx.lineWidth = 5; ctx.strokeText(titleCanvas.textContent, 300, 120, 560); ctx.fillStyle = '#9B6BEA'; ctx.fillText(titleCanvas.textContent, 300, 120, 560)
@@ -320,8 +327,8 @@ class ClearBook {
   notebookPhotos(files, label, arrow = false) {
     return '<div class="notebook-photos">' + files.map((file, index) =>
       '<figure class="notebook-print' + (arrow ? ' notebook-arrow' : '') + '" hidden>' +
-        '<img data-notebook-photo="' + file + '" alt="' + label + (arrow ? '' : ' ' + (index + 1)) + '">' +
-        (arrow ? '<figcaption>Zhang Linghe</figcaption>' : '') + '</figure>'
+      '<img data-notebook-photo="' + file + '" alt="' + label + (arrow ? '' : ' ' + (index + 1)) + '">' +
+      (arrow ? '<figcaption>Zhang Linghe</figcaption>' : '') + '</figure>'
     ).join('') + '</div>';
   }
 
@@ -747,10 +754,10 @@ class ClearBook {
       if (isJohn && cfg.type === 'cover') {
         const front = pageEl.querySelector('.page-front'); front.classList.add('john-collage-cover');
         front.replaceChildren(JohnFolderArt.get(member).canvas);
-      } else if(cfg.type==='john-divider') {
-        const front=pageEl.querySelector('.page-front');front.classList.add('john-divider-cover');
+      } else if (cfg.type === 'john-divider') {
+        const front = pageEl.querySelector('.page-front'); front.classList.add('john-divider-cover');
         front.replaceChildren(this.johnDivider());
-      } else if(cfg.type==='john-profile') {
+      } else if (cfg.type === 'john-profile') {
         pageEl.querySelector('.page-front').replaceChildren(this.johnProfile(member));
       }
 
@@ -1044,6 +1051,7 @@ class ClearBook {
 
     // Spread 1 Left Page (Sheet 0 Verso - Inside Cover Profile)
     if (idx === 0) {
+      const portraitSrc = 'assets/photos/nicole-portrait.jpg';
       return `
         <div class="nicole-verso-container nicole-dossier-page">
           <div class="nicole-washi-strip washi-matcha">STA. JOHN GI ACADEMY</div>
@@ -1055,7 +1063,7 @@ class ClearBook {
             <div class="dossier-photo-row">
               <div class="nicole-mini-polaroid">
                 <div class="nicole-brass-clip" aria-hidden="true"></div>
-                <img src="${member.photo}" alt="${member.name}">
+                <img src="${portraitSrc}" alt="${fullName}">
                 <span class="mini-caption">${fullName}</span>
               </div>
               <div class="dossier-id-badge">
@@ -1113,7 +1121,7 @@ class ClearBook {
                   <span class="tool-role">UI and Wireframes</span>
                 </div>
               </div>
-              <p class="tool-desc">Screen layouts, buttons, and clickable prototypes for class projects.</p>
+              <p class="tool-desc">Screen layouts, buttons, slides, and clickable prototypes for class projects.</p>
             </div>
 
             <div class="tool-card tool-affinity">
@@ -1163,7 +1171,7 @@ class ClearBook {
                   <span class="tool-role">Presentation Design</span>
                 </div>
               </div>
-              <p class="tool-desc">Slide decks, project reports, and visual summaries.</p>
+              <p class="tool-desc">Publication materials, slide decks, project reports, and visual summaries.</p>
             </div>
           </div>
         </div>
@@ -1196,15 +1204,15 @@ class ClearBook {
                 </div>
               </div>
               <div class="nib-spec-grid">
-                <div class="nib-spec-item"><span class="spec-label">PEN TYPE</span><span class="spec-val">Japanese Gel Pen (0.38mm)</span></div>
+                <div class="nib-spec-item"><span class="spec-label">PEN TYPE</span><span class="spec-val">Gel Pen (0.38mm)</span></div>
                 <div class="nib-spec-item"><span class="spec-label">PAPER TYPE</span><span class="spec-val">Smooth Cream Grid Paper</span></div>
-                <div class="nib-spec-item"><span class="spec-label">INK COLOR</span><span class="spec-val">Dark Green and Black</span></div>
-                <div class="nib-spec-item"><span class="spec-label">BEST FOR</span><span class="spec-val">Class Notes and Planning</span></div>
+                <div class="nib-spec-item"><span class="spec-label">INK COLOR</span><span class="spec-val">Black | Brown Black</span></div>
+                <div class="nib-spec-item"><span class="spec-label">BEST FOR</span><span class="spec-val">Note-Taking and Planning</span></div>
               </div>
             </div>
             <div class="stationery-quote-tape">
               <span class="quote-tape-pin" aria-hidden="true"></span>
-              <p>&ldquo;Good stationery keeps my notes neat and readable.&rdquo;</p>
+              <p>&ldquo;Neat tools, neat thoughts.&rdquo;</p>
             </div>
           </div>
         </div>
@@ -1482,7 +1490,7 @@ class ClearBook {
                   <span class="sensory-sub">Research and Routine</span>
                 </div>
               </div>
-              <p class="sensory-desc">I like learning about ingredients such as ceramides, niacinamide, and hyaluronic acid. Understanding how different products work helps me pick gentle and effective skincare.</p>
+              <p class="sensory-desc">I like learning about ingredients such as ceramides, azelaic acid, and retinals. Understanding how different products work helps me pick gentle and effective skincare.</p>
               <div class="sensory-tags">
                 <span class="tag-pill">Ceramides</span>
                 <span class="tag-pill">Hydration</span>

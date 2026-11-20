@@ -127,6 +127,9 @@
         const res = await fetch(`/api/members/${id}`);
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
         const member = await res.json();
+        if (member.id === 4) {
+          member.photo = 'assets/photos/nicole-portrait.jpg';
+        }
         status.textContent = `Loaded ${member.name}. Opening portfolio...`;
         memberCache.set(id, member);
         book.open(member);
