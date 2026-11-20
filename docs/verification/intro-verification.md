@@ -1,5 +1,7 @@
 # Intro overlay verification
 
+> Historical verification record. See [current checks](../../scripts/verification/README.md) for runnable checks after the repository reorganization.
+
 Implemented on feature/four-member-desk. Existing uncommitted work was preserved.
 
 ## Implementation

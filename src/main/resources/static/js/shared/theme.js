@@ -195,7 +195,8 @@ window.Theme = (() => {
           });
           seatMap.colorSpace=THREE.SRGBColorSpace;
           const seat=desk.seatVandalism=makePlane(seatMap,'seat-tablet-vandalism');seat.scale.set(.4/10.5,1.04/6.2,1);
-          seat.position.set(seatSlot.x+.86,-2.84+2.768,seatSlot.z-.48);desk.roomGroup.add(seat);desk.seatDecalSlot=seatSlot;
+          seat.position.set(seatSlot.x+.86,-2.84+2.768,seatSlot.z-.48);
+          (desk.roomGroup.getObjectByName('floating-classroom-chairs')||desk.roomGroup).add(seat);desk.seatDecalSlot=seatSlot;
         }
         resolve();
       };

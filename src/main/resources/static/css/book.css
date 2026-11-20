@@ -791,7 +791,7 @@
 
 @font-face {
   font-family: 'Patrick Hand';
-  src: url('../fonts/PatrickHand-Regular.ttf') format('truetype');
+  src: url('../assets/fonts/PatrickHand-Regular.ttf') format('truetype');
   font-display: swap;
 }
 .theme-spiral {
@@ -817,7 +817,7 @@
 
 @font-face {
   font-family: 'Dancing Script';
-  src: url('../fonts/DancingScript.ttf') format('truetype');
+  src: url('../assets/fonts/DancingScript.ttf') format('truetype');
   font-weight: 400 700;
   font-display: swap;
 }
@@ -849,7 +849,7 @@
 
 @font-face {
   font-family: 'Plus Jakarta Sans';
-  src: url('../fonts/PlusJakartaSans.ttf') format('truetype');
+  src: url('../assets/fonts/PlusJakartaSans.ttf') format('truetype');
   font-weight: 200 800;
   font-display: swap;
 }
@@ -1015,8 +1015,8 @@
   .book-overlay.theme-spiral, .theme-spiral .book-container, .theme-spiral .page-dot { transition: none; }
 }
 
-@font-face { font-family: 'Gochi Hand'; src: url('../fonts/GochiHand-Regular.ttf') format('truetype'); font-display: swap; }
-@font-face { font-family: Caveat; src: url('../fonts/Caveat.ttf') format('truetype'); font-weight: 400 700; font-display: swap; }
+@font-face { font-family: 'Gochi Hand'; src: url('../assets/fonts/GochiHand-Regular.ttf') format('truetype'); font-display: swap; }
+@font-face { font-family: Caveat; src: url('../assets/fonts/Caveat.ttf') format('truetype'); font-weight: 400 700; font-display: swap; }
 
 .theme-spiral .ink-word {
   display: inline-block; max-width: 100%; font: inherit; letter-spacing: var(--spacing);

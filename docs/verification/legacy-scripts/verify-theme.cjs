@@ -10,22 +10,22 @@ const { execFileSync } = require('node:child_process');
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1.5 });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => { if(m.type() === 'error') errors.push(m.text()); });
-  await page.route('**/js/scene.js', async route => {
+  await page.route('**/js/classroom/scene.js', async route => {
     const response = await route.fetch();
     await route.fulfill({ response, body: (await response.text()).replace('this.init();', 'window.__desk = this; this.init();') });
   });
-  await page.route('**/js/book.js', async route => {
+  await page.route('**/js/portfolio/book.js', async route => {
     const response=await route.fetch();
     await route.fulfill({response,body:(await response.text()).replace('this.initDOM();','window.__book=this;this.initDOM();')});
   });
   if(phase==='before') {
     // Reproduce the starting frontend from Git without altering the working checkout.
-    const originals=new Map(['index.html','css/book.css','js/main.js','js/scene.js'].map(file=>
+    const originals=new Map(['index.html','css/book.css','js/core/main.js','js/classroom/scene.js'].map(file=>
       [file,execFileSync('git',['show','HEAD:src/main/resources/static/'+file],{encoding:'utf8',maxBuffer:4*1024*1024})]));
     await page.route('**/*',async route=>{
       const file=new URL(route.request().url()).pathname.replace(/^\//,'')||'index.html';
       if(!originals.has(file)) return route.fallback();
-      let body=originals.get(file);if(file==='js/scene.js')body=body.replace('this.init();','window.__desk=this;this.init();');
+      let body=originals.get(file);if(file==='js/classroom/scene.js')body=body.replace('this.init();','window.__desk=this;this.init();');
       await route.fulfill({body,contentType:file.endsWith('.html')?'text/html':file.endsWith('.css')?'text/css':'application/javascript'});
     });
   }

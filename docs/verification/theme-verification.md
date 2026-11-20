@@ -1,5 +1,7 @@
 # Visual theme and photo filter — verification
 
+> Historical verification record. See [current checks](../../scripts/verification/README.md) for runnable checks after the repository reorganization.
+
 Verified November 17, 2026 (Asia/Manila), on `feature/four-member-desk`, starting from `158868f6b5ec0db263c0ac297d4233f91127ce1d`.
 
 ## Implemented

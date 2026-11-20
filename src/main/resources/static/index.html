@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="A humorous 3D interactive portfolio website for Application and Emerging Technologies featuring 5 member clear books on a messy student desk.">
+  <meta name="description" content="A humorous 3D interactive classroom portfolio for Application and Emerging Technologies featuring four member portfolios on a messy student desk.">
   <meta name="author" content="AET Group 1">
   <title>Sean Dyogi Truthers | Group 1 Portfolio</title>
 
@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="css/whiteboard.css?v=whiteboard-v1">
   <link rel="stylesheet" href="css/phone.css?v=universal-back-v1">
   <link rel="stylesheet" href="css/experiences.css?v=universal-back-v1">
+  <link rel="stylesheet" href="css/cursor.css?v=cartoon-pointer-v1">
   <script>if (new URLSearchParams(location.search).get("intro") === "off") document.documentElement.classList.add("intro-off");</script>
 </head>
 <body>
@@ -174,23 +175,24 @@
   <div id="bookOverlayRoot"></div>
 
   <!-- 6. VENDORED OFFLINE LIBRARIES -->
-  <script src="js/lib/three.min.js?v=students-grid-20261117"></script>
-  <script src="js/lib/gsap.min.js?v=students-grid-20261117"></script>
+  <script src="vendor/js/three.min.js?v=students-grid-20261117"></script>
+  <script src="vendor/js/gsap.min.js?v=students-grid-20261117"></script>
 
   <!-- 7. APPLICATION MODULES -->
-  <script src="js/api.js?v=labibi-portrait-v1"></script>
-  <script src="js/theme.js?v=table-whiteboard-20261117"></script>
-  <script src="js/humor.js?v=universal-back-v1"></script>
-  <script src="js/handwriting.js?v=vernie-update-20261120"></script>
-  <script src="js/sketches.js?v=vernie-update-20261120"></script>
-  <script src="js/themesong.js?v=vernie-update-20261120"></script>
-  <script src="js/book.js?v=universal-back-v1"></script>
-  <script src="js/scene.js?v=universal-back-v1"></script>
-  <script src="js/whiteboard.js?v=whiteboard-v1"></script>
-  <script src="js/introSound.js?v=vernie-update-20261120"></script>
-  <script src="js/intro.js?v=classroom-extras-v1"></script>
-  <script src="js/phone.js?v=universal-back-v1"></script>
-  <script src="js/experiences.js?v=universal-back-v1"></script>
-  <script src="js/main.js?v=universal-back-v1"></script>
+  <script src="js/core/api.js?v=labibi-portrait-v1"></script>
+  <script src="js/shared/theme.js?v=table-whiteboard-20261117"></script>
+  <script src="js/shared/humor.js?v=universal-back-v1"></script>
+  <script src="js/portfolio/handwriting.js?v=vernie-update-20261120"></script>
+  <script src="js/portfolio/sketches.js?v=vernie-update-20261120"></script>
+  <script src="js/portfolio/themesong.js?v=vernie-update-20261120"></script>
+  <script src="js/portfolio/folder-art.js"></script>
+  <script src="js/portfolio/book.js?v=universal-back-v1"></script>
+  <script src="js/classroom/scene.js?v=universal-back-v1"></script>
+  <script src="js/classroom/whiteboard.js?v=whiteboard-v1"></script>
+  <script src="js/intro/introSound.js?v=vernie-update-20261120"></script>
+  <script src="js/intro/intro.js?v=classroom-extras-v1"></script>
+  <script src="js/phone/phone.js?v=universal-back-v1"></script>
+  <script src="js/classroom/experiences.js?v=universal-back-v1"></script>
+  <script src="js/core/main.js?v=universal-back-v1"></script>
 </body>
 </html>

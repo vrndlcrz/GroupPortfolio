@@ -1,5 +1,7 @@
 # Golden classroom verification
 
+> Historical verification record. See [current checks](../../scripts/verification/README.md) for runnable checks after the repository reorganization.
+
 ## Result and outstanding asset
 
 Implemented on feature/four-member-desk. The supplied sunset is visible in the chat, but no readable local file was available at src/main/resources/static/assets/textures/window-sunset.jpg. The live window currently uses the requested golden gradient fallback. Place the original photo at that path and rebuild to enable its treatment. No substitute photograph or generated artwork was installed.

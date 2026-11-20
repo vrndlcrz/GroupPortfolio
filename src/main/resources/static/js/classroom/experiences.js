@@ -1,4 +1,4 @@
-const SPOTIBAI_START_SECONDS = Object.freeze({ preso: 20, tma: 148 });
+const SPOTIBAI_START_SECONDS = Object.freeze({ preso: 20, tma: 30 });
 
 /* Classroom events reuse the room's geometry, ink and toon palette. */
 class ClassroomExperiences {
@@ -58,10 +58,12 @@ class ClassroomExperiences {
       const mesh=new THREE.Mesh(type==='cornymo'?lidGeometry:geometry,materials[type]);mesh.position.set(x,-2.79,z);mesh.rotation.set(-Math.PI/2,0,(index*.83)%1-.5);mesh.name=type+'-scrap-'+index;this.s.roomGroup.add(mesh);
       const hit=new THREE.Mesh(this.s.studentGeometry.box,this.s.studentHitMaterial);hit.position.set(x,-2.72,z);hit.scale.set(1.2,.35,.9);hit.layers.set(1);
       const scrap={type,index,mesh,hit,collected:false};hit.userData={type:'floor-scrap',scrap};this.s.roomGroup.add(hit);this.s.interactiveObjects.push(hit);this.scraps.push(scrap);
+      scrap.group=this.s.groupFloatingObjects('floating-wrapper-'+index,[mesh,hit]);
     });
   }
   registerDoor() {
     const hit=new THREE.Mesh(this.s.studentGeometry.box,this.s.studentHitMaterial);hit.position.set(0,1.38,8.58);hit.scale.set(3.55,8.36,.4);hit.layers.set(1);hit.userData.type='exit-door';this.s.roomGroup.add(hit);this.s.interactiveObjects.push(hit);
+    this.s.roomGroup.updateMatrixWorld(true);this.s.exitDoorLeaf.parent.attach(hit);
   }
   handleClick(object) {
     const type=object.userData.type;
@@ -214,7 +216,7 @@ class ClassroomExperiences {
     this.cleanTween.timeScale(this.reduced.matches?1:.65);
   }
   buildBasketball() {
-    const ball=new THREE.Group();ball.position.set(9.5,-2.28,7.3);this.s.roomGroup.add(ball);
+    const ball=this.ball=new THREE.Group();ball.position.set(9.5,-2.28,7.3);this.s.roomGroup.add(ball);
     const skin=this.mesh(ball,'sphere','#D87932',0,0,0,.56,.56,.56);
     for (const rotation of [[0,0,0],[Math.PI/2,0,0],[0,Math.PI/2,0]]) {
       const seam=new THREE.Mesh(new THREE.TorusGeometry(.553,.016,5,24),this.paint(Theme.ink));
@@ -634,7 +636,7 @@ class ClassroomExperiences {
     this.hideStadium();this.clearSpeaker();this.s.renderer.shadowMap.needsUpdate=true;
   }
   enterDark() {
-    if(!this.s.inputEnabled||this.s.view==='gliding'||this.dark)return;
+    if(!this.s.renderer||!this.s.inputEnabled||this.s.view==='gliding'||this.dark)return;
     this.s.resetHoverState();this.s.pendingHover=null;
     this.darkHome={input:this.s.rig.inputEnabled,focus:document.activeElement};
     if(!this.blackout){

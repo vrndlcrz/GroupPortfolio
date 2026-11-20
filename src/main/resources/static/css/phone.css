@@ -5,15 +5,16 @@
 .portfolio-phone * { box-sizing:border-box; }
 .portfolio-phone button { color:inherit; font:inherit; border:3px solid var(--ink,#3A2312); background:#FFE6A1; cursor:pointer; }
 .portfolio-phone button:focus-visible,.portfolio-phone video:focus-visible,.phone-video-feed:focus-visible { outline:3px solid #2B6C85; outline-offset:2px; }
-.phone-status { display:flex; height:25px; flex:none; align-items:center; justify-content:space-between; padding:0 10px 5px; }
+.phone-status { display:flex; height:40px; flex:none; align-items:center; justify-content:space-between; padding:8px 14px 6px; background:#F8D677; }
 .phone-notch { height:12px; width:70px; background:var(--ink,#3A2312); border-radius:0 0 12px 12px; align-self:start; }
 .phone-signal { display:flex; align-items:end; gap:2px; height:14px; }
 .phone-signal i { width:4px; height:6px; background:var(--ink,#3A2312); }.phone-signal i:nth-child(2) { height:10px; }.phone-signal i:nth-child(3) { height:14px; }
 .phone-battery { position:relative; width:21px; height:11px; border:2px solid var(--ink,#3A2312); border-radius:2px; background:#8BB66D; }.phone-battery::after { content:''; position:absolute; right:-5px; top:2px; width:3px; height:4px; background:var(--ink,#3A2312); }
-.phone-header { flex:none; display:flex; align-items:center; gap:8px; min-height:39px; padding:0 3px 7px; }
+.phone-header { flex:none; display:flex; align-items:center; gap:8px; min-height:39px; padding:0 12px 7px; }
 .phone-header h2 { flex:1; margin:0; font:inherit; font-size:22px; line-height:1.1; }
 .phone-header button { width:29px; height:29px; flex:none; padding:0; border-radius:8px; font-size:25px; line-height:1; box-shadow:2px 2px 0 var(--ink,#3A2312); }
-.phone-screen { min-height:0; flex:1; overflow:hidden; border:3px solid var(--ink,#3A2312); border-radius:12px; background:#FFF2CD; }
+.phone-screen { min-height:0; flex:1; display:flex; flex-direction:column; overflow:hidden; border:3px solid var(--ink,#3A2312); border-radius:18px; background:#FFF2CD; }
+.phone-content { min-height:0; flex:1; overflow:hidden; }
 .phone-apps { display:grid; grid-template-columns:1fr 1fr; align-content:start; gap:24px 18px; padding:34px 15px; height:100%; background:#F8D677; }
 .phone-app { display:flex; flex-direction:column; align-items:center; gap:9px; border:0!important; background:transparent!important; padding:0; font-size:17px!important; }
 .phone-app svg { width:72px; height:72px; stroke:var(--ink,#3A2312); stroke-width:3px; stroke-linecap:round; stroke-linejoin:round; }

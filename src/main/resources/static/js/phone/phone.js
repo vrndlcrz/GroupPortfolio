@@ -47,11 +47,13 @@ class PortfolioPhone {
     const status=this.element('div','phone-status');status.setAttribute('aria-hidden','true');
     const signal=this.element('span','phone-signal');for(let i=0;i<3;i++)signal.append(this.element('i'));
     status.append(signal,this.element('span','phone-notch'),this.element('span','phone-battery'));
-    const header=this.element('header','phone-header');
+    const header=this.header=this.element('header','phone-header');
     this.title=this.element('h2','','Phone');this.title.id='phone-title';
     header.append(this.title);
     this.screen=this.element('div','phone-screen');
-    root.append(status,header,this.screen);document.body.append(root);
+    this.content=this.element('div','phone-content');
+    this.screen.append(status,header,this.content);
+    root.append(this.screen);document.body.append(root);
     for(const type of ['pointerdown','pointerup','pointermove','mousedown','mouseup','mousemove','click','dblclick','wheel','touchstart','touchmove','touchend'])
       root.addEventListener(type,event=>event.stopPropagation(),{passive:true});
     root.addEventListener('pointerdown',event=>{this.gesture ||= event.isTrusted});
@@ -108,12 +110,13 @@ class PortfolioPhone {
   }
   showHome() {
     this.stopMedia();this.app='home';this.title.textContent='Phone';
+    this.header.hidden=true;
     const home=this.element('div','phone-apps');
     for(const [type,name,open] of [['spotibai','SpotiBai',()=>this.showSpotiBai()],['labibi','Labibi',()=>this.showLabibi()]]){
       const button=this.action('',open,'phone-app');
       button.append(this.icon(type),this.element('span','',name));home.append(button);
     }
-    this.screen.replaceChildren(home);
+    this.content.replaceChildren(home);
   }
 
   goBack() {
@@ -130,6 +133,7 @@ class PortfolioPhone {
   }
   showSpotiBai() {
     this.stopMedia();this.app='spotibai';this.title.textContent='SpotiBai';
+    this.header.hidden=false;
     const list=this.element('div','phone-playlists');
     const status=this.element('p','phone-placeholder');
     status.setAttribute('role','status');
@@ -165,11 +169,12 @@ class PortfolioPhone {
       }));
       list.append(row);
     }
-    this.screen.replaceChildren(list,status);
+    this.content.replaceChildren(list,status);
   }
 
   showLabibi(rolled = this.rolledLabibi) {
     this.stopMedia();this.app='labibi';this.title.textContent='Labibi';
+    this.header.hidden=false;
     const card=this.element('div',rolled?'phone-labibi phone-labibi-rolled':'phone-labibi');
     const controls=this.element('div','phone-labibi-controls');
     const ready=!!this.experiences?.s.deskGroup;
@@ -192,11 +197,12 @@ class PortfolioPhone {
     });
     roll.disabled=!ready;
     controls.append(roll);card.append(controls);
-    this.screen.replaceChildren(card);
+    this.content.replaceChildren(card);
   }
 
   showTiktik() {
     this.stopMedia();this.app='tiktik';this.title.textContent='Tiktik';
+    this.header.hidden=false;
     this.entries=Array.isArray(this.config.videos)?this.config.videos:[];this.failed=new Set();this.visible=-1;
     const feed=this.feed=this.element('div','phone-video-feed');feed.setAttribute('aria-label','Group videos');feed.tabIndex=0;
     this.pages=[];this.mounts=[];
@@ -209,7 +215,7 @@ class PortfolioPhone {
       heart.setAttribute('aria-label','Like '+(entry.title||'video'));heart.setAttribute('aria-pressed',String(this.likes.has(entry.id||index)));heart.append(this.icon('heart'));
       page.append(mount,caption,heart);feed.append(page);this.pages.push(page);this.mounts.push(mount);
     });
-    this.screen.replaceChildren(feed);
+    this.content.replaceChildren(feed);
     this.videoObserver=new IntersectionObserver(entries=>{
       if(!this.opened||this.app!=='tiktik')return;
       for(const entry of entries)if(entry.isIntersecting&&entry.intersectionRatio>=.6)this.setVisible(Number(entry.target.dataset.index));

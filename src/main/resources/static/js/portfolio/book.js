@@ -177,7 +177,7 @@ class ClearBook {
     // The standalone book tester loads GSAP when a portfolio needs the page-turn animation.
     if ((this.isSpiral || this.isCharellaJournal) && !window.gsap && !document.querySelector('script[src$="/gsap.min.js"]')) {
       const script = document.createElement('script');
-      script.src = 'js/lib/gsap.min.js';
+      script.src = 'vendor/js/gsap.min.js';
       document.head.appendChild(script);
     }
     this.currentMember = memberData;

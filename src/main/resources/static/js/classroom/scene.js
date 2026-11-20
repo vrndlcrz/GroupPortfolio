@@ -1,59 +1,3 @@
-// One shared canvas supplies John's 3D folder and opened cover from the attached AET aesthetic image.
-const JohnFolderArt = (() => {
-  const cache = new Map();
-  return {
-    get(member) {
-      const key = member.name + '|' + member.section;
-      if (cache.has(key)) return cache.get(key);
-      const canvas = document.createElement('canvas');
-      canvas.width = 1024;
-      canvas.height = 1536;
-      canvas.textContent = 'Application and Emerging Technologies - John Vernie Dela Cruz';
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#0F172A';
-      ctx.fillRect(0, 0, 1024, 1536);
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.anisotropy = 4;
-      const entry = { canvas, texture };
-      cache.set(key, entry);
-
-      const coverImg = new Image();
-      coverImg.crossOrigin = 'anonymous';
-      const drawCover = () => {
-        if (coverImg.naturalWidth) {
-          ctx.drawImage(coverImg, 0, 0, 1024, 1536);
-          // Draw the corrected subject over the cover image's printed lettering.
-          ctx.save();
-          ctx.scale(canvas.width / 764, canvas.height / 1024);
-          ctx.fillStyle = '#1E1E1D';
-          ctx.fillRect(202, 369, 425, 60);
-          ctx.fillRect(201, 435, 454, 64);
-          ctx.fillRect(197, 504, 518, 57);
-          ctx.font = '900 50px Georgia, serif';
-          ctx.lineJoin = 'round';
-          ctx.lineWidth = 5;
-          ctx.strokeStyle = '#EBF6FA';
-          ctx.fillStyle = '#2A638A';
-          for (const [line, y, width] of [
-            ['APPLICATION AND', 422, 419], ['EMERGING', 490, 446], ['TECHNOLOGIES', 553, 508]
-          ]) {
-            ctx.strokeText(line, 207, y, width);
-            ctx.fillText(line, 207, y, width);
-          }
-          ctx.restore();
-        }
-        texture.needsUpdate = true;
-      };
-      coverImg.onload = drawCover;
-      coverImg.src = 'assets/textures/john-cover.jpg';
-      if (coverImg.complete && coverImg.naturalWidth) drawCover();
-
-      entry.ready = Promise.resolve(entry);
-      return entry;
-    }
-  };
-})();
-
 /** Interactive group portfolio desk in a Philippine high school classroom. */
 // Keyboard look direction; drag keeps its original direction.
 const INVERT_X = false;
@@ -208,6 +152,7 @@ class DeskScene {
     this.antiGravityTweens=[];
     this.antiGravityResetTweens=[];
     this.antiGravityLanding=false;
+    this.classroomFloatRoots=[];
 
     this.isDraggingView = false;
     this.dragStartPos = { x: 0, y: 0 };
@@ -393,6 +338,7 @@ class DeskScene {
     door.position.set(0, floor, back - 0.25);
     door.userData = { type: 'door', enabled: false };
     room.add(door);
+    this.classroomFloatRoots.push(door);
     const leaf = this.exitDoorLeaf = new THREE.Group();
     leaf.position.x = -1.76;
     door.add(leaf);
@@ -439,8 +385,12 @@ class DeskScene {
     slats.forEach((slat,i)=>{slat.updateMatrix();slatOutlines.setMatrixAt(i,matrix.copy(slat.matrix).multiply(expansion));});
     slatOutlines.userData.outlineAdded=true;slatOutlines.raycast=()=>{};room.add(slatOutlines);
     this.buildWindowView(side,sill,lintel,start,end);
+    const curtainStart=new Set(room.children);
     this.buildCurtain(room, box, texture, side, sill, lintel, start, end);
+    this.groupFloatingObjects('floating-curtains',room.children.filter(o=>!curtainStart.has(o)));
 
+    // Keep the building shell fixed; all furniture and teaching fixtures can lift off.
+    const fixturesStart = new Set(room.children);
     const boardX = 0, boardWidth = 22 * .75, boardHeight = wallHeight * .37, boardY = 3.5;
     box(room, paint(Theme.gold), boardX, boardY, front + .18, boardWidth, boardHeight, .2);
     const board = texture(2048, 560, () => {});
@@ -480,6 +430,7 @@ class DeskScene {
       box(room, white, i - 1, trayY + .11, front + .42, .61, .09, .09);
       box(room, paint(color), i - .72, trayY + .11, front + .42, .12, .1, .1);
     });
+    this.groupFloatingObjects('floating-whiteboard', room.children.filter(o=>!fixturesStart.has(o)));
     for (const [key, x] of [['mission', -5.5], ['vision', 5.5]]) {
       const content = this.classroom[key];
       const sign = texture(768, 320, ctx => {
@@ -495,8 +446,10 @@ class DeskScene {
       const face = panel(sign, 22 * .17, 1.65, x, 7.75, front + .25);
       face.userData = { type: 'placard', content };
       this.interactiveObjects.push(face);
+      this.classroomFloatRoots.push(face);
     }
     const tv = new THREE.Group(); room.add(tv);
+    this.classroomFloatRoots.push(tv);
     tv.position.set(boardX, boardY + boardHeight / 2 + .35 + 2.75 / 2, front + .21);
     box(tv, frame, 0, 0, 0, 4.87, 2.75, .2);
     this.tvTexture = texture(512,288,ctx => {ctx.fillStyle="#1034A6";ctx.fillRect(0,0,512,288)});
@@ -507,19 +460,44 @@ class DeskScene {
     this.interactiveObjects.push(screen);
     this.initDVD(screen);
     this.buildTeacher(room, floor, box, paint, texture);
-    const notices = texture(1024, 560, ctx => {
+    const noticesStart = new Set(room.children);
+    const notices = texture(2048, 1120, ctx => {
+      ctx.scale(2,2);
       ctx.fillStyle = '#aa7952'; ctx.fillRect(0,0,1024,560);
       const cards = [
         ['CLASS OFFICERS', 'President: Nicole', 'Vice President: Vernie', 'Secretary: Charella', 'Muse: Riam'],
         ['SCHEDULE', '7:30   Filipino', '8:30   Mathematics', '9:30   Recess', '10:00  Science'],
-        ['PAALALA', 'Bawal magkalat.', 'Bawal kumain', 'sa loob ng klase.']
+        ['Rules ni Boy Bestfriend',
+          '1. Ayukong lalabas ka ng nakasando na kita ang bra mo.',
+          '2. Ayukong magagala na ng subrang igsi ng short mo at wala ka pang cycling.',
+          '3. Wag na wag kang magbibisyo.',
+          '4. Ayukong lage kang nagpupuyat sa walang kwentang dahilan.']
       ];
       cards.forEach(([title,...rows], i) => {
         const x = 26 + i * 330;
         ctx.fillStyle = ['#fff8cc','#f9f6ef','#e7f2df'][i]; ctx.fillRect(x,41,310,470);
         ctx.fillStyle = '#ab4637'; ctx.beginPath(); ctx.arc(x+155,55,7,0,Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#234941'; ctx.font = 'bold 30px sans-serif'; ctx.fillText(title,x+16,115);
-        ctx.font = '25px sans-serif'; rows.forEach((line,j) => ctx.fillText(line,x+16,195+j*63));
+        ctx.fillStyle = '#234941';
+        if(i===2){
+          ctx.font='bold 25px sans-serif';
+          ctx.fillText('Rules ni Boy',x+16,100);
+          ctx.fillText('Bestfriend',x+16,130);
+          ctx.font='20px sans-serif';
+          let y=165;
+          for(const rule of rows){
+            let line='';
+            for(const word of rule.split(' ')){
+              const next=line?line+' '+word:word;
+              if(line && ctx.measureText(next).width>278){ctx.fillText(line,x+16,y);y+=25;line=word;}
+              else line=next;
+            }
+            if(line){ctx.fillText(line,x+16,y);y+=25;}
+            y+=8;
+          }
+        }else{
+          ctx.font = 'bold 30px sans-serif'; ctx.fillText(title,x+16,115);
+          ctx.font = '25px sans-serif'; rows.forEach((line,j) => ctx.fillText(line,x+16,195+j*63));
+        }
       });
     });
     box(room, frame, -10.84, 2.9, -4, 0.2, 4.4, 8.4);
@@ -543,17 +521,21 @@ class DeskScene {
     panel(plaque, 2.36, .48, -10.715, 1.15, portraitZ, Math.PI/2);
 
 
+    this.groupFloatingObjects('floating-wall-displays', room.children.filter(o=>!noticesStart.has(o)));
+    const lightsStart = new Set(room.children);
     const tube = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff4d9, emissiveIntensity: 0.95 });
     for (const x of [-5.3, 5.3]) {
       box(room, silver, x, ceiling - .12, -5.2, 5, .24, .58);
       box(room, tube, x, ceiling - .31, -5.2, 4.8, .14, .24);
     }
+    this.groupFloatingObjects('floating-light-fixtures', room.children.filter(o=>!lightsStart.has(o)));
     this.classroomRotors = [];
     const fan = (x,y,z,wall) => {
       const mount = new THREE.Group();
       mount.position.set(x,y,z);
       if (wall) { mount.rotation.z = Math.PI/2; mount.scale.setScalar(0.57); }
       room.add(mount);
+      this.classroomFloatRoots.push(mount);
       box(mount, silver, 0, 0.35, 0, 0.12, 0.7, 0.12);
       const rotor = new THREE.Group(); mount.add(rotor);
       const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.26,0.23,0.28,16), frame);
@@ -573,6 +555,7 @@ class DeskScene {
     fan(0,9.24,-9,false); fan(0,9.24,1,false); fan(-10.48,6.3,2,true);
 
     // The viewer gets the same seat and legs as the class, without a tablet or its support.
+    const chairsStart = new Set(room.children);
     const seats = SEAT_SLOTS.filter(slot => slot !== VIEWER_SLOT);
     const chairBatch = (material, parts, slots=SEAT_SLOTS, castShadow=true) => {
       const mesh = new THREE.InstancedMesh(unitBox, material, slots.length * parts.length);
@@ -589,8 +572,11 @@ class DeskScene {
     for (const x of [-0.69,0.69]) for (const z of [-0.58,0.58]) supports.push([x,0.83,z,0.11,1.66,0.11]);
     chairBatch(this.chairMaterials.legs,supports,SEAT_SLOTS,false);
     chairBatch(this.chairMaterials.legs,[[0.77,2.13,-0.36,0.1,1.04,0.1]],seats,false);
+    this.groupFloatingObjects('floating-classroom-chairs', room.children.filter(o=>!chairsStart.has(o)));
     this.buildStudents(room, floor);
+    const absentStart = new Set(room.children);
     this.buildAbsentSeat(room, floor);
+    this.groupFloatingObjects('floating-absent-seat-details', room.children.filter(o=>!absentStart.has(o)));
 
     const glow = texture(128,128,ctx => {
       const g = ctx.createRadialGradient(64,64,0,64,64,64);
@@ -612,6 +598,15 @@ class DeskScene {
     const cloud = new THREE.BufferGeometry(); cloud.setAttribute('position',new THREE.BufferAttribute(positions,3));
     this.classroomDust = new THREE.Points(cloud,new THREE.PointsMaterial({map:glow,color:0xffd27a,size:0.055,transparent:true,opacity:0.65,blending:THREE.AdditiveBlending,depthWrite:false}));
     room.add(this.classroomDust);
+  }
+
+  groupFloatingObjects(name, objects) {
+    if(!objects.length)return null;
+    const group=new THREE.Group();group.name=name;
+    this.roomGroup.add(group);this.roomGroup.updateMatrixWorld(true);
+    objects.forEach(object=>group.attach(object));
+    this.classroomFloatRoots.push(group);
+    return group;
   }
 
 
@@ -776,6 +771,7 @@ class DeskScene {
       const person=this.buildStudent(student.look);
       person.position.set(slot.x,floor,slot.z);person.rotation.y=slot.yaw;
       person.name=student.id; room.add(person);
+      this.classroomFloatRoots.push(person);
       const parts=person.userData.parts;
       // Stable id hash supplies a fixed +/-3 degree head tilt without per-frame randomness.
       let seed=17; for (const char of student.id) seed=(seed*31+char.charCodeAt(0))>>>0;
@@ -789,6 +785,7 @@ class DeskScene {
   }
 
   buildExtras(room, floor) {
+    const extrasStart = new Set(room.children);
     this.extras=[];this.extraSightlineSkips=[];this.extraBatches=[];
     const targets=[],point=new THREE.Vector3(),origin=new THREE.Vector3(CameraRig.SEAT_POSE.x,CameraRig.SEAT_POSE.y,CameraRig.SEAT_POSE.z);
     const frontDesk=new THREE.Matrix4().makeRotationY(Math.PI);frontDesk.setPosition(0,0,-11.55);
@@ -836,6 +833,7 @@ class DeskScene {
       data.matrices.forEach((matrix,i)=>mesh.setMatrixAt(i,matrix));mesh.receiveShadow=true;mesh.castShadow=false;
       mesh.name='still-student-extras';room.add(mesh);this.extraBatches.push(mesh);
     }
+    this.groupFloatingObjects('floating-student-extras', room.children.filter(o=>!extrasStart.has(o)));
   }
 
   buildStudentBags(room, floor) {
@@ -1021,6 +1019,7 @@ class DeskScene {
   buildTeacher(room, floor, box, paint, texture) {
     const black = paint(Theme.ink), mint = this.chairMaterials.plank;
     const teacherChair = new THREE.Group(); room.add(teacherChair);
+    this.classroomFloatRoots.push(teacherChair);
     teacherChair.position.set(0,0,-.68);
     box(teacherChair,mint,0,floor+1.74,-13.44,1.82,.18,1.4);
     box(teacherChair,mint,0,floor+3.05,-14.02,1.82,2.4,.16);
@@ -1031,7 +1030,8 @@ class DeskScene {
     const person = new THREE.Group();
     person.position.set(0,floor - 1.5,-14.22); person.rotation.y = 0;
     this.teacher = person;
-    person.userData.type = 'teacher'; room.add(person);
+    this.classroomFloatRoots.push(person);
+    person.userData.type = 'teacher'; room.add(person); 
     const skin = paint(0xb98058), slacks = paint(0x35373d), hair = paint(0x242021);
     this.teacherJacket = paint(Theme.ink);
     const oval = (parent, material, x,y,z, w,h,d) => {
@@ -1125,7 +1125,7 @@ class DeskScene {
     const material=new THREE.MeshBasicMaterial({map,transparent:true,depthWrite:false,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-1});
     const layer=this.whiteboardDrawingLayer=new THREE.Mesh(this.whiteboardFace.geometry,material);
     layer.name='whiteboard-drawing-layer';layer.position.copy(this.whiteboardFace.position);layer.position.z+=.014;layer.raycast=()=>{};
-    this.roomGroup.add(layer);return map;
+    this.whiteboardFace.parent.add(layer);return map;
   }
 
   moveTableContents(roomObjects) {
@@ -2378,6 +2378,8 @@ createThemeBook(member) {
 
   handleObjectClick(obj) {
     if (this.interactionBlocked()) return;
+    // Restore exact object poses before starting another prop or camera animation.
+    if(this.isFloating){this.stopAntiGravity();this.finishAntiGravityReset();}
     if(this.experiences?.handleClick(obj))return;
     const type = obj.userData.type;
     if (type==='student-extra' || type==='absent-seat') return;
@@ -2755,10 +2757,27 @@ createThemeBook(member) {
     return this.antiGravityHomes?.get(obj);
   }
 
+  getFloatingObjects() {
+    const candidates=[this.deskGroup,...this.classroomFloatRoots,
+      ...(this.studentBags||[]).map(bag=>bag.mesh)];
+    const extras=this.experiences;
+    if(extras){
+      for(const scrap of extras.scraps||[])if(!scrap.collected)candidates.push(scrap.mesh,scrap.hit);
+      candidates.push(extras.ball,extras.banner);
+      for(const actor of Object.values(extras.actors||{}))if(actor.group.visible)candidates.push(actor.group);
+    }
+    const roots=[...new Set(candidates.filter(object=>object?.parent && object.visible))];
+    // Only move the outer assembly; its artwork, geometry and hitboxes follow together.
+    return roots.filter(object=>{
+      for(let parent=object.parent;parent;parent=parent.parent)if(roots.includes(parent))return false;
+      return true;
+    });
+  }
+
   snapshotAntiGravityHomes() {
     this.antiGravityHomes=new Map();
     this.antiGravityMaterials=new Map();
-    this.deskGroup.traverse(obj=>{
+    const remember=obj=>{
       this.antiGravityHomes.set(obj,{position:obj.position.clone(),rotation:obj.rotation.clone(),scale:obj.scale.clone(),
         castShadow:obj.castShadow,receiveShadow:obj.receiveShadow,material:obj.material,
         materials:Array.isArray(obj.material)?obj.material.slice():null});
@@ -2770,7 +2789,9 @@ createThemeBook(member) {
         if(material.emissive)state.emissive=material.emissive.clone();
         this.antiGravityMaterials.set(material,state);
       }
-    });
+    };
+    this.antiGravityRoots=this.getFloatingObjects();
+    for(const root of this.antiGravityRoots)root.traverse(remember);
   }
 
   finishAntiGravityReset() {
@@ -2790,13 +2811,13 @@ createThemeBook(member) {
       }
       if(changed)material.needsUpdate=true;
     });
-    this.deskGroup.updateMatrixWorld(true);
+    this.scene.updateMatrixWorld(true);
     this.antiGravityLanding=false;
     this.renderer.shadowMap.needsUpdate=true;
   }
 
   triggerAntiGravity() {
-    if(this.isFloating)return;
+    if(this.isFloating || !this.renderer || this.interactionBlocked())return;
     // A quick restart finishes the previous landing before taking a new snapshot.
     if(this.antiGravityLanding)this.finishAntiGravityReset();
     this.snapshotAntiGravityHomes();
@@ -2804,18 +2825,21 @@ createThemeBook(member) {
 
     if (window.PortfolioHumor) {
       window.PortfolioHumor.playSound('fanfare');
-      window.PortfolioHumor.showToast('?? ZERO-G MODE ENGAGED! Desk is floating in zero gravity. Press "E" to toggle.');
+      window.PortfolioHumor.showToast('ZERO-G! The whole classroom is floating. Press E to restore gravity.');
     }
 
     if (typeof gsap !== 'undefined') {
-      const home=this.getHomePose(this.deskGroup);
       const float=(target,vars)=>this.antiGravityTweens.push(gsap.to(target,vars));
-      float(this.deskGroup.position,{y:home.position.y+2.2,duration:2.2,repeat:-1,yoyo:true,ease:'sine.inOut'});
-      float(this.deskGroup.rotation,{x:home.rotation.x+.08,z:home.rotation.z-.06,duration:3.2,repeat:-1,yoyo:true,ease:'sine.inOut'});
-      this.folders.forEach((f,idx)=>{
-        const pose=this.getHomePose(f.mesh);
-        float(f.mesh.position,{y:pose.position.y+.6+idx*.12,duration:2+idx*.3,repeat:-1,yoyo:true,ease:'sine.inOut'});
-        float(f.mesh.rotation,{y:pose.rotation.y+.35,duration:2.8+idx*.4,repeat:-1,yoyo:true,ease:'sine.inOut'});
+      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      this.antiGravityRoots.forEach((object,index)=>{
+        const home=this.getHomePose(object);
+        const lift=object===this.deskGroup ? 2.2 :
+          (object.position.y>7||object.name==='floating-light-fixtures' ? -.8 : .7+(index%5)*.19);
+        // Shared assemblies retain their local geometry, including invisible hitboxes.
+        float(object.position,{y:home.position.y+lift,duration:reduced ? .3 : 2.1+(index%7)*.17,
+          repeat:reduced?0:-1,yoyo:!reduced,ease:'sine.inOut'});
+        if(!reduced)float(object.rotation,{x:home.rotation.x+.025,z:home.rotation.z+(index%2?-.035:.035),
+          duration:3+(index%5)*.23,repeat:-1,yoyo:true,ease:'sine.inOut'});
       });
     }
   }
@@ -2825,12 +2849,12 @@ createThemeBook(member) {
     this.isFloating = false;
     if (window.PortfolioHumor) {
       window.PortfolioHumor.playSound('pop');
-      window.PortfolioHumor.showToast('?? Gravity Restored: Desk back on the ground.');
+      window.PortfolioHumor.showToast('Gravity restored. Everything is back in its place.');
     }
     for(const tween of this.antiGravityTweens)tween.kill();
     this.antiGravityTweens.length=0;
     this.antiGravityLanding=true;
-    if(typeof gsap==='undefined'){this.finishAntiGravityReset();return;}
+    if(typeof gsap==='undefined'||matchMedia('(prefers-reduced-motion: reduce)').matches){this.finishAntiGravityReset();return;}
     this.antiGravityHomes.forEach((home,obj)=>{
       for(const key of ['position','rotation','scale']) {
         const target=obj[key],pose=home[key];

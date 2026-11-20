@@ -19,12 +19,14 @@ public class VisitController {
 
     @PostMapping("/api/visit")
     public ResponseEntity<Map<String, Object>> recordVisit() {
-        int newCount = counterService.incrementAndGet();
-        String joke = counterService.getVisitorJoke(newCount);
-        return ResponseEntity.ok(Map.of(
-                "count", newCount,
-                "message", joke
-        ));
+        try {
+            int newCount = counterService.incrementAndGet();
+            String joke = counterService.getVisitorJoke(newCount);
+            return ResponseEntity.ok(Map.of("count", newCount, "message", joke));
+        } catch (IllegalStateException | ArithmeticException e) {
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Failed to save visitor count."));
+        }
     }
 
     @GetMapping("/api/visit")

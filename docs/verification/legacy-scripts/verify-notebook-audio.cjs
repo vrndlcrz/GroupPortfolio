@@ -17,12 +17,12 @@ const assert = require('node:assert/strict');
       window.__timings=[];
     });
     await page.route('**/api/visit',route=>route.fulfill({json:{count:1}}));
-    await page.route('**/js/book.js',async route=>{
+    await page.route('**/js/portfolio/book.js',async route=>{
       const response=await route.fetch();let body=(await response.text()).replace('this.initDOM();','window.__book=this;this.initDOM();');
       body+='\nfor(const name of ["open","prepareMusic"]) {const original=ClearBook.prototype[name];ClearBook.prototype[name]=function(...args){const start=performance.now();try{return original.apply(this,args);}finally{__timings.push({name,ms:performance.now()-start});}}}';
       await route.fulfill({response,body});
     });
-    await page.route('**/js/scene.js',async route=>{
+    await page.route('**/js/classroom/scene.js',async route=>{
       const response=await route.fetch();let body=(await response.text()).replace('this.init();','window.__desk=this;this.init();');
       body+='\nconst originalSelect=DeskScene.prototype.selectFolder;DeskScene.prototype.selectFolder=function(...args){const start=performance.now();try{return originalSelect.apply(this,args);}finally{__timings.push({name:"selectFolder",ms:performance.now()-start});}}';
       await route.fulfill({response,body});
