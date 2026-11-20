@@ -205,6 +205,7 @@ class ClearBook {
     this.pagesElements = pages.pagesElements;
     this.dotsElements = pages.dotsElements;
     this.totalPages = pages.totalPages;
+    this.hasBackCover = pages.hasBackCover;
     this.overlayElement.classList.add('active');
     this.updatePageStates();
   }
@@ -416,8 +417,8 @@ class ClearBook {
       }
     }
 
-    // Page 7: Back Cover
-    if (!looseSheets) pageConfigs.push({
+    // Member 1 finishes on the last numbered notebook page.
+    if (!looseSheets && !(isSpiral && member.id === 1)) pageConfigs.push({
       type: 'back-cover',
       title: 'Back Cover'
     });
@@ -835,13 +836,14 @@ class ClearBook {
       dotsContainer.appendChild(dot);
       dotsElements.push(dot);
     });
-    return { pagesElements, dotsElements, deck: Array.from(deckElement.children), totalPages };
+    return { pagesElements, dotsElements, deck: Array.from(deckElement.children), totalPages,
+      hasBackCover: pageConfigs.at(-1)?.type === 'back-cover' };
   }
 
   updatePageStates() {
     this.bookContainer.classList.toggle('john-first-spread', false);
     this.bookContainer.classList.toggle('is-cover', this.isSpiral && this.currentPageIndex === 0);
-    this.bookContainer.classList.toggle('is-back', this.isSpiral && this.currentPageIndex === this.totalPages - 1);
+    this.bookContainer.classList.toggle('is-back', this.isSpiral && this.hasBackCover && this.currentPageIndex === this.totalPages - 1);
     this.pagesElements.forEach((pageEl, idx) => {
       if (this.isSpiral) pageEl.classList.toggle('visible-verso', idx === this.currentPageIndex - 1);
       pageEl.classList.remove('flipped', 'active-page', 'next-page');
@@ -959,8 +961,8 @@ class ClearBook {
   }
 
   turnSpiral(destination) {
-    const wasClosed = this.currentPageIndex === 0 || this.currentPageIndex === this.totalPages - 1;
-    const willClose = destination === 0 || destination === this.totalPages - 1;
+    const wasClosed = this.currentPageIndex === 0 || (this.hasBackCover && this.currentPageIndex === this.totalPages - 1);
+    const willClose = destination === 0 || (this.hasBackCover && destination === this.totalPages - 1);
     const forward = destination > this.currentPageIndex;
     const leaf = this.pagesElements[forward ? this.currentPageIndex : destination];
     const shadow = this.deckElement.querySelector('.spiral-shadow');
