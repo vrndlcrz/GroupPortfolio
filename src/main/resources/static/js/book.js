@@ -1060,7 +1060,7 @@ class ClearBook {
             </div>
             <div class="school-form-row">
               <span class="school-field-label">SUBJECT</span>
-              <span class="school-field-line"><span class="student-handwriting">${member.subject || 'Advanced Emerging Technologies'}</span></span>
+              <span class="school-field-line"><span class="student-handwriting">${member.subject || 'Application and Emerging Technologies'}</span></span>
             </div>
             <div class="school-form-row">
               <span class="school-field-label">GRADE / LEVEL</span>
@@ -1658,7 +1658,7 @@ class ClearBook {
             <div class="letterhead-top">
               <div class="letterhead-brand">
                 <h3>${fullName}</h3>
-                <span class="letterhead-sub">BSIT 3-1 &bull; Advanced Emerging Technologies</span>
+                <span class="letterhead-sub">BSIT 3-1 &bull; Application and Emerging Technologies</span>
               </div>
               <div class="letterhead-seal">BSIT 3-1</div>
             </div>
@@ -1704,7 +1704,7 @@ class ClearBook {
         <div class="back-cover-subtitle">Thank you for visiting my Sta. John Gi Academy notebook.</div>
         <div class="nicole-credits-card">
           <h4>Sean Dyogi Truthers &bull; Group 1</h4>
-          <p>Advanced Emerging Technologies</p>
+          <p>Application and Emerging Technologies</p>
           <p class="craft-note">Sta. John Gi Academy Official Student Notebook</p>
         </div>
         <div class="back-cover-motto">&ldquo;Always choose quality over quantity.&rdquo;</div>
